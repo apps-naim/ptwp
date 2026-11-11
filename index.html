@@ -950,12 +950,12 @@ function preserveMatchMeta(oldMatches,newMatches){
   const map={};
   oldMatches.forEach(m=>{(m.partai||[]).forEach(p=>{const key=`${m.timA}|${m.timB}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;if(!map[key]) map[key]={hari:m.hari,tgl:m.tgl,jam:m.jam,lapangan:m.lapangan,lokasiLapangan:m.lokasiLapangan};});});
   newMatches.forEach(m=>{(m.partai||[]).forEach(p=>{const key=`${m.timA}|${m.timB}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;if(map[key]&&map[key].tgl){m.hari=map[key].hari;m.tgl=map[key].tgl;m.jam=map[key].jam;m.lapangan=map[key].lapangan;m.lokasiLapangan=map[key].lokasiLapangan;}});});}
-
+}
 function preserveScores(oldMatches,newMatches){
   const map={};
   oldMatches.forEach(m=>{(m.partai||[]).forEach(p=>{if(!p.menang&&!p.skor) return;const key=`${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;const revKey=`${m.timB}|${m.timA}|${p.kode}|${p.jenis}|${(p.pemainB||[]).join('&')}|${(p.pemainA||[]).join('&')}`;map[key]={menang:p.menang,skor:p.skor||''};if(p.menang==='A') map[revKey]={menang:'B',skor:flipSkor(p.skor||'')};else if(p.menang==='B') map[revKey]={menang:'A',skor:flipSkor(p.skor||'')};});});
   newMatches.forEach(m=>{(m.partai||[]).forEach(p=>{const key=`${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;if(map[key]){p.menang=map[key].menang;p.skor=map[key].skor;}});});}
-}
+
 
 async function autoRegenerateSchedule(eventId,katId,opts){
   opts = opts || {};
