@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id" data-theme="light">
 <head>
 <link rel="icon" type="image/x-icon" href="/tennis.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0fa958">
 <title>PTWP PTA Sulawesi Barat — Turnamen Tenis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://rtrejyxdwldhygcnmmvm.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--radius:18px;--font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif}
 [data-theme="dark"]{--bg:#070d16;--bg2:#0b1524;--panel:#0e1b2b;--panel2:#14263c;--text:#e9f2f7;--muted:#89a2b8;--line:#1d3250;--accent:#2ee07a;--accent2:#b8e62e;--danger:#f87171;--purple:#a78bfa;--pink:#f472b6;--blue:#38bdf8;--orange:#f97316;--shadow:0 22px 45px -28px rgba(0,0,0,.9);--glow:0 10px 30px -12px rgba(46,224,122,.55)}
 [data-theme="light"]{--bg:#f1f6f3;--bg2:#ffffff;--panel:#ffffff;--panel2:#f5faf7;--text:#0c1b26;--muted:#5d7488;--line:#dfeae4;--accent:#0fa958;--accent2:#7cb518;--danger:#dc2626;--purple:#7c3aed;--pink:#db2777;--blue:#0284c7;--orange:#ea580c;--shadow:0 20px 40px -28px rgba(12,27,38,.45);--glow:0 10px 26px -12px rgba(15,169,88,.45)}
 html{scroll-behavior:smooth;scroll-padding-top:96px}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;transition:background .35s ease,color .35s ease;background-image:radial-gradient(900px 480px at 8% -12%, color-mix(in srgb,var(--accent) 18%, transparent), transparent 62%),radial-gradient(720px 420px at 100% 0%, color-mix(in srgb,var(--accent2) 14%, transparent), transparent 58%);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;transition:background .35s ease,color .35s ease;background-image:radial-gradient(900px 480px at 8% -12%, color-mix(in srgb,var(--accent) 18%, transparent), transparent 62%),radial-gradient(720px 420px at 100% 0%, color-mix(in srgb,var(--accent2) 14%, transparent), transparent 58%);background-attachment:fixed;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 .wrap{width:min(1240px,100% - 36px);margin-inline:auto}
 .muted{color:var(--muted)}
@@ -32,6 +32,7 @@ a{color:inherit;text-decoration:none}
 .nav{margin-left:auto;display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 .nav a{font-size:13px;font-weight:700;padding:9px 14px;border-radius:11px;color:var(--muted);transition:.2s;white-space:nowrap;cursor:pointer}
 .nav a:hover,.nav a.active{color:var(--text);background:var(--panel2)}
+.nav a.active{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel2))}
 .icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;font-size:17px;display:grid;place-items:center;transition:.2s;flex:none}
 .icon-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
 .admin-chip{display:none;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:6px 11px;border-radius:999px;background:var(--accent);color:#04170d;letter-spacing:.4px;border:0;cursor:pointer;font-family:inherit}
@@ -79,10 +80,10 @@ body.admin .admin-chip{display:inline-flex}
 .day-heading span{margin-left:auto;font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:none}
 .filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
 .filter-bar .lbl{font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-right:2px}
-.filter-select,.filter-input{font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 30px 8px 11px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2389a2b8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:.2s;min-width:0}
+.filter-select,.filter-input{font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 30px 8px 11px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%235d7488' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:.2s;min-width:0}
 .filter-input{background-image:none;padding-right:11px;cursor:text}
 .filter-input[type="date"]{background-image:none}
-.filter-input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.6);cursor:pointer}
+.filter-input[type="date"]::-webkit-calendar-picker-indicator{opacity:.6;cursor:pointer}
 .filter-select:focus,.filter-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)}
 .filter-input::placeholder{color:var(--muted);font-weight:600}
 .filter-search{flex:1;min-width:140px;max-width:260px}
@@ -101,6 +102,8 @@ body.admin .admin-chip{display:inline-flex}
 .chip.pool{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 8%,transparent)}
 .chip.ko{color:var(--purple);border-color:color-mix(in srgb,var(--purple) 45%,transparent);background:color-mix(in srgb,var(--purple) 8%,transparent)}
 .chip.manual{color:var(--purple);border-color:color-mix(in srgb,var(--purple) 45%,transparent);background:color-mix(in srgb,var(--purple) 10%,transparent)}
+.chip.seed{color:var(--orange);border-color:color-mix(in srgb,var(--orange) 45%,transparent);background:color-mix(in srgb,var(--orange) 10%,transparent)}
+.chip.bye{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 10%,transparent)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 .match-meta{font-size:10.5px;color:var(--muted);font-weight:600;margin-left:auto;letter-spacing:.2px;text-align:right;line-height:1.35}
 .match-meta .mloc{display:block;font-size:9.5px;color:color-mix(in srgb,var(--muted) 80%,transparent);font-weight:500;margin-top:1px}
@@ -185,19 +188,19 @@ body.admin .admin-chip{display:inline-flex}
 .kat-tag.kompetisi{background:color-mix(in srgb,var(--accent2) 18%,transparent);color:var(--accent2)}
 .kat-tag.penyisihan{background:color-mix(in srgb,var(--purple) 16%,transparent);color:var(--purple)}
 .kat-tag.gugur{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
-.site-footer{margin-top:50px;border-top:1px solid var(--line);padding:26px 0 34px;background:color-mix(in srgb,var(--bg2) 55%,transparent)}
+.site-footer{margin-top:50px;border-top:1px solid var(--line);padding:26px 0 34px;background:color-mix(in srgb,var(--bg2) 55%,transparent);padding-bottom:calc(34px + env(safe-area-inset-bottom))}
 .footer-inner{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between}
 .footer-inner p{font-size:12.5px;color:var(--muted);line-height:1.7}
 .footer-inner strong{color:var(--text)}
-.login-dot{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:grid;place-items:center;transition:.25s;position:relative}
+.login-dot{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:grid;place-items:center;transition:.25s;position:relative}
 .login-dot:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--glow)}
 .login-dot.on{color:#04170d;background:var(--accent);border-color:transparent}
 .login-dot.on::after{content:"";position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:#22c55e;border:2px solid var(--bg)}
 .modal{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:20px;background:rgba(4,10,18,.72);backdrop-filter:blur(7px)}
 .modal.open{display:grid;animation:fade .2s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-.modal-card{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 40px 80px -30px rgba(0,0,0,.85);position:relative;animation:pop .25s cubic-bezier(.2,.9,.3,1.2)}
-.modal-card.wide{width:min(900px,100%);max-height:92vh;overflow-y:auto}
+.modal-card{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 40px 80px -30px rgba(0,0,0,.85);position:relative;animation:pop .25s cubic-bezier(.2,.9,.3,1.2);max-height:92vh;overflow-y:auto}
+.modal-card.wide{width:min(900px,100%)}
 @keyframes pop{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 .modal-card h3{font-size:19px;letter-spacing:-.6px;display:flex;align-items:center;gap:9px;margin-bottom:4px}
 .modal-card .sub{font-size:12.5px;color:var(--muted);margin-top:6px;margin-bottom:18px;line-height:1.6}
@@ -219,7 +222,7 @@ body.admin .admin-chip{display:inline-flex}
 .btn-danger{font-family:inherit;font-size:12px;font-weight:700;padding:9px 14px;border-radius:10px;border:1px solid color-mix(in srgb,var(--danger) 40%,transparent);background:color-mix(in srgb,var(--danger) 10%,transparent);color:var(--danger);cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
 .btn-danger:hover{background:var(--danger);color:#fff}
 .err{font-size:12px;color:var(--danger);font-weight:700;min-height:18px;margin-bottom:8px}
-.modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;font-size:16px;line-height:1;display:grid;place-items:center}
+.modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;font-size:16px;line-height:1;display:grid;place-items:center;z-index:5}
 .modal-close:hover{color:var(--text);border-color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,90px);z-index:400;background:var(--panel);border:1px solid var(--accent);color:var(--text);padding:13px 22px;border-radius:14px;font-size:13px;font-weight:700;box-shadow:0 24px 50px -20px rgba(0,0,0,.7);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.2);pointer-events:none;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 .toast.show{transform:translate(-50%,0);opacity:1}
@@ -251,7 +254,7 @@ body.admin .admin-chip{display:inline-flex}
 .astat span{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:800}
 .admin-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .admin-toolbar .grow{flex:1}
-.admin-table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px}
+.admin-table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px;overflow-x:auto}
 .admin-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .admin-table th{text-align:left;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);font-weight:800;background:var(--panel2);white-space:nowrap}
 .admin-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -298,15 +301,21 @@ body.admin .admin-chip{display:inline-flex}
 .peserta-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .peserta-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 8px 5px 10px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--text);flex-wrap:wrap}
 .peserta-chip.manual{border-color:color-mix(in srgb,var(--purple) 50%,var(--line));background:color-mix(in srgb,var(--purple) 8%,var(--panel2))}
+.peserta-chip.seeded{border-color:color-mix(in srgb,var(--orange) 60%,var(--line));background:color-mix(in srgb,var(--orange) 10%,var(--panel2))}
+.peserta-chip.bye{border-color:color-mix(in srgb,var(--blue) 60%,var(--line));background:color-mix(in srgb,var(--blue) 10%,var(--panel2))}
 .peserta-chip .x{width:16px;height:16px;border-radius:4px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;line-height:1;display:grid;place-items:center;padding:0}
 .peserta-chip .x:hover{color:var(--danger)}
 .peserta-chip .c{width:8px;height:8px;border-radius:50%;flex:none}
 .peserta-chip .m-tag{font-size:8.5px;font-weight:800;padding:1px 5px;border-radius:3px;background:color-mix(in srgb,var(--purple) 20%,transparent);color:var(--purple);letter-spacing:.5px}
+.peserta-chip .seed-badge{font-size:8.5px;font-weight:800;padding:1px 5px;border-radius:3px;background:var(--orange);color:#fff;letter-spacing:.5px}
+.peserta-chip .bye-badge{font-size:8.5px;font-weight:800;padding:1px 5px;border-radius:3px;background:var(--blue);color:#fff;letter-spacing:.5px}
 .peserta-empty{font-size:11.5px;color:var(--muted);font-style:italic;padding:8px 0}
 .auto-note{padding:10px 12px;background:color-mix(in srgb,var(--accent) 8%,transparent);border-left:3px solid var(--accent);border-radius:6px;font-size:11.5px;margin-bottom:14px;color:var(--text);line-height:1.5}
 .auto-note b{color:var(--accent)}
 .manual-note{padding:10px 12px;background:color-mix(in srgb,var(--purple) 8%,transparent);border-left:3px solid var(--purple);border-radius:6px;font-size:11.5px;margin-bottom:14px;color:var(--text);line-height:1.5}
 .manual-note b{color:var(--purple)}
+.seed-note{padding:10px 12px;background:color-mix(in srgb,var(--orange) 8%,transparent);border-left:3px solid var(--orange);border-radius:6px;font-size:11.5px;margin-bottom:14px;color:var(--text);line-height:1.5}
+.seed-note b{color:var(--orange)}
 .pool-assign-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:12px}
 .pool-assign-card{border:1px solid var(--line);border-radius:12px;background:var(--panel2);overflow:hidden}
 .pool-assign-head{padding:8px 12px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 20%,transparent),color-mix(in srgb,var(--accent2) 15%,transparent));font-weight:800;font-size:12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
@@ -353,6 +362,20 @@ body.admin .admin-chip{display:inline-flex}
 .pe-result{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .pe-result .field{margin-bottom:0}
 .pe-result .field label{font-size:9.5px}
+/* SEED & BYE UI */
+.seed-bye-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.seed-bye-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+.seed-bye-row.is-seeded{border-color:color-mix(in srgb,var(--orange) 50%,var(--line));background:color-mix(in srgb,var(--orange) 6%,var(--panel2))}
+.seed-bye-row.is-bye{border-color:color-mix(in srgb,var(--blue) 50%,var(--line));background:color-mix(in srgb,var(--blue) 6%,var(--panel2))}
+.seed-name{font-weight:700;font-size:12.5px;line-height:1.3;word-break:break-word}
+.seed-select{font-family:inherit;font-size:11px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;min-width:80px}
+.seed-select:focus{outline:none;border-color:var(--orange)}
+.bye-toggle{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;cursor:pointer;padding:6px 10px;border-radius:8px;background:var(--panel);border:1px solid var(--line);white-space:nowrap;user-select:none;transition:.15s}
+.bye-toggle input{width:14px;height:14px;accent-color:var(--blue);cursor:pointer;margin:0}
+.bye-toggle.checked{background:color-mix(in srgb,var(--blue) 15%,var(--panel));border-color:var(--blue);color:var(--blue)}
+.bye-toggle.checked input{accent-color:var(--blue)}
+.seed-info-bar{padding:8px 12px;background:color-mix(in srgb,var(--orange) 8%,transparent);border-left:3px solid var(--orange);border-radius:6px;font-size:11.5px;margin-bottom:10px;color:var(--text);line-height:1.5}
+.seed-info-bar b{color:var(--orange)}
 .loading-screen{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:var(--bg);color:var(--text);font-family:var(--font)}
 .loading-inner{text-align:center;max-width:400px;padding:24px}
 .loading-inner .spinner{font-size:56px;margin-bottom:16px;display:inline-block;animation:spin 2s linear infinite}
@@ -379,10 +402,6 @@ body.admin .admin-chip{display:inline-flex}
 .bracket-team.win{font-weight:800;color:var(--accent)}
 .bracket-team.tbd{color:var(--muted);font-style:italic}
 .bracket-team .skor{font-size:10px;color:var(--muted);margin-left:4px}
-@media (max-width:1200px){.grid.satker,.grid.pemain{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:960px){#jadwalList{grid-template-columns:repeat(2,1fr)}.grid.satker,.grid.pemain{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:900px){.header-inner{padding:10px 0}.nav{order:3;width:100%;margin-left:0;overflow-x:auto;padding-bottom:3px}.nav::-webkit-scrollbar{display:none}.brand strong{font-size:14px}.hero{padding:56px 0 40px}.hero-bg{background-attachment:scroll}.hero-ball.b1{width:60px;height:60px;top:12%;right:5%}.hero-ball.b2{width:38px;height:38px;opacity:.6}.hero-ball.b3{display:none}.admin-panel{flex-direction:column}.admin-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:0;border-right:0;border-bottom:1px solid var(--line)}.admin-brand{display:none}.admin-nav{display:flex;padding:0;flex:1;overflow-x:auto}.admin-nav .sec-label{display:none}.admin-nav button{white-space:nowrap;padding:13px 15px;border-left:0;border-bottom:3px solid transparent}.admin-nav button.active{border-left:0;border-bottom-color:var(--accent)}.admin-sidebar-foot{flex-direction:row;padding:7px;border-top:0;border-left:1px solid var(--line)}.admin-sidebar-foot button{padding:7px 11px;font-size:10.5px}.admin-main{padding:16px}.admin-page-head h2{font-size:20px}.filter-search{max-width:none}}
-@media (max-width:640px){#jadwalList{grid-template-columns:1fr}.grid.satker,.grid.pemain{grid-template-columns:1fr}.partai{grid-template-columns:1fr auto 1fr}.duel .t{font-size:12px}.duel .sc{font-size:16px;padding:4px 10px}.table th,.table td{padding:9px 7px;font-size:12px}.hide-sm{display:none}.form-grid{grid-template-columns:1fr}.event-grid,.kat-grid{grid-template-columns:1fr}.pe-cols,.pe-result{grid-template-columns:1fr}.pool-assign-grid{grid-template-columns:1fr}.court-row{grid-template-columns:1fr 1fr auto}.filter-bar,.print-filter-bar{padding:10px}.filter-select,.filter-input{flex:1;min-width:110px}.filter-search{max-width:none;min-width:100%}.hero-ball{display:none}.hero{padding:42px 0 32px}}
 .global-loader{position:fixed;top:0;left:0;right:0;height:3px;z-index:9998;background:transparent;pointer-events:none;opacity:0;transition:opacity .25s}
 .global-loader.active{opacity:1}
 .global-loader::after{content:"";position:absolute;top:0;left:0;height:100%;width:35%;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);animation:loaderSlide 1.1s ease-in-out infinite;border-radius:2px}
@@ -397,6 +416,142 @@ body.admin .admin-chip{display:inline-flex}
 .btn-ghost.btn-loading::after,.btn-danger.btn-loading::after{border-color:color-mix(in srgb,currentColor 30%,transparent);border-top-color:currentColor}
 .icon-act.loading{opacity:.5;pointer-events:none;position:relative}
 .icon-act.loading::after{content:"";position:absolute;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:btnSpin .6s linear infinite;top:50%;left:50%;margin:-6px 0 0 -6px}
+/* ============ RESPONSIVE ============ */
+@media (max-width:1200px){.grid.satker,.grid.pemain{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:960px){#jadwalList{grid-template-columns:repeat(2,1fr)}.grid.satker,.grid.pemain{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:900px){
+  .header-inner{padding:9px 0;gap:9px}
+  .nav{order:3;width:100%;margin-left:0;overflow-x:auto;padding-bottom:3px;gap:2px;-webkit-overflow-scrolling:touch}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{padding:8px 13px;font-size:12.5px;flex:none}
+  .brand strong{font-size:14px}
+  .hero{padding:56px 0 40px}
+  .hero-bg{background-attachment:scroll}
+  .hero-ball.b1{width:60px;height:60px;top:12%;right:5%}
+  .hero-ball.b2{width:38px;height:38px;opacity:.6}
+  .hero-ball.b3{display:none}
+  .admin-panel{flex-direction:column}
+  .admin-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:0;border-right:0;border-bottom:1px solid var(--line)}
+  .admin-brand{display:none}
+  .admin-nav{display:flex;padding:0;flex:1;overflow-x:auto}
+  .admin-nav .sec-label{display:none}
+  .admin-nav button{white-space:nowrap;padding:13px 15px;border-left:0;border-bottom:3px solid transparent;min-height:44px}
+  .admin-nav button.active{border-left:0;border-bottom-color:var(--accent)}
+  .admin-sidebar-foot{flex-direction:row;padding:7px;border-top:0;border-left:1px solid var(--line);gap:5px}
+  .admin-sidebar-foot button{padding:8px 11px;font-size:10.5px;min-height:38px}
+  .admin-main{padding:16px}
+  .admin-page-head h2{font-size:20px}
+  .filter-search{max-width:none}
+}
+@media (max-width:768px){
+  .site-header .header-inner{padding:8px 0;gap:8px}
+  .brand-mark{width:38px;height:38px;border-radius:11px;font-size:18px}
+  .brand strong{font-size:13px}
+  .brand span{font-size:9.5px;letter-spacing:.9px}
+  .icon-btn{width:38px;height:38px;border-radius:10px;font-size:15px}
+  .hero{padding:42px 0 32px}
+  .hero h1{font-size:clamp(24px,7vw,34px);letter-spacing:-1.2px}
+  .hero p.lead{font-size:13px;line-height:1.6;margin-top:12px}
+  .tagline{font-size:10px;padding:6px 11px;letter-spacing:1.1px;margin-bottom:16px}
+  .stats{gap:8px;margin-top:20px}
+  .stat{padding:11px 13px;border-radius:12px;min-width:100px}
+  .stat b{font-size:20px}
+  .stat span{font-size:9.5px;letter-spacing:.8px}
+  .event-tab{padding:9px 13px;font-size:12px;border-radius:10px}
+  .event-tab small{font-size:9.5px}
+  .match{padding:13px 14px;border-radius:14px}
+  .duel .t{font-size:12.5px}
+  .duel .sc{font-size:16px;padding:3px 10px}
+  .partai{padding:8px 10px;border-radius:10px}
+  .pside{font-size:11px}
+  .filter-bar{padding:9px 10px;gap:6px;border-radius:11px}
+  .filter-bar .lbl{font-size:9.5px}
+  .filter-select,.filter-input{padding:8px 26px 8px 10px;font-size:12px;border-radius:9px}
+  .admin-page-head h2{font-size:18px}
+  .admin-table{font-size:11.5px;min-width:520px}
+  .admin-table th,.admin-table td{padding:8px 10px}
+  .admin-stats{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+  .astat{padding:12px}
+  .astat b{font-size:22px}
+  .astat span{font-size:9px}
+  .form-grid{grid-template-columns:1fr}
+  .event-grid,.kat-grid{grid-template-columns:1fr}
+  .cetak-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .tb-card{padding:14px}
+  .bracket-round{min-width:130px}
+  .footer-inner{gap:10px}
+  .footer-inner p{font-size:11.5px}
+  .modal-card{padding:22px 20px;border-radius:18px}
+  .modal-card h3{font-size:17px}
+  .btn-primary{padding:12px}
+  .seed-bye-row{padding:7px 9px;gap:6px}
+  .seed-select{min-width:70px;font-size:10.5px;padding:5px 6px}
+  .bye-toggle{font-size:10.5px;padding:5px 8px}
+  .bye-toggle input{width:13px;height:13px}
+  .peserta-chip{font-size:11px;padding:4px 7px 4px 9px}
+}
+@media (max-width:640px){
+  .wrap{width:calc(100% - 24px)}
+  #jadwalList{grid-template-columns:1fr}
+  .grid.satker,.grid.pemain{grid-template-columns:1fr}
+  .partai{grid-template-columns:1fr auto 1fr}
+  .duel .t{font-size:12px}
+  .duel .sc{font-size:16px;padding:4px 10px}
+  .table th,.table td{padding:9px 7px;font-size:12px}
+  .hide-sm{display:none}
+  .event-grid,.kat-grid{grid-template-columns:1fr}
+  .pe-cols,.pe-result{grid-template-columns:1fr}
+  .pool-assign-grid{grid-template-columns:1fr}
+  .court-row{grid-template-columns:1fr 1fr auto}
+  .filter-bar,.print-filter-bar{padding:10px}
+  .filter-select,.filter-input{flex:1;min-width:110px}
+  .filter-search{max-width:none;min-width:100%}
+  .hero-ball{display:none}
+  .hero{padding:36px 0 28px}
+  .stats{flex-wrap:wrap}
+  .stat{flex:1 1 calc(50% - 8px);min-width:0}
+  .day-heading{font-size:10.5px;padding:10px 0 6px}
+  .day-heading span{font-size:9px}
+  .sec-head h2{font-size:19px}
+  .sec-head p{font-size:12px}
+  .modal{padding:12px}
+  .modal-card.wide{max-height:94vh}
+  .print-filter-bar{gap:6px}
+  .print-filter-bar .lbl{width:100%;margin-bottom:2px}
+  .print-filter-bar .filter-select,.print-filter-bar .filter-input{flex:1 1 calc(50% - 3px);min-width:0}
+  .cetak-card{padding:14px}
+  .cetak-card h4{font-size:12px}
+  .cetak-card p{font-size:10.5px}
+  .admin-page-head h2{font-size:17px}
+  .admin-toolbar{gap:6px}
+  .admin-toolbar .btn-primary,.admin-toolbar .btn-ghost{font-size:11px;padding:8px 11px}
+}
+@media (max-width:480px){
+  .brand span{font-size:9px;letter-spacing:.8px}
+  .hero h1{font-size:22px;letter-spacing:-.5px}
+  .hero p.lead{font-size:12.5px}
+  .stat b{font-size:18px}
+  .stat span{font-size:8.5px}
+  .stat{padding:9px 10px}
+  .match{padding:11px 12px}
+  .event-tab{padding:8px 11px;font-size:11.5px}
+  .filter-search{order:10}
+  .nav a{padding:7px 11px;font-size:12px}
+  .modal-card{padding:18px 16px}
+  .btn-primary{padding:11px;font-size:12.5px}
+}
+/* Disable hover transforms on touch devices */
+@media (hover: none) and (pointer: coarse){
+  .card:hover,.match:hover,.event-card:hover,.cetak-card:hover,
+  .admin-nav button:hover,.btn-ghost:hover,.btn-primary:hover,
+  .icon-btn:hover,.login-dot:hover,.seed-bye-row:hover,
+  .event-tab:hover,.kat-card:hover,.tab:hover{
+    transform:none;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+}
 </style>
 </head>
 <body>
@@ -426,13 +581,12 @@ body.admin .admin-chip{display:inline-flex}
       <a href="#" onclick="showPublicPage('pemain');return false;">Pemain</a>
     </nav>
     <button class="admin-chip" id="openDashboardBtn">● ADMIN · Dashboard</button>
-    <button class="icon-btn" id="themeBtn" title="Ganti tema">🌙</button>
+    <button class="icon-btn" id="themeBtn" title="Ganti tema">☀️</button>
   </div>
 </header>
 
 <main id="top">
   <div id="page-home" class="page-view active">
-    <!-- HERO SECTION -->
     <section class="hero">
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-ball b1"></div>
@@ -515,23 +669,15 @@ body.admin .admin-chip{display:inline-flex}
   <div id="page-tabelbagan" class="page-view">
     <section class="section">
       <div class="wrap">
-        <div class="sec-head">
-          <div><h2>Tabel & Bagan</h2><p>Visualisasi pertandingan dan skor</p></div>
-        </div>
+        <div class="sec-head"><div><h2>Tabel & Bagan</h2><p>Visualisasi pertandingan dan skor</p></div></div>
         <div class="filter-bar" id="tbFilterBar">
           <span class="lbl">🔍 Filter</span>
           <select class="filter-select" id="tbEventFilter"></select>
           <select class="filter-select" id="tbKatFilter"><option value="all">Semua Kategori</option></select>
         </div>
         <div class="tb-layout">
-          <div class="tb-card">
-            <h3>📋 Tabel Pertandingan</h3>
-            <div id="tbTableContent"></div>
-          </div>
-          <div class="tb-card">
-            <h3>🌳 Bagan (Bracket)</h3>
-            <div id="tbBracketContent"></div>
-          </div>
+          <div class="tb-card"><h3>📋 Tabel Pertandingan</h3><div id="tbTableContent"></div></div>
+          <div class="tb-card"><h3>🌳 Bagan (Bracket)</h3><div id="tbBracketContent"></div></div>
         </div>
       </div>
     </section>
@@ -609,8 +755,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_eOANkZ5kDxOV-lEQZxaEhw_D7iNdnR8';
 const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const DEFAULT_HERO_IMAGE='https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=80';
-const LS_THEME='ptwp_theme_v20', LS_ADMIN='ptwp_admin_v20';
-const LS_CACHE='ptwp_cache_v1', LS_UI='ptwp_ui_v1', LS_SCROLL='ptwp_scroll_v1';
+const LS_THEME='ptwp_theme_v21', LS_ADMIN='ptwp_admin_v21';
+const LS_CACHE='ptwp_cache_v2', LS_UI='ptwp_ui_v2', LS_SCROLL='ptwp_scroll_v2';
 
 let SETTINGS={
   title:'PTWP PTA Sulawesi Barat',sub:'Turnamen Tenis',year:2025,
@@ -625,17 +771,42 @@ let SETTINGS={
 let TEAMS=[],PEMAIN=[],EVENTS=[],MATCHES=[];
 let state={admin:false,view:'dashboard',publicEventId:null,publicKatFilter:'all',klasemenEventId:null,adminKegiatan:{view:'list',eventId:null},jadwalFilter:{tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},pemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},adminJadwalFilter:{kategoriId:'all',tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},adminPemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},printFilter:{eventId:'all',kategoriId:'all',status:'all',gender:'all',tanggalFrom:'',tanggalTo:'',satker:'all',jenis:'all'},tbFilter:{eventId:'all',kategoriId:'all'}};
 
+/* ============ Meta encoder for seeds & byes in name field ============ */
+const META_OPEN='⟪', META_CLOSE='⟫';
+function encodeKatMeta(kat){
+  const hasSeeds = kat.seeds && Object.keys(kat.seeds).length > 0;
+  const hasByes = kat.byes && kat.byes.length > 0;
+  if(!hasSeeds && !hasByes) return '';
+  try{
+    const payload = JSON.stringify({s:kat.seeds||{}, b:kat.byes||[]});
+    return META_OPEN + btoa(payload) + META_CLOSE;
+  }catch(e){ return ''; }
+}
+function decodeKatName(fullName){
+  if(!fullName) return {nama:'', seeds:{}, byes:[]};
+  const s = String(fullName);
+  const idx = s.lastIndexOf(META_OPEN);
+  const endIdx = s.lastIndexOf(META_CLOSE);
+  if(idx === -1 || endIdx === -1 || endIdx <= idx) return {nama:s, seeds:{}, byes:[]};
+  const nama = s.substring(0, idx);
+  const b64 = s.substring(idx + META_OPEN.length, endIdx);
+  try{
+    const data = JSON.parse(atob(b64));
+    return {nama, seeds:data.s||{}, byes:data.b||[]};
+  }catch(e){ return {nama:s, seeds:{}, byes:[]}; }
+}
+
 function saveCache(){
   try{
     localStorage.setItem(LS_CACHE, JSON.stringify({
-      v:1, settings:SETTINGS, teams:TEAMS, pemain:PEMAIN, events:EVENTS, matches:MATCHES, ts:Date.now()
+      v:2, settings:SETTINGS, teams:TEAMS, pemain:PEMAIN, events:EVENTS, matches:MATCHES, ts:Date.now()
     }));
   }catch(e){}
 }
 function loadCache(){
   try{
     const raw=localStorage.getItem(LS_CACHE); if(!raw) return false;
-    const d=JSON.parse(raw); if(!d||d.v!==1) return false;
+    const d=JSON.parse(raw); if(!d||d.v!==2) return false;
     if(d.settings) Object.assign(SETTINGS,d.settings);
     if(Array.isArray(d.teams)) TEAMS=d.teams;
     if(Array.isArray(d.pemain)) PEMAIN=d.pemain;
@@ -735,7 +906,6 @@ async function saveData(){
     const syncComposite=async(table,items,keyCols,mapper)=>{
       const {data:existing,error:errSel}=await supa.from(table).select(keyCols.join(','));
       if(errSel) throw errSel;
-      const existingKeys=new Set((existing||[]).map(x=>keyCols.map(k=>x[k]).join('|')));
       const newKeys=new Set(items.map(x=>keyCols.map(k=>x[k]).join('|')));
       const toDelete=(existing||[]).filter(x=>!newKeys.has(keyCols.map(k=>x[k]).join('|')));
       const ops=[];
@@ -759,7 +929,14 @@ async function saveData(){
       syncTable('players',PEMAIN,p=>({id:p.id,nama:p.nama,team_id:p.team,jenis:p.jenis,gender:p.gender})),
       syncTable('courts',SETTINGS.courts||[],(c,i)=>({id:c.id,nama:c.nama,lokasi:c.lokasi,urutan:i})),
       syncTable('events',EVENTS,e=>({id:e.id,nama:e.nama,mulai:e.mulai,selesai:e.selesai,lokasi:e.lokasi})),
-      syncTable('categories',allCats,c=>({id:c.id,event_id:c.eventId,nama:c.nama,tipe:c.tipe,gender:c.gender,sistem:c.sistem,jumlah_partai:c.jumlahPartai||3,lolos_per_pool:c.lolosPerPool||2,seeding:c.seeding||false})),
+      syncTable('categories',allCats,c=>({
+        id:c.id,event_id:c.eventId,
+        nama:c.nama + encodeKatMeta(c),
+        tipe:c.tipe,gender:c.gender,sistem:c.sistem,
+        jumlah_partai:c.jumlahPartai||3,
+        lolos_per_pool:c.lolosPerPool||2,
+        seeding:c.seeding||false
+      })),
       syncTable('pools',allPools,p=>({id:p.id,category_id:p.categoryId,nama:p.nama,urutan:p.urutan})),
       syncTable('matches',MATCHES,m=>({id:m.id,event_id:m.eventId,category_id:m.kategoriId,pool_id:m.poolId,stage:m.stage,babak_label:m.babakLabel,hari:m.hari,tgl:m.tgl,jam:m.jam,lapangan:m.lapangan,lokasi_lapangan:m.lokasiLapangan,tim_a:m.timA,tim_b:m.timB})),
       syncComposite('category_participants',allParts,['category_id','participant_id'],p=>p),
@@ -809,7 +986,14 @@ async function loadData(){
       const catParts=parts.filter(p=>p.category_id===c.id);
       const peserta=catParts.map(p=>p.participant_id);
       const poolAssignment={};catParts.forEach(p=>{if(p.pool_id) poolAssignment[p.participant_id]=p.pool_id;});
-      ev.kategori.push({id:c.id,nama:c.nama,tipe:c.tipe,gender:c.gender,sistem:c.sistem,jumlahPartai:c.jumlah_partai||3,lolosPerPool:c.lolos_per_pool||2,seeding:c.seeding||false,pools:catPools,peserta,poolAssignment});
+      const decoded = decodeKatName(c.nama||'');
+      ev.kategori.push({
+        id:c.id,nama:decoded.nama,tipe:c.tipe,gender:c.gender,sistem:c.sistem,
+        jumlahPartai:c.jumlah_partai||3,lolosPerPool:c.lolos_per_pool||2,
+        seeding:c.seeding||false,
+        seeds:decoded.seeds,byes:decoded.byes,
+        pools:catPools,peserta,poolAssignment
+      });
     });
     const partaiByMatch={};
     (partaiRes.data||[]).forEach(p=>{if(!partaiByMatch[p.match_id]) partaiByMatch[p.match_id]=[];partaiByMatch[p.match_id].push(p);});
@@ -841,6 +1025,12 @@ function autoAssignPools(kat){ensurePools(kat);if(!kat.poolAssignment) kat.poolA
 function getPools(kat){ensurePools(kat);autoAssignPools(kat);return kat.pools.map(pool=>({pool,peserta:kat.peserta.filter(pid=>kat.poolAssignment[pid]===pool.id)}));}
 function getPoolName(kat,poolId){if(!kat.pools) return poolId;const p=kat.pools.find(x=>x.id===poolId);return p?p.nama:poolId;}
 function getPoolSummary(kat){if(!kat||kat.sistem!=='pool') return '';const pools=getPools(kat);return pools.map(({pool,peserta})=>`${pool.nama}: ${peserta.length}`).join(' · ');}
+function calculateTotalByes(kat){
+  const n = (kat.peserta||[]).length;
+  if(n < 2) return 0;
+  let size = 1; while(size < n) size *= 2;
+  return size - n;
+}
 const tim=id=>TEAMS.find(t=>t.id===id)||{nama:'?',singkat:'?',warna:'#888',kota:''};
 const pemainTim=id=>PEMAIN.filter(p=>p.team===id);
 const getEvent=id=>EVENTS.find(e=>e.id===id);
@@ -886,10 +1076,7 @@ function getSeedPositions(n) {
   for(let size = 4; size <= n; size *= 2) {
     let next = [];
     const sum = size + 1;
-    result.forEach(s => {
-      next.push(s);
-      next.push(sum - s);
-    });
+    result.forEach(s => { next.push(s); next.push(sum - s); });
     result = next;
   }
   return result;
@@ -981,45 +1168,99 @@ function rebuildPartaiNames(m,kat){
     }
   });
 }
-/* ========== FIXED: createMatch converts null to 'TBD' so auto-advance works ========== */
 function createMatch(event,kat,opts){
   const timA = (opts.timA===null||opts.timA===undefined)?'TBD':opts.timA;
   const timB = (opts.timB===null||opts.timB===undefined)?'TBD':opts.timB;
   return {id:genId('m'),eventId:event.id,kategoriId:kat.id,tipe:kat.tipe,poolId:opts.poolId||null,stage:opts.stage,babakLabel:opts.babakLabel,hari:'',tgl:'',jam:'',lapangan:'',lokasiLapangan:'',timA:timA,timB:timB,partai:makePartaiDefault(kat,timA,timB)};
 }
 function generateRoundRobin(event,kat,peserta,poolId,label){const out=[];for(let i=0;i<peserta.length;i++)for(let j=i+1;j<peserta.length;j++)out.push(createMatch(event,kat,{poolId,stage:poolId?'pool':'kompetisi',babakLabel:label,timA:peserta[i],timB:peserta[j]}));return out;}
-function generateKnockoutBracket(event,kat,peserta,useSeeding){
-  const n=peserta.length;if(n<2) return [];
-  let size=1;while(size<n) size*=2;
+
+/* ============ NEW: Manual Seeding & Bye bracket generation ============ */
+function generateKnockoutBracket(event, kat, peserta, useSeeding){
+  const n = peserta.length;
+  if(n < 2) return [];
+  let size = 1;
+  while(size < n) size *= 2;
+  const totalByes = size - n;
+  
+  const seedsMap = kat.seeds || {};
+  const manualByes = new Set((kat.byes || []).filter(pid => peserta.includes(pid)));
+  
+  // Build ordered list: manual seeds first (by number), then rest in original order
+  const orderedList = [];
+  const seededPids = Object.keys(seedsMap)
+    .filter(pid => peserta.includes(pid))
+    .sort((a,b) => (seedsMap[a]||999) - (seedsMap[b]||999));
+  seededPids.forEach(pid => { if(!orderedList.includes(pid)) orderedList.push(pid); });
+  peserta.forEach(pid => { if(!orderedList.includes(pid)) orderedList.push(pid); });
+  
+  const hasSeeding = useSeeding || seededPids.length > 0;
+  
+  // Build slots
   const slots = new Array(size).fill('BYE');
-  if (useSeeding) {
-      const seedOrder = getSeedPositions(size);
-      peserta.forEach((pid, idx) => {
-          const seed = idx + 1;
-          const pos = seedOrder.indexOf(seed);
-          if(pos !== -1) slots[pos] = pid;
-      });
+  
+  if(hasSeeding){
+    const seedPositions = getSeedPositions(size);
+    orderedList.forEach((pid, idx) => {
+      const seedNum = idx + 1;
+      const posIdx = seedPositions.indexOf(seedNum);
+      if(posIdx !== -1) slots[posIdx] = pid;
+    });
   } else {
-      peserta.forEach((pid, idx) => { slots[idx] = pid; });
+    // Simple: place in order
+    orderedList.forEach((pid, idx) => { if(idx < size) slots[idx] = pid; });
   }
-  const matches=[];let remaining=slots.slice();
-  while(remaining.length>=2){
-    const numMatches=remaining.length/2;
-    const roundName=remaining.length===2?'Final':remaining.length===4?'Semifinal':remaining.length===8?'Perempat Final':`${remaining.length} Besar`;
-    const nextRound=[];
-    for(let i=0;i<numMatches;i++){
-      const a=remaining[i*2],b=remaining[i*2+1];
-      if (a === 'BYE' && b === 'BYE') { nextRound.push('BYE'); continue; }
-      const m=createMatch(event,kat,{poolId:null,stage:'knockout',babakLabel:roundName,timA:a,timB:b});
-      if (a === 'BYE') { m.partai.forEach(p => { p.pemainA = ['BYE']; }); }
-      else if (b === 'BYE') { m.partai.forEach(p => { p.pemainB = ['BYE']; }); }
+  
+  // Handle manual byes - ensure they're paired with BYE
+  if(manualByes.size > 0){
+    // Find non-manual-bye participants that are already paired with BYE (available to swap)
+    const byePairPositions = [];
+    for(let i = 0; i < size; i += 2){
+      const a = slots[i], b = slots[i+1];
+      if(a === 'BYE' && b !== 'BYE' && !manualByes.has(b)) byePairPositions.push(i+1);
+      else if(b === 'BYE' && a !== 'BYE' && !manualByes.has(a)) byePairPositions.push(i);
+    }
+    
+    let swapIdx = 0;
+    manualByes.forEach(pid => {
+      const pos = slots.indexOf(pid);
+      if(pos === -1) return;
+      const pairPos = pos % 2 === 0 ? pos + 1 : pos - 1;
+      if(slots[pairPos] === 'BYE') return; // already paired with bye
+      
+      while(swapIdx < byePairPositions.length){
+        const targetPos = byePairPositions[swapIdx++];
+        const targetPid = slots[targetPos];
+        if(targetPid === 'BYE' || manualByes.has(targetPid)) continue;
+        // Swap
+        slots[pos] = targetPid;
+        slots[targetPos] = pid;
+        break;
+      }
+    });
+  }
+  
+  // Generate matches from slots
+  const matches = [];
+  let remaining = slots.slice();
+  while(remaining.length >= 2){
+    const numMatches = remaining.length / 2;
+    const roundName = remaining.length === 2 ? 'Final' : remaining.length === 4 ? 'Semifinal' : remaining.length === 8 ? 'Perempat Final' : `${remaining.length} Besar`;
+    const nextRound = [];
+    for(let i = 0; i < numMatches; i++){
+      const a = remaining[i*2], b = remaining[i*2+1];
+      if(a === 'BYE' && b === 'BYE'){ nextRound.push('BYE'); continue; }
+      const m = createMatch(event, kat, {poolId: null, stage: 'knockout', babakLabel: roundName, timA: a, timB: b});
+      if(a === 'BYE'){ m.partai.forEach(p => { p.pemainA = ['BYE']; }); }
+      else if(b === 'BYE'){ m.partai.forEach(p => { p.pemainB = ['BYE']; }); }
       matches.push(m);
       nextRound.push(null);
     }
-    remaining=nextRound;
+    remaining = nextRound;
   }
   return matches;
 }
+
 function buildCrossPoolSeeds(pools,lolos){
   const n=pools.length;if(n<2) return [];
   const result=[];
@@ -1105,6 +1346,15 @@ function preserveScores(oldMatches,newMatches){
 async function autoRegenerateSchedule(eventId,katId){
   const ev=getEvent(eventId);if(!ev) return {cleared:false,count:0};
   const kat=ev.kategori.find(k=>k.id===katId);if(!kat) return {cleared:false,count:0};
+  
+  // Cleanup stale seeds/byes
+  if(kat.seeds){
+    Object.keys(kat.seeds).forEach(pid => { if(!kat.peserta.includes(pid)) delete kat.seeds[pid]; });
+  }
+  if(kat.byes){
+    kat.byes = kat.byes.filter(pid => kat.peserta.includes(pid));
+  }
+  
   const oldMatches=MATCHES.filter(m=>m.eventId===eventId&&m.kategoriId===katId);
   MATCHES=MATCHES.filter(m=>!(m.eventId===eventId&&m.kategoriId===katId));
   if(kat.peserta.length<2){await saveData();return {cleared:true,count:0};}
@@ -1162,9 +1412,7 @@ function advanceFromPools(ev,kat){
       const poolIdx=pools.findIndex((_,idx)=>String.fromCharCode(65+idx)===placeholder.prefix);
       if(poolIdx<0) return;
       const poolWinners=poolStandings[poolIdx];
-      if(!poolWinners||!poolWinners[placeholder.rank-1]) {
-          m[timField] = 'BYE'; changed = true; return;
-      }
+      if(!poolWinners||!poolWinners[placeholder.rank-1]) { m[timField]='BYE'; changed=true; return; }
       m[timField]=poolWinners[placeholder.rank-1].id;changed=true;
     });
     if(changed){rebuildPartaiNames(m,kat);updated++;}
@@ -1307,7 +1555,6 @@ function getFilteredPrintMatches(opts){
   });
 }
 
-/* ========== UPDATED: applySettings now also updates hero content ========== */
 function applySettings(){
   if(!SETTINGS.tagline) SETTINGS.tagline='Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat';
   if(!SETTINGS.heroLead) SETTINGS.heroLead='Ajang silaturahmi dan sportivitas antar satker.';
@@ -1333,7 +1580,6 @@ function applySettings(){
       brandMark.textContent = SETTINGS.logo;
     }
   }
-  // Update hero content
   const heroTagline=document.getElementById('heroTagline');
   if(heroTagline) heroTagline.textContent=SETTINGS.tagline;
   const heroLead=document.getElementById('heroLead');
@@ -1454,6 +1700,10 @@ function renderMatchCard(m){
   const chipText = isBye ? 'Bye' : (st==='selesai'?'Selesai':st==='berlangsung'?'Live':'Akan');
   const isPool=m.stage==='pool',isKO=m.stage==='knockout';
   const manualA=isManualPeserta(m.timA),manualB=isManualPeserta(m.timB);
+  const seedA = kat.seeds && kat.seeds[m.timA];
+  const seedB = kat.seeds && kat.seeds[m.timB];
+  const byeA = (kat.byes||[]).includes(m.timA);
+  const byeB = (kat.byes||[]).includes(m.timB);
   const scHtml=isBye ? `<div class="sc wait">BYE</div>` : (st==='akan'?`<div class="sc wait">VS</div>`:`<div class="sc">${a} - ${b}</div>`);
   const partaiHtml=(m.partai||[]).map((p,pi)=>{
     const menang=p.menang,skor=(menang&&p.skor)?p.skor:'';const label=p.jenis||'Tunggal';
@@ -1469,6 +1719,8 @@ function renderMatchCard(m){
     <div class="match-top">
       <span class="chip ${chipClass}">${chipText}</span>
       <span class="chip ${isPool?'pool':isKO?'ko':''}">${esc(m.babakLabel||'')}</span>
+      ${seedA?`<span class="chip seed">Seed ${seedA} A</span>`:''}
+      ${seedB?`<span class="chip seed">Seed ${seedB} B</span>`:''}
       ${manualA||manualB?`<span class="chip manual">MANUAL</span>`:''}
       <span class="match-meta" title="${esc(metaTitle)}">${esc(m.jam||'')} · ${esc(m.lapangan||'')}${m.lokasiLapangan?`<span class="mloc">📍 ${esc(m.lokasiLapangan)}</span>`:''}</span>
     </div>
@@ -1660,6 +1912,7 @@ function viewDashboard(){
   return `<div class="admin-page-head"><div><h2>📊 Dashboard</h2><p>Ringkasan turnamen ${esc(SETTINGS.title)} ${SETTINGS.year}</p></div></div>
     <div class="admin-stats"><div class="astat"><b>${EVENTS.length}</b><span>Kegiatan</span></div><div class="astat"><b>${totalKat}</b><span>Kategori</span></div><div class="astat"><b>${TEAMS.length}</b><span>Satker</span></div><div class="astat"><b>${PEMAIN.length}</b><span>Pemain</span></div><div class="astat"><b>${MATCHES.length}</b><span>Pertandingan</span></div><div class="astat"><b>${courtCount}</b><span>Lapangan</span></div><div class="astat"><b>${selesai}</b><span>Selesai</span></div><div class="astat"><b>${berjalan}</b><span>Berlangsung</span></div></div>
     <div class="auto-note" style="margin-bottom:10px">☁️ <b>Supabase:</b> Semua data tersimpan otomatis di cloud Supabase. Edit di mana saja, data real-time sinkron.</div>
+    <div class="seed-note" style="margin-bottom:14px">🌱 <b>BARU:</b> <b>Seeding Manual & BYE</b> tersedia di Kelola Peserta untuk sistem Gugur & Penyisihan. Atur seed (1,2,3...) dan centang BYE untuk peserta yang lolos otomatis.</div>
     <div class="manual-note" style="margin-bottom:14px">🎾 <b>Fitur:</b> Auto-advance SF/Final, cross-pool A1 vs B2, add/remove partai beregu, filter jadwal &amp; pemain, import Excel, <b>Reset & Regenerate</b> jadwal dari awal.</div>
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)"><h3 style="font-size:14px;margin-bottom:12px">Aksi Cepat</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="adminGo('kegiatan')">🏆 Kegiatan</button><button class="btn-ghost" onclick="adminGo('jadwal')">📅 Jadwal</button><button class="btn-ghost" onclick="adminGo('pemain')">👥 Pemain</button><button class="btn-ghost" onclick="adminGo('pengaturan')">⚙️ Pengaturan</button></div></div>`;
 }
@@ -1678,15 +1931,21 @@ function viewKegiatanDetail(eventId){
   const tgl=ev.mulai&&ev.selesai?`${ev.mulai} s/d ${ev.selesai}`:(ev.mulai||'');
   const katCards=ev.kategori.map(kat=>{
     const catMatches=MATCHES.filter(m=>m.eventId===ev.id&&m.kategoriId===kat.id);const done=catMatches.filter(m=>statusMatch(m)==='selesai').length;const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;const poolInfo=kat.sistem==='pool'?getPoolSummary(kat):'';const st=getKategoriStatus(kat,ev.id);
+    const seedCount = kat.seeds ? Object.keys(kat.seeds).length : 0;
+    const byeCount = kat.byes ? kat.byes.length : 0;
     let progressHTML='';
     if(kat.sistem==='pool'){progressHTML=`<div class="kat-progress"><span class="pitem ${st.pool.done===st.pool.total?'done':''}">🏊 Pool: <b>${st.pool.done}/${st.pool.total}</b></span><span class="pitem ${st.ko.filled===st.ko.total?'done':''}">🎯 KO: <b>${st.ko.filled}/${st.ko.total}</b></span><span class="pitem ${st.ko.done===st.ko.total&&st.ko.total>0?'done':''}">🏁 KO: <b>${st.ko.done}/${st.ko.total}</b></span></div>`;}
     else if(kat.sistem==='penyisihan' || kat.sistem==='gugur'){progressHTML=`<div class="kat-progress"><span class="pitem ${st.ko.filled===st.ko.total?'done':''}">🎯 <b>${st.ko.filled}/${st.ko.total}</b> terisi</span><span class="pitem ${st.ko.done===st.ko.total&&st.ko.total>0?'done':''}">🏁 <b>${st.ko.done}/${st.ko.total}</b> selesai</span></div>`;}
     else if(kat.sistem==='kompetisi'){const koInfo=st.ko.total>0?`<span class="pitem ${st.ko.done===st.ko.total?'done':''}">🏁 KO: <b>${st.ko.done}/${st.ko.total}</b></span>`:`<span class="pitem" style="color:var(--muted)">🏁 KO: belum dibuat</span>`;progressHTML=`<div class="kat-progress"><span class="pitem ${st.rr.done===st.rr.total?'done':''}">🔄 Kompetisi: <b>${st.rr.done}/${st.rr.total}</b></span>${koInfo}</div>`;}
     const partaiInfo=kat.tipe==='beregu'?` · <b>${kat.jumlahPartai||3}</b> partai`:'';
 
-    return `<div class="kat-card"><div class="kat-card-head"><span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span></div><h4 style="margin-bottom:8px">${esc(kat.nama)}</h4><div class="kat-card-body"><div class="kat-info"><b>${kat.peserta.length}</b> peserta${manualCount?` · <span style="color:var(--purple);font-weight:700">${manualCount} manual</span>`:''}${partaiInfo} · <b>${catMatches.length}</b> pertandingan${catMatches.length?` (${done} selesai)`:''}</div>${kat.sistem==='pool'?`<div class="kat-info">Pool: <b>${kat.pools?kat.pools.length:0}</b> · ${poolInfo||'—'} · Lolos/pool: <b>${kat.lolosPerPool||2}</b> · <i>Cross-pool SF: A1 vs B2</i></div>`:''}</div>${progressHTML}<div class="kat-card-actions" style="margin-top:10px"><button class="btn-ghost advance" onclick="manualAdvance('${ev.id}','${kat.id}')">⚡ Advance</button><button class="btn-ghost regen" onclick="regenerateManual('${ev.id}','${kat.id}')">🔄 Reset & Regenerate</button><button class="btn-ghost" onclick="editKategori('${ev.id}','${kat.id}')">✏️ Edit</button><button class="btn-primary" style="width:auto;padding:7px 11px;font-size:11px" onclick="managePeserta('${ev.id}','${kat.id}')">👥 Peserta</button>${catMatches.length?`<button class="btn-ghost" onclick="viewKatMatches('${ev.id}','${kat.id}')">📋 Lihat</button>`:''}<button class="btn-danger" onclick="hapusKategori('${ev.id}','${kat.id}')">🗑️</button></div></div>`;
+    const seedByeInfo = (seedCount>0 || byeCount>0)
+      ? `<div class="kat-info" style="color:var(--orange);font-weight:700">🌱 ${seedCount} seed · ${byeCount} BYE</div>`
+      : '';
+
+    return `<div class="kat-card"><div class="kat-card-head"><span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span></div><h4 style="margin-bottom:8px">${esc(kat.nama)}</h4><div class="kat-card-body"><div class="kat-info"><b>${kat.peserta.length}</b> peserta${manualCount?` · <span style="color:var(--purple);font-weight:700">${manualCount} manual</span>`:''}${partaiInfo} · <b>${catMatches.length}</b> pertandingan${catMatches.length?` (${done} selesai)`:''}</div>${seedByeInfo}${kat.sistem==='pool'?`<div class="kat-info">Pool: <b>${kat.pools?kat.pools.length:0}</b> · ${poolInfo||'—'} · Lolos/pool: <b>${kat.lolosPerPool||2}</b> · <i>Cross-pool SF: A1 vs B2</i></div>`:''}</div>${progressHTML}<div class="kat-card-actions" style="margin-top:10px"><button class="btn-ghost advance" onclick="manualAdvance('${ev.id}','${kat.id}')">⚡ Advance</button><button class="btn-ghost regen" onclick="regenerateManual('${ev.id}','${kat.id}')">🔄 Reset & Regenerate</button><button class="btn-ghost" onclick="editKategori('${ev.id}','${kat.id}')">✏️ Edit</button><button class="btn-primary" style="width:auto;padding:7px 11px;font-size:11px" onclick="managePeserta('${ev.id}','${kat.id}')">👥 Peserta</button>${catMatches.length?`<button class="btn-ghost" onclick="viewKatMatches('${ev.id}','${kat.id}')">📋 Lihat</button>`:''}<button class="btn-danger" onclick="hapusKategori('${ev.id}','${kat.id}')">🗑️</button></div></div>`;
   }).join('');
-  return `<button class="kegiatan-back" onclick="closeKegiatanDetail()">← Kembali</button><div class="admin-page-head"><div><h2>🏆 ${esc(ev.nama)}</h2><p>📅 ${esc(tgl)} · 📍 ${esc(ev.lokasi||'-')}</p></div><div style="display:flex;gap:8px"><button class="btn-ghost" onclick="editEvent('${ev.id}')">✏️ Edit</button><button class="btn-danger" onclick="hapusEvent('${ev.id}')">🗑️ Hapus</button></div></div><div class="auto-note" style="margin-bottom:12px">⚡ Tombol <b>Advance</b> memicu pembentukan semifinal & final. Pool: <b>cross-pool</b> A1 vs B2, B1 vs A2.<br>🔄 <b>Reset & Regenerate</b>: reset jadwal dari awal, pertahankan skor, dan otomatis generate babak lanjutan berdasarkan skor yang ada.</div><div class="admin-subhead">Kategori Pertandingan</div><div class="admin-toolbar"><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="editKategori('${ev.id}',null)">+ Tambah Kategori</button></div><div class="kat-grid">${katCards||`<div class="empty" style="grid-column:1/-1"><p>Belum ada kategori.</p></div>`}</div>`;
+  return `<button class="kegiatan-back" onclick="closeKegiatanDetail()">← Kembali</button><div class="admin-page-head"><div><h2>🏆 ${esc(ev.nama)}</h2><p>📅 ${esc(tgl)} · 📍 ${esc(ev.lokasi||'-')}</p></div><div style="display:flex;gap:8px"><button class="btn-ghost" onclick="editEvent('${ev.id}')">✏️ Edit</button><button class="btn-danger" onclick="hapusEvent('${ev.id}')">🗑️ Hapus</button></div></div><div class="auto-note" style="margin-bottom:12px">⚡ Tombol <b>Advance</b> memicu pembentukan semifinal & final. Pool: <b>cross-pool</b> A1 vs B2, B1 vs A2.<br>🔄 <b>Reset & Regenerate</b>: reset jadwal dari awal, pertahankan skor, dan otomatis generate babak lanjutan berdasarkan skor yang ada.</div><div class="seed-note" style="margin-bottom:12px">🌱 <b>Seeding Manual & BYE:</b> Klik <b>👥 Peserta</b> pada kategori dengan sistem <b>Gugur/Penyisihan</b> untuk mengatur seed manual (1,2,3...) dan menandai BYE.</div><div class="admin-subhead">Kategori Pertandingan</div><div class="admin-toolbar"><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="editKategori('${ev.id}',null)">+ Tambah Kategori</button></div><div class="kat-grid">${katCards||`<div class="empty" style="grid-column:1/-1"><p>Belum ada kategori.</p></div>`}</div>`;
 }
 function editEvent(id){
   const ev=id?getEvent(id):null;
@@ -1702,9 +1961,9 @@ function editKategori(eventId,katId){
   const isPoolInit=kat&&kat.sistem==='pool';const isBereguInit=!kat||kat.tipe==='beregu';
   const isKOInit = kat && (kat.sistem==='gugur' || kat.sistem==='penyisihan');
   const body=`<form id="katForm"><input type="hidden" name="eventId" value="${eventId}"><input type="hidden" name="id" value="${kat?kat.id:''}"><div class="form-grid"><div class="field full"><label>Nama Kategori</label><input name="nama" required value="${kat?esc(kat.nama):''}"></div><div class="field"><label>Tipe</label><select name="tipe" required><option value="beregu" ${kat&&kat.tipe==='beregu'?'selected':''}>Beregu</option><option value="tunggal" ${kat&&(kat.tipe==='tunggal'||kat.tipe==='perorangan')?'selected':''}>Perorangan Tunggal</option><option value="ganda" ${kat&&kat.tipe==='ganda'?'selected':''}>Perorangan Ganda</option></select></div><div class="field"><label>Gender</label><select name="gender" required><option value="putra" ${kat&&kat.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${kat&&kat.gender==='putri'?'selected':''}>Putri</option></select></div><div class="field full"><label>Sistem</label><select name="sistem" required><option value="kompetisi" ${kat&&kat.sistem==='kompetisi'?'selected':''}>Kompetisi (Round-Robin)</option><option value="penyisihan" ${kat&&kat.sistem==='penyisihan'?'selected':''}>Penyisihan</option><option value="gugur" ${kat&&kat.sistem==='gugur'?'selected':''}>Gugur (Single Elimination)</option><option value="pool" ${kat&&kat.sistem==='pool'?'selected':''}>Pool + Knockout</option></select></div><div class="field" id="fJumlahPartai" style="${isBereguInit?'':'display:none'}"><label>Jumlah Partai (Beregu)</label><input name="jumlahPartai" type="number" min="1" max="9" value="${kat?(kat.jumlahPartai||3):3}"><small>Standar 3: T1, GD, T2. Bisa 1-9.</small></div>
-      <div class="field" id="fSeeding" style="${isKOInit?'':'display:none'}">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" name="seeding" value="1" ${kat&&kat.seeding?'checked':''} style="width:auto"> Gunakan Seeding & Bye</label>
-        <small>Unggulan dipisah, Bye diberikan ke unggulan teratas.</small>
+      <div class="field full" id="fSeeding" style="${isKOInit?'':'display:none'}">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" name="seeding" value="1" ${kat&&kat.seeding?'checked':''} style="width:auto"> Seeding &amp; BYE Otomatis (jika tidak diisi manual)</label>
+        <small>Jika aktif, seed otomatis diberikan sesuai urutan peserta. <b>Untuk seeding manual, atur di Kelola Peserta.</b></small>
       </div>
       </div><div id="poolConfigSection" style="${isPoolInit?'':'display:none'}"><div class="admin-subhead">Daftar Pool</div><div id="poolsRows">${initialPools.map(p=>`<div class="pool-row" data-pool-id="${esc(p.id)}"><input class="pool-name" value="${esc(p.nama)}" placeholder="Pool A"><button type="button" class="icon-act rm" onclick="this.parentElement.remove()">×</button></div>`).join('')}</div><button type="button" class="btn-ghost" style="margin-top:6px" onclick="addPoolRow()">+ Tambah Pool</button><div class="form-grid" style="margin-top:12px"><div class="field"><label>Lolos per Pool</label><input name="lolosPerPool" type="number" min="1" max="4" value="${kat?(kat.lolosPerPool||2):2}"><small>Cross-pool: A1 vs B2 (otomatis).</small></div></div></div><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="submit" class="btn-primary" style="flex:1">Simpan</button></div></form>`;
   openAdminForm(kat?'✏️ Edit Kategori':'➕ Tambah Kategori','',body);
@@ -1737,26 +1996,37 @@ function editKategori(eventId,katId){
       if(sistem==='pool'&&kat.poolAssignment){const validIds=new Set(data.pools.map(p=>p.id));Object.keys(kat.poolAssignment).forEach(pid=>{if(!validIds.has(kat.poolAssignment[pid])) delete kat.poolAssignment[pid];});}
       if(konfigBerubah&&kat.peserta.length>=2){const result=await autoRegenerateSchedule(eventId,kat.id);toast(`Kategori diperbarui & jadwal auto-regenerate: ${result.count} pertandingan ✓`);}
       else{await saveData();toast('Kategori diperbarui ✓');}
-    } else {ev.kategori.push({id:genId('k'),peserta:[],...data});await saveData();toast('Kategori ditambahkan');}
+    } else {ev.kategori.push({id:genId('k'),peserta:[],seeds:{},byes:[],...data});await saveData();toast('Kategori ditambahkan');}
     closeAdminForm();renderAdminView('kegiatan');renderPublic();
   });
 }
 function addPoolRow(){const cont=document.getElementById('poolsRows');if(!cont) return;const count=cont.children.length;const row=document.createElement('div');row.className='pool-row';row.dataset.poolId='p'+Date.now().toString(36)+(_poolRowCounter++);row.innerHTML=`<input class="pool-name" value="Pool ${String.fromCharCode(65+count)}" placeholder="Nama Pool"><button type="button" class="icon-act rm" onclick="this.parentElement.remove()">×</button>`;cont.appendChild(row);}
 async function hapusKategori(eventId,katId){if(!confirm('Hapus kategori ini? Semua pertandingan terhapus.')) return;const ev=getEvent(eventId);ev.kategori=ev.kategori.filter(k=>k.id!==katId);MATCHES=MATCHES.filter(m=>!(m.eventId===eventId&&m.kategoriId===katId));await saveData();renderAdminView('kegiatan');renderPublic();toast('Kategori dihapus');}
 
+/* ============ Manage Peserta with Seeding & BYE UI ============ */
 function managePeserta(eventId,katId){
   const ev=getEvent(eventId);const kat=ev.kategori.find(k=>k.id===katId);const isPool=kat.sistem==='pool';
+  if(!kat.seeds) kat.seeds={};
+  if(!kat.byes) kat.byes=[];
   if(isPool) autoAssignPools(kat);
   const usedPlayerIds = new Set();
   if (kat.tipe === 'ganda') {
-      kat.peserta.forEach(pid => {
-          parsePair(pid).forEach(id => usedPlayerIds.add(id));
-      });
+      kat.peserta.forEach(pid => { parsePair(pid).forEach(id => usedPlayerIds.add(id)); });
   }
   const available = kat.tipe === 'beregu'
     ? TEAMS.filter(t => !kat.peserta.includes(t.id))
     : PEMAIN.filter(p => !usedPlayerIds.has(p.id) && (!kat.gender || p.gender === kat.gender) && (kat.tipe === 'ganda' ? p.jenis === 'Ganda' : (kat.tipe === 'tunggal' || kat.tipe === 'perorangan' ? p.jenis === 'Tunggal' : true)));
-  const pesertaHtml=kat.peserta.map((pid,idx)=>{const info=getPesertaInfo(pid,kat);const isMan=isManualPeserta(pid);const poolId=isPool?kat.poolAssignment[pid]:null;const poolBadge=isPool&&poolId?`<span class="chip pool" style="font-size:8.5px;padding:1px 5px">${esc(getPoolName(kat,poolId))}</span>`:'';return `<span class="peserta-chip ${isMan?'manual':''}"><span class="c" style="background:${info.warna}"></span>${isMan?'<span class="m-tag">MANUAL</span>':''}${esc(info.nama)}${poolBadge}<button class="x" onclick="removePesertaAt('${eventId}','${katId}',${idx})">×</button></span>`;}).join('')||`<span class="peserta-empty">Belum ada peserta.</span>`;
+  const pesertaHtml=kat.peserta.map((pid,idx)=>{
+    const info=getPesertaInfo(pid,kat);
+    const isMan=isManualPeserta(pid);
+    const poolId=isPool?kat.poolAssignment[pid]:null;
+    const poolBadge=isPool&&poolId?`<span class="chip pool" style="font-size:8.5px;padding:1px 5px">${esc(getPoolName(kat,poolId))}</span>`:'';
+    const seedNum = kat.seeds[pid];
+    const isBye = kat.byes.includes(pid);
+    const seedBadge = seedNum ? `<span class="seed-badge">SEED ${seedNum}</span>` : '';
+    const byeBadge = isBye ? `<span class="bye-badge">BYE</span>` : '';
+    return `<span class="peserta-chip ${isMan?'manual':''} ${seedNum?'seeded':''} ${isBye?'bye':''}"><span class="c" style="background:${info.warna}"></span>${isMan?'<span class="m-tag">MANUAL</span>':''}${seedBadge}${byeBadge}${esc(info.nama)}${poolBadge}<button class="x" onclick="removePesertaAt('${eventId}','${katId}',${idx})">×</button></span>`;
+  }).join('')||`<span class="peserta-empty">Belum ada peserta.</span>`;
   const optionsHtml=available.map(item=>{const label=kat.tipe==='beregu'?item.nama:item.nama+' ('+tim(item.team).singkat+')';return `<option value="${item.id}">${esc(label)}</option>`;}).join('');
   const poolsData=isPool?getPools(kat):[];const poolOptionsHtml=isPool?poolsData.map(({pool})=>`<option value="${esc(pool.id)}">${esc(pool.nama)}</option>`).join(''):'';
   const catMatches=MATCHES.filter(m=>m.eventId===eventId&&m.kategoriId===katId);const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;
@@ -1785,10 +2055,116 @@ function managePeserta(eventId,katId){
           <button class="btn-primary" style="width:auto;padding:10px 16px" onclick="addPeserta('${eventId}','${katId}')">Tambah</button>
       </div>`;
   }
-  const body=`<div><div class="auto-note">⚡ Perubahan peserta/pool meregenerasi jadwal. Semifinal/final otomatis terbentuk saat semua skor terisi.</div><div class="admin-subhead" style="margin-top:0">Tambah dari Daftar Resmi</div>${addAreaHtml}<div class="admin-subhead">Tambah Manual</div><div style="display:flex;gap:6px;flex-wrap:wrap"><input id="manualNameInput" placeholder="${manualPlaceholder}" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--purple) 40%,var(--line));background:var(--panel2);color:var(--text);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();addPesertaManual('${eventId}','${katId}');}">${isPool?`<select id="manualPoolSel" style="font-family:inherit;font-size:11.5px;font-weight:700;padding:10px 8px;border-radius:10px;border:1px solid color-mix(in srgb,var(--purple) 40%,var(--line));background:var(--panel2);color:var(--text);min-width:90px"><option value="auto">Auto</option>${poolOptionsHtml}</select>`:''}<button class="btn-primary" style="width:auto;padding:10px 16px;background:linear-gradient(135deg,var(--purple),var(--pink));box-shadow:0 10px 30px -12px rgba(167,139,250,.55)" onclick="addPesertaManual('${eventId}','${katId}')">+ Manual</button></div>${poolUI}<div class="admin-subhead">Daftar Peserta (${kat.peserta.length}${manualCount?` · ${manualCount} manual`:''})</div><div class="peserta-list">${pesertaHtml}</div><div class="admin-subhead">Status</div><div style="font-size:12px;color:var(--muted)">${catMatches.length===0?`<span style="font-style:italic">Belum ada jadwal.</span>`:`<span style="color:var(--accent);font-weight:700">✓ ${catMatches.length} pertandingan</span>`}</div><div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost advance" style="flex:1" onclick="closeAdminForm();manualAdvance('${eventId}','${katId}')">⚡ Advance</button><button class="btn-ghost regen" style="flex:1" onclick="regenerateManual('${eventId}','${katId}')">🔄 Reset & Regenerate</button><button class="btn-ghost" style="flex:1" onclick="clearManualPeserta('${eventId}','${katId}')">🧹 Hapus Manual</button></div></div>`;
+
+  // Seeding & BYE UI (only for KO systems)
+  let seedingUI = '';
+  const isKO = kat.sistem === 'gugur' || kat.sistem === 'penyisihan';
+  if(isKO && kat.peserta.length >= 2){
+    const totalByes = calculateTotalByes(kat);
+    // Count seeds by number
+    const seedByNumber = {};
+    Object.entries(kat.seeds||{}).forEach(([pid, num]) => { seedByNumber[num] = pid; });
+    const maxSeedOptions = Math.min(kat.peserta.length, 8);
+    const seedOptionsHtml = Array.from({length: maxSeedOptions}, (_,i) => i+1);
+    
+    seedingUI = `
+      <div class="admin-subhead">🌱 Seeding & BYE Manual (Knockout)</div>
+      <div class="seed-info-bar">
+        <b>Total BYE tersedia: ${totalByes}</b> (dari ${kat.peserta.length} peserta). 
+        Atur seed 1,2,3,... dan centang BYE untuk peserta yang lolos otomatis. 
+        Jika BYE tidak diisi manual, otomatis diberikan ke seed teratas.
+      </div>
+      <div class="seed-bye-list">
+        ${kat.peserta.map(pid => {
+          const info = getPesertaInfo(pid, kat);
+          const currentSeed = (kat.seeds||{})[pid] || '';
+          const isBye = (kat.byes||[]).includes(pid);
+          const rowCls = `${currentSeed?'is-seeded':''} ${isBye?'is-bye':''}`;
+          const seedSelectOptions = ['<option value="0">— Unseeded —</option>']
+            .concat(seedOptionsHtml.map(n => `<option value="${n}" ${currentSeed==n?'selected':''}>Seed ${n}</option>`))
+            .join('');
+          return `<div class="seed-bye-row ${rowCls}">
+            <span class="seed-name">${esc(info.nama)}${isManualPeserta(pid)?' <span class="m-tag">M</span>':''}</span>
+            <select class="seed-select" onchange="setManualSeed('${eventId}','${katId}',${JSON.stringify(pid)},this.value)">
+              ${seedSelectOptions}
+            </select>
+            <label class="bye-toggle ${isBye?'checked':''}">
+              <input type="checkbox" ${isBye?'checked':''} onchange="toggleManualBye('${eventId}','${katId}',${JSON.stringify(pid)},this.checked)">
+              <span>BYE</span>
+            </label>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  const body=`<div><div class="auto-note">⚡ Perubahan peserta/pool/seeding meregenerasi jadwal. Semifinal/final otomatis terbentuk saat semua skor terisi.</div>
+  <div class="admin-subhead" style="margin-top:0">Tambah dari Daftar Resmi</div>
+  ${addAreaHtml}
+  <div class="admin-subhead">Tambah Manual</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <input id="manualNameInput" placeholder="${manualPlaceholder}" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--purple) 40%,var(--line));background:var(--panel2);color:var(--text);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();addPesertaManual('${eventId}','${katId}');}">
+    ${isPool?`<select id="manualPoolSel" style="font-family:inherit;font-size:11.5px;font-weight:700;padding:10px 8px;border-radius:10px;border:1px solid color-mix(in srgb,var(--purple) 40%,var(--line));background:var(--panel2);color:var(--text);min-width:90px"><option value="auto">Auto</option>${poolOptionsHtml}</select>`:''}
+    <button class="btn-primary" style="width:auto;padding:10px 16px;background:linear-gradient(135deg,var(--purple),var(--pink));box-shadow:0 10px 30px -12px rgba(167,139,250,.55)" onclick="addPesertaManual('${eventId}','${katId}')">+ Manual</button>
+  </div>
+  ${seedingUI}
+  ${poolUI}
+  <div class="admin-subhead">Daftar Peserta (${kat.peserta.length}${manualCount?` · ${manualCount} manual`:''})</div>
+  <div class="peserta-list">${pesertaHtml}</div>
+  <div class="admin-subhead">Status</div>
+  <div style="font-size:12px;color:var(--muted)">${catMatches.length===0?`<span style="font-style:italic">Belum ada jadwal.</span>`:`<span style="color:var(--accent);font-weight:700">✓ ${catMatches.length} pertandingan</span>`}</div>
+  <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn-ghost advance" style="flex:1" onclick="closeAdminForm();manualAdvance('${eventId}','${katId}')">⚡ Advance</button>
+    <button class="btn-ghost regen" style="flex:1" onclick="regenerateManual('${eventId}','${katId}')">🔄 Reset & Regenerate</button>
+    <button class="btn-ghost" style="flex:1" onclick="clearManualPeserta('${eventId}','${katId}')">🧹 Hapus Manual</button>
+  </div></div>`;
   openAdminForm('👥 Kelola Peserta — '+kat.nama,`${kat.peserta.length} peserta · ${formatLabel(kat.sistem)}`,body);
   setTimeout(()=>{const inp=document.getElementById('manualNameInput');if(inp) inp.focus();},120);
 }
+
+/* ============ Seed & Bye handlers ============ */
+async function setManualSeed(eventId, katId, pid, seedStr){
+  const ev = getEvent(eventId), kat = ev.kategori.find(k => k.id === katId);
+  if(!kat) return;
+  kat.seeds = kat.seeds || {};
+  const seedNum = parseInt(seedStr) || 0;
+  // Remove this pid's existing seed
+  delete kat.seeds[pid];
+  // If new seed > 0, remove that seed from any other participant
+  if(seedNum > 0){
+    Object.keys(kat.seeds).forEach(otherPid => {
+      if(kat.seeds[otherPid] === seedNum) delete kat.seeds[otherPid];
+    });
+    kat.seeds[pid] = seedNum;
+  }
+  const result = await autoRegenerateSchedule(eventId, katId);
+  managePeserta(eventId, katId);
+  renderPublic();
+  toast(`✓ Seed diperbarui — ${result.count} pertandingan`);
+}
+
+async function toggleManualBye(eventId, katId, pid, isBye){
+  const ev = getEvent(eventId), kat = ev.kategori.find(k => k.id === katId);
+  if(!kat) return;
+  kat.byes = kat.byes || [];
+  const totalByes = calculateTotalByes(kat);
+  if(isBye){
+    if(!kat.byes.includes(pid)){
+      if(kat.byes.length >= totalByes){
+        toast(`Maksimal ${totalByes} BYE untuk ${kat.peserta.length} peserta`);
+        return;
+      }
+      kat.byes.push(pid);
+    }
+  } else {
+    kat.byes = kat.byes.filter(x => x !== pid);
+  }
+  const result = await autoRegenerateSchedule(eventId, katId);
+  managePeserta(eventId, katId);
+  renderPublic();
+  toast(`✓ BYE diperbarui — ${result.count} pertandingan`);
+}
+
 async function addPeserta(eventId,katId){const sel=document.getElementById('addPesertaSel');const poolSel=document.getElementById('addPoolSel');if(!sel||!sel.value){toast('Pilih peserta');return;}const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(!kat.peserta.includes(sel.value)){kat.peserta.push(sel.value);if(kat.sistem==='pool'&&poolSel&&poolSel.value!=='auto'){kat.poolAssignment=kat.poolAssignment||{};kat.poolAssignment[sel.value]=poolSel.value;}const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`Ditambahkan — butuh ${2-kat.peserta.length} lagi`:`✓ ${result.count} pertandingan`);}}
 async function addPesertaGanda(eventId,katId){
   const sel1=document.getElementById('addPesertaSel1');
@@ -1838,8 +2214,8 @@ async function addPesertaManual(eventId,katId){
   kat.peserta.push(id);
   if(kat.sistem==='pool'&&poolSel&&poolSel.value!=='auto'){kat.poolAssignment=kat.poolAssignment||{};kat.poolAssignment[id]=poolSel.value;}
   const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`✓ "${name}" ditambahkan`:`✓ "${name}" — ${result.count} pertandingan`);}
-async function removePesertaAt(eventId,katId,idx){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(idx<0||idx>=kat.peserta.length) return;const pid=kat.peserta[idx];const info=getPesertaInfo(pid,kat);kat.peserta.splice(idx,1);if(kat.poolAssignment) delete kat.poolAssignment[pid];const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`"${info.nama}" dihapus`:`✓ "${info.nama}" dihapus`);}
-async function clearManualPeserta(eventId,katId){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);const manuals=kat.peserta.filter(p=>isManualPeserta(p));if(!manuals.length){toast('Tidak ada peserta manual');return;}if(!confirm(`Hapus ${manuals.length} peserta manual?`)) return;kat.peserta=kat.peserta.filter(p=>!isManualPeserta(p));if(kat.poolAssignment) manuals.forEach(pid=>delete kat.poolAssignment[pid]);const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(`✓ ${manuals.length} manual dihapus`);}
+async function removePesertaAt(eventId,katId,idx){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(idx<0||idx>=kat.peserta.length) return;const pid=kat.peserta[idx];const info=getPesertaInfo(pid,kat);kat.peserta.splice(idx,1);if(kat.poolAssignment) delete kat.poolAssignment[pid];if(kat.seeds) delete kat.seeds[pid];if(kat.byes) kat.byes=kat.byes.filter(x=>x!==pid);const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`"${info.nama}" dihapus`:`✓ "${info.nama}" dihapus`);}
+async function clearManualPeserta(eventId,katId){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);const manuals=kat.peserta.filter(p=>isManualPeserta(p));if(!manuals.length){toast('Tidak ada peserta manual');return;}if(!confirm(`Hapus ${manuals.length} peserta manual?`)) return;kat.peserta=kat.peserta.filter(p=>!isManualPeserta(p));if(kat.poolAssignment) manuals.forEach(pid=>delete kat.poolAssignment[pid]);if(kat.seeds) manuals.forEach(pid=>delete kat.seeds[pid]);if(kat.byes) kat.byes=kat.byes.filter(x=>!manuals.includes(x));const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(`✓ ${manuals.length} manual dihapus`);}
 
 async function regenerateManual(eventId, katId){
   const ev = getEvent(eventId);
@@ -1851,6 +2227,7 @@ async function regenerateManual(eventId, katId){
     '🔄 RESET & REGENERATE JADWAL DARI AWAL\n\n' +
     '• Semua pertandingan (termasuk knockout) akan dihapus & dibuat ulang\n' +
     '• Skor yang sudah dimasukkan akan dipertahankan jika matchup-nya sama\n' +
+    '• Seeding & BYE manual yang tersimpan akan dipakai kembali\n' +
     '• Babak knockout akan di-generate otomatis berdasarkan skor yang ada\n\n' +
     'Lanjutkan?'
   )) return;
@@ -1958,7 +2335,7 @@ function viewJadwalAdmin(){
   const filterActive=!!(f.kategoriId!=='all'||f.tanggal||f.status!=='all'||f.pool!=='all'||f.lapangan!=='all'||(f.search&&f.search.trim()));
   const rows=evMatches.map(m=>{const kat=ev.kategori.find(k=>k.id===m.kategoriId);if(!kat) return '';const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);const st=statusMatch(m),{a,b}=skorMatch(m);return `<tr><td><b>${esc(kat.nama)}</b></td><td><span class="chip ${m.stage==='pool'?'pool':m.stage==='knockout'?'ko':''}">${esc(m.babakLabel||'')}</span></td><td><b>${esc(infoA.singkat)}</b> vs <b>${esc(infoB.singkat)}</b></td><td>${esc(m.hari)}, ${esc(m.tgl)}<br><small class="muted">${esc(m.jam)} · ${esc(m.lapangan)}</small></td><td>${st==='selesai'?`<span class="chip done">${a}-${b}</span>`:st==='berlangsung'?`<span class="chip live">Live</span>`:`<span class="chip next">Akan</span>`}</td><td><div class="act-btns"><button class="icon-act" onclick="editMatch('${m.id}')">✏️</button><button class="icon-act del" onclick="hapusMatch('${m.id}')">🗑️</button></div></td></tr>`;}).join('');
   return `<div class="admin-page-head"><div><h2>📅 Jadwal Pertandingan</h2><p>Kelola jadwal &amp; skor</p></div></div>
-    <div class="admin-toolbar"><select class="filter-select" onchange="state.publicEventId=this.value;state.adminJadwalFilter.kategoriId='all';state.adminJadwalFilter.pool='all';renderAdminView('jadwal')" style="min-width:220px">${eventOpts}</select><button class="btn-primary" style="width:auto;padding:9px 16px" onclick="editMatch(null)">+ Tambah Match Manual</button><div class="grow"></div><span class="muted" style="font-size:12px;font-weight:600">${evMatches.length}${filterActive?' / '+baseMatches.length:''} pertandingan</span></div>
+    <div class="admin-toolbar"><select class="filter-select" onchange="state.publicEventId=this.value;state.adminJadwalFilter.kategoriId='all';state.adminJadwalFilter.pool='all';renderAdminView('jadwal')" style="min-width:200px;max-width:100%">${eventOpts}</select><button class="btn-primary" style="width:auto;padding:9px 16px" onclick="editMatch(null)">+ Tambah Match Manual</button><div class="grow"></div><span class="muted" style="font-size:12px;font-weight:600">${evMatches.length}${filterActive?' / '+baseMatches.length:''} pertandingan</span></div>
     <div class="filter-bar ${filterActive?'filter-active':''}" style="margin-bottom:14px"><span class="lbl">🔍 Filter</span><select class="filter-select" onchange="adminJadwalFilter('kategoriId',this.value)">${katOpts}</select><input type="date" class="filter-input" value="${f.tanggal}" onchange="adminJadwalFilter('tanggal',this.value)"><select class="filter-select" onchange="adminJadwalFilter('status',this.value)"><option value="all" ${f.status==='all'?'selected':''}>Semua Status</option><option value="akan" ${f.status==='akan'?'selected':''}>Akan Datang</option><option value="berlangsung" ${f.status==='berlangsung'?'selected':''}>Berlangsung</option><option value="selesai" ${f.status==='selesai'?'selected':''}>Selesai</option></select><select class="filter-select" onchange="adminJadwalFilter('pool',this.value)">${poolOpts.join('')}</select><select class="filter-select" onchange="adminJadwalFilter('lapangan',this.value)">${lapOpts.join('')}</select><input type="text" class="filter-input filter-search" id="adminJadwalSearch" placeholder="🔎 Cari..." value="${esc(f.search)}" oninput="adminJadwalSearch(this.value)" autocomplete="off"><button class="btn-ghost" onclick="adminResetJadwalFilter()">↺ Reset</button>${filterActive?`<span class="filter-count"><b>${evMatches.length}</b> / ${baseMatches.length}</span>`:''}</div>
     <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Kategori</th><th>Babak</th><th>Pertandingan</th><th>Waktu &amp; Lapangan</th><th>Status</th><th style="text-align:right">Aksi</th></tr></thead><tbody>${rows||`<tr><td colspan="6" class="empty" style="padding:32px">${baseMatches.length===0?'Belum ada pertandingan.':'Tidak ada yang cocok.'}</td></tr>`}</tbody></table></div>`;
 }
@@ -2069,18 +2446,14 @@ function refreshPlayerDatalists(){
   if(kat.tipe==='beregu'){
     if(!isManualPeserta(selA.value)){const psA=pemainTim(selA.value).filter(p=>!kat.gender||p.gender===kat.gender);listA.innerHTML=psA.map(p=>`<option value="${esc(p.nama)}">`).join('');}else{listA.innerHTML='';}
     if(!isManualPeserta(selB.value)){const psB=pemainTim(selB.value).filter(p=>!kat.gender||p.gender===kat.gender);listB.innerHTML=psB.map(p=>`<option value="${esc(p.nama)}">`).join('');}else{listB.innerHTML='';}
-  } else if(kat.tipe==='ganda'){
-    listA.innerHTML=''; listB.innerHTML='';
-  } else {
-    listA.innerHTML=''; listB.innerHTML='';
-  }
+  } else { listA.innerHTML=''; listB.innerHTML=''; }
 }
 function reloadMatchFormEvent(eventId){const ev=getEvent(eventId);const katSel=document.querySelector('#matchForm [name="kategoriId"]');if(katSel&&ev){katSel.innerHTML=ev.kategori.map(k=>`<option value="${k.id}">${esc(k.nama)} (${k.tipe})</option>`).join('');refreshPlayerDatalists();}}
 async function hapusMatch(id){if(!confirm('Hapus pertandingan ini?')) return;MATCHES=MATCHES.filter(m=>m.id!==id);await saveData();renderAdminView(state.view);renderPublic();toast('Pertandingan dihapus');}
 
 function viewKlasemenAdmin(){
   const ev=getEvent(state.klasemenEventId)||EVENTS[0];if(!ev) return `<div class="empty"><p>Belum ada kegiatan.</p></div>`;
-  let html=`<div class="admin-page-head"><div><h2>📈 Klasemen</h2><p>Klasemen per kategori</p></div></div><div class="admin-toolbar"><select class="filter-select" onchange="state.klasemenEventId=this.value;saveUIState();renderAdminView('klasemen')" style="min-width:220px">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div>`;
+  let html=`<div class="admin-page-head"><div><h2>📈 Klasemen</h2><p>Klasemen per kategori</p></div></div><div class="admin-toolbar"><select class="filter-select" onchange="state.klasemenEventId=this.value;saveUIState();renderAdminView('klasemen')" style="min-width:200px;max-width:100%">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div>`;
   if(!ev.kategori.length) return html+`<div class="empty"><p>Belum ada kategori.</p></div>`;
   ev.kategori.forEach(kat=>{
     const rows=hitungKlasemen(kat,ev.id);const isBeregu=kat.tipe==='beregu';const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;const poolInfo=kat.sistem==='pool'?getPoolSummary(kat):'';
@@ -2114,6 +2487,8 @@ async function hapusSatker(id){
       return !deletedPlayerIds.has(pid);
     });
     if(k.poolAssignment) delete k.poolAssignment[id];
+    if(k.seeds) delete k.seeds[id];
+    if(k.byes) k.byes = k.byes.filter(x => x !== id);
   }));
   await saveData();renderAdminView('satker');renderPublic();toast('Satker dihapus');
 }
@@ -2158,6 +2533,8 @@ async function bulkDeletePemain(){
             return !idSet.has(pid);
         });
         if(k.poolAssignment) ids.forEach(id=>{delete k.poolAssignment[id];});
+        if(k.seeds) ids.forEach(id=>{delete k.seeds[id];});
+        if(k.byes) k.byes = k.byes.filter(x => !idSet.has(x));
     }));
     MATCHES=MATCHES.filter(m=>!idSet.has(m.timA)&&!idSet.has(m.timB));
     await saveData();renderAdminView('pemain');renderPublic();toast(`✓ ${ids.length} pemain dihapus`);
@@ -2184,6 +2561,8 @@ async function hapusPemain(id){
           return pid !== id;
       });
       if(k.poolAssignment) delete k.poolAssignment[id];
+      if(k.seeds) delete k.seeds[id];
+      if(k.byes) k.byes = k.byes.filter(x => x !== id);
   }));
   MATCHES = MATCHES.filter(m => m.timA !== id && m.timB !== id);
   await saveData();renderAdminView('pemain');renderPublic();toast('Pemain dihapus');
@@ -2627,7 +3006,8 @@ function restoreScrollIfNeeded(){
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveUIState();saveCache();}});
 
 (async function init(){
-  setTheme(localStorage.getItem(LS_THEME)||'dark');
+  // DEFAULT THEME: LIGHT
+  setTheme(localStorage.getItem(LS_THEME)||'light');
   loadUIState();
   const isAdminSession = localStorage.getItem(LS_ADMIN)==='1';
   const wantsAdmin = location.hash.startsWith('#admin');
@@ -2645,13 +3025,13 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
     if(!hadCache){
       document.body.innerHTML=`<div style="padding:60px 20px;text-align:center;font-family:sans-serif;max-width:600px;margin:0 auto">
         <div style="font-size:60px;margin-bottom:20px">⚠️</div>
-        <h1 style="margin-bottom:12px;color:#e9f2f7">Gagal Memuat Data</h1>
-        <p style="color:#89a2b8;line-height:1.7;margin-bottom:24px">Periksa:<br>
+        <h1 style="margin-bottom:12px;color:var(--text)">Gagal Memuat Data</h1>
+        <p style="color:var(--muted);line-height:1.7;margin-bottom:24px">Periksa:<br>
         1. <b>SUPABASE_URL</b> dan <b>SUPABASE_ANON_KEY</b> di kode HTML<br>
         2. Koneksi internet<br>
         3. RLS policy di Supabase (harus allow anon read/write)<br>
         4. SQL schema sudah dijalankan?</p>
-        <button onclick="location.reload()" style="padding:12px 28px;font-size:14px;font-weight:800;border:0;border-radius:10px;background:#2ee07a;color:#04170d;cursor:pointer">🔄 Coba Lagi</button>
+        <button onclick="location.reload()" style="padding:12px 28px;font-size:14px;font-weight:800;border:0;border-radius:10px;background:#0fa958;color:#fff;cursor:pointer">🔄 Coba Lagi</button>
       </div>`;
       return;
     }
