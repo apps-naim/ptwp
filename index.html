@@ -24,13 +24,14 @@ a{color:inherit;text-decoration:none}
 .site-header{position:sticky;top:0;z-index:60;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:color-mix(in srgb,var(--bg) 76%, transparent);border-bottom:1px solid var(--line)}
 .header-inner{display:flex;align-items:center;gap:14px;padding:11px 0;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:21px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--glow);flex:none}
+.brand-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:21px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--glow);flex:none;overflow:hidden}
+.brand-mark img{width:100%;height:100%;object-fit:cover}
 .brand strong{display:block;font-size:15px;letter-spacing:-.3px;line-height:1.2}
 .brand span{font-size:10.5px;color:var(--muted);letter-spacing:1.1px;text-transform:uppercase;font-weight:700}
 .brand span b{color:var(--accent);font-weight:800}
-.nav{margin-left:auto;display:flex;gap:4px}
-.nav a{font-size:13px;font-weight:700;padding:9px 14px;border-radius:11px;color:var(--muted);transition:.2s;white-space:nowrap}
-.nav a:hover{color:var(--text);background:var(--panel2)}
+.nav{margin-left:auto;display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.nav a{font-size:13px;font-weight:700;padding:9px 14px;border-radius:11px;color:var(--muted);transition:.2s;white-space:nowrap;cursor:pointer}
+.nav a:hover,.nav a.active{color:var(--text);background:var(--panel2)}
 .icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;font-size:17px;display:grid;place-items:center;transition:.2s;flex:none}
 .icon-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
 .admin-chip{display:none;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:6px 11px;border-radius:999px;background:var(--accent);color:#04170d;letter-spacing:.4px;border:0;cursor:pointer;font-family:inherit}
@@ -123,8 +124,8 @@ body.admin .admin-chip{display:inline-flex}
 .set-badge{font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px;background:var(--bg2);border:1px solid var(--line);color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
 .set-badge.empty{color:var(--muted);font-weight:600}
 .grid{display:grid;gap:14px}
-.grid.satker{grid-template-columns:1fr}
-.grid.pemain{grid-template-columns:1fr}
+.grid.satker{grid-template-columns:repeat(4,1fr)}
+.grid.pemain{grid-template-columns:repeat(4,1fr)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);transition:.25s}
 .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
 .satker-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
@@ -188,7 +189,7 @@ body.admin .admin-chip{display:inline-flex}
 .footer-inner{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between}
 .footer-inner p{font-size:12.5px;color:var(--muted);line-height:1.7}
 .footer-inner strong{color:var(--text)}
-.login-dot{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;font-size:14px;display:grid;place-items:center;transition:.25s;position:relative}
+.login-dot{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;font-size:16px;display:grid;place-items:center;transition:.25s;position:relative}
 .login-dot:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--glow)}
 .login-dot.on{color:#04170d;background:var(--accent);border-color:transparent}
 .login-dot.on::after{content:"";position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:#22c55e;border:2px solid var(--bg)}
@@ -356,9 +357,35 @@ body.admin .admin-chip{display:inline-flex}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .loading-inner h3{font-size:17px;margin-bottom:8px;font-weight:800}
 .loading-inner p{color:var(--muted);font-size:13px;line-height:1.6}
-@media (max-width:960px){#jadwalList{grid-template-columns:repeat(2,1fr)}}
+
+/* PAGE TOGGLE */
+.page-view{display:none;}
+.page-view.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* TABEL & BAGAN STYLE */
+.tb-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media(max-width: 1024px) { .tb-layout { grid-template-columns: 1fr; } }
+.tb-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.tb-card h3 { font-size: 16px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; color: var(--accent); }
+.bracket-wrap{display:flex;gap:14px;margin:12px 0 18px;padding:10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;overflow-x:auto}
+.bracket-round{flex:1;display:flex;flex-direction:column;min-width:150px;position:relative}
+.bracket-round:not(:last-child)::after{content:'›';position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:var(--accent);font-size:18px;font-weight:700}
+.bracket-round-title{text-align:center;font-weight:700;font-size:10px;text-transform:uppercase;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04170d;padding:6px 4px;border-radius:6px;margin-bottom:10px}
+.bracket-matches{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:8px}
+.bracket-match{border:1.5px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--panel);font-size:11px}
+.bracket-match.final{border-color:var(--accent);border-width:2px;background:color-mix(in srgb,var(--accent) 5%,var(--panel))}
+.bracket-match .match-meta-small{font-size:8.5px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.bracket-team{display:flex;justify-content:space-between;gap:6px;padding:2px 0;border-bottom:1px dashed var(--line);line-height:1.3}
+.bracket-team:last-of-type{border-bottom:0}
+.bracket-team.win{font-weight:800;color:var(--accent)}
+.bracket-team.tbd{color:var(--muted);font-style:italic}
+.bracket-team .skor{font-size:10px;color:var(--muted);margin-left:4px}
+
+@media (max-width:1200px){.grid.satker,.grid.pemain{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:960px){#jadwalList{grid-template-columns:repeat(2,1fr)}.grid.satker,.grid.pemain{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:900px){.header-inner{padding:10px 0}.nav{order:3;width:100%;margin-left:0;overflow-x:auto;padding-bottom:3px}.nav::-webkit-scrollbar{display:none}.brand strong{font-size:14px}.hero{padding:56px 0 40px}.hero-bg{background-attachment:scroll}.hero-ball.b1{width:60px;height:60px;top:12%;right:5%}.hero-ball.b2{width:38px;height:38px;opacity:.6}.hero-ball.b3{display:none}.admin-panel{flex-direction:column}.admin-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:0;border-right:0;border-bottom:1px solid var(--line)}.admin-brand{display:none}.admin-nav{display:flex;padding:0;flex:1;overflow-x:auto}.admin-nav .sec-label{display:none}.admin-nav button{white-space:nowrap;padding:13px 15px;border-left:0;border-bottom:3px solid transparent}.admin-nav button.active{border-left:0;border-bottom-color:var(--accent)}.admin-sidebar-foot{flex-direction:row;padding:7px;border-top:0;border-left:1px solid var(--line)}.admin-sidebar-foot button{padding:7px 11px;font-size:10.5px}.admin-main{padding:16px}.admin-page-head h2{font-size:20px}.filter-search{max-width:none}}
-@media (max-width:640px){#jadwalList{grid-template-columns:1fr}.partai{grid-template-columns:1fr auto 1fr}.duel .t{font-size:12px}.duel .sc{font-size:16px;padding:4px 10px}.table th,.table td{padding:9px 7px;font-size:12px}.hide-sm{display:none}.form-grid{grid-template-columns:1fr}.event-grid,.kat-grid{grid-template-columns:1fr}.pe-cols,.pe-result{grid-template-columns:1fr}.pool-assign-grid{grid-template-columns:1fr}.court-row{grid-template-columns:1fr 1fr auto}.filter-bar,.print-filter-bar{padding:10px}.filter-select,.filter-input{flex:1;min-width:110px}.filter-search{max-width:none;min-width:100%}.hero-ball{display:none}.hero{padding:42px 0 32px}}
+@media (max-width:640px){#jadwalList{grid-template-columns:1fr}.grid.satker,.grid.pemain{grid-template-columns:1fr}.partai{grid-template-columns:1fr auto 1fr}.duel .t{font-size:12px}.duel .sc{font-size:16px;padding:4px 10px}.table th,.table td{padding:9px 7px;font-size:12px}.hide-sm{display:none}.form-grid{grid-template-columns:1fr}.event-grid,.kat-grid{grid-template-columns:1fr}.pe-cols,.pe-result{grid-template-columns:1fr}.pool-assign-grid{grid-template-columns:1fr}.court-row{grid-template-columns:1fr 1fr auto}.filter-bar,.print-filter-bar{padding:10px}.filter-select,.filter-input{flex:1;min-width:110px}.filter-search{max-width:none;min-width:100%}.hero-ball{display:none}.hero{padding:42px 0 32px}}
 
 /* LOADING INDICATORS */
 .global-loader{position:fixed;top:0;left:0;right:0;height:3px;z-index:9998;background:transparent;pointer-events:none;opacity:0;transition:opacity .25s}
@@ -392,17 +419,18 @@ body.admin .admin-chip{display:inline-flex}
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="#top">
-      <div class="brand-mark">🎾</div>
+      <div class="brand-mark" id="brandMark">🎾</div>
       <div>
         <strong id="brandTitle">PTWP PTA Sulawesi Barat</strong>
         <span><span id="brandSub">Turnamen Tenis</span> <b id="brandYear">2025</b></span>
       </div>
     </a>
-    <nav class="nav">
-      <a href="#jadwal">Jadwal</a>
-      <a href="#satker">Satker</a>
-      <a href="#pemain">Pemain</a>
-      <a href="#klasemen">Klasemen</a>
+    <nav class="nav" id="publicNav">
+      <a href="#jadwal" onclick="showPublicPage('home');scrollToSection('jadwal');return false;">Jadwal</a>
+      <a href="#klasemen" onclick="showPublicPage('home');scrollToSection('klasemen');return false;">Klasemen</a>
+      <a href="#" onclick="showPublicPage('tabelbagan');return false;">Tabel & Bagan</a>
+      <a href="#" onclick="showPublicPage('satker');return false;">Satker</a>
+      <a href="#" onclick="showPublicPage('pemain');return false;">Pemain</a>
     </nav>
     <button class="admin-chip" id="openDashboardBtn">● ADMIN · Dashboard</button>
     <button class="icon-btn" id="themeBtn" title="Ganti tema">🌙</button>
@@ -410,84 +438,103 @@ body.admin .admin-chip{display:inline-flex}
 </header>
 
 <main id="top">
-  <section class="hero">
-    <div class="hero-bg" id="heroBg"></div>
-    <div class="hero-ball b1"></div><div class="hero-ball b2"></div><div class="hero-ball b3"></div>
-    <div class="wrap" style="position:relative;z-index:1">
-      <div class="tagline" id="heroTagline">● Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat</div>
-      <h1>Turnamen Tenis<br><span class="grad" id="heroTitle">PTWP PTA Sulawesi Barat</span> <span id="heroYear">2025</span></h1>
-      <p class="lead" id="heroLead"></p>
-      <div class="stats">
-        <div class="stat"><b id="stEvent">1</b><span>Kegiatan</span></div>
-        <div class="stat"><b id="stKat">4</b><span>Kategori</span></div>
-        <div class="stat"><b id="stMatch">0</b><span>Pertandingan</span></div>
-        <div class="stat"><b id="stPool">0</b><span>Pool</span></div>
+  <!-- HALAMAN DEPAN (JADWAL & KLASEMEN) -->
+  <div id="page-home" class="page-view active">
+    <section class="section" id="jadwal">
+      <div class="wrap">
+        <div class="sec-head">
+          <div><h2>Jadwal Pertandingan</h2><p id="jadwalSub">Pilih kegiatan untuk melihat jadwal</p></div>
+          <div class="tabs" id="katFilter"></div>
+        </div>
+        <div class="event-tabs" id="eventTabs"></div>
+        <div class="filter-bar" id="jadwalFilterBar">
+          <span class="lbl">🔍 Filter</span>
+          <input type="date" class="filter-input" id="jadwalTglFilter">
+          <select class="filter-select" id="jadwalStatusFilter"><option value="all">Semua Status</option><option value="akan">Akan Datang</option><option value="berlangsung">Berlangsung</option><option value="selesai">Selesai</option></select>
+          <select class="filter-select" id="jadwalPoolFilter"><option value="all">Semua Pool</option></select>
+          <select class="filter-select" id="jadwalLapanganFilter"><option value="all">Semua Lapangan</option></select>
+          <input type="text" class="filter-input filter-search" id="jadwalSearchFilter" placeholder="🔎 Cari tim/pemain..." autocomplete="off">
+          <button class="btn-ghost" onclick="resetJadwalFilter()">↺ Reset</button>
+          <span class="filter-count" id="jadwalFilterCount"></span>
+        </div>
+        <div id="jadwalList"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section" id="jadwal">
-    <div class="wrap">
-      <div class="sec-head">
-        <div><h2>Jadwal Pertandingan</h2><p id="jadwalSub">Pilih kegiatan untuk melihat jadwal</p></div>
-        <div class="tabs" id="katFilter"></div>
+    <section class="section" id="klasemen">
+      <div class="wrap">
+        <div class="sec-head"><div><h2>Klasemen</h2><p>Klasemen per kegiatan &amp; kategori</p></div></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
+          <span style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)">Kegiatan</span>
+          <select class="filter-select" id="klasemenEventFilter"></select>
+        </div>
+        <div id="progressPanel"></div>
+        <div id="klasemenContent"></div>
       </div>
-      <div class="event-tabs" id="eventTabs"></div>
-      <div class="filter-bar" id="jadwalFilterBar">
-        <span class="lbl">🔍 Filter</span>
-        <input type="date" class="filter-input" id="jadwalTglFilter">
-        <select class="filter-select" id="jadwalStatusFilter"><option value="all">Semua Status</option><option value="akan">Akan Datang</option><option value="berlangsung">Berlangsung</option><option value="selesai">Selesai</option></select>
-        <select class="filter-select" id="jadwalPoolFilter"><option value="all">Semua Pool</option></select>
-        <select class="filter-select" id="jadwalLapanganFilter"><option value="all">Semua Lapangan</option></select>
-        <input type="text" class="filter-input filter-search" id="jadwalSearchFilter" placeholder="🔎 Cari tim/pemain..." autocomplete="off">
-        <button class="btn-ghost" onclick="resetJadwalFilter()">↺ Reset</button>
-        <span class="filter-count" id="jadwalFilterCount"></span>
-      </div>
-      <div id="jadwalList"></div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <section class="section" id="satker">
-    <div class="wrap">
-      <div class="sec-head"><div><h2>Daftar Satker</h2><p id="satkerSub">Peserta turnamen</p></div></div>
-      <div class="grid satker" id="satkerList"></div>
-    </div>
-  </section>
-
-  <section class="section" id="pemain">
-    <div class="wrap">
-      <div class="sec-head"><div><h2>Daftar Pemain</h2><p>Pemain per satker</p></div></div>
-      <div class="filter-bar" id="pemainFilterBar">
-        <span class="lbl">🔍 Filter</span>
-        <select class="filter-select" id="pemainSatkerFilter"><option value="all">Semua Satker</option></select>
-        <select class="filter-select" id="pemainGenderFilter"><option value="all">Semua Gender</option><option value="putra">Putra</option><option value="putri">Putri</option></select>
-        <select class="filter-select" id="pemainJenisFilter"><option value="all">Semua Jenis</option><option value="Tunggal">Tunggal</option><option value="Ganda">Ganda</option></select>
-        <input type="text" class="filter-input filter-search" id="pemainSearchFilter" placeholder="🔎 Cari nama pemain..." autocomplete="off">
-        <button class="btn-ghost" onclick="resetPemainFilter()">↺ Reset</button>
-        <span class="filter-count" id="pemainFilterCount"></span>
+  <!-- HALAMAN SATKER -->
+  <div id="page-satker" class="page-view">
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head"><div><h2>Daftar Satker</h2><p id="satkerSub">Peserta turnamen</p></div></div>
+        <div class="grid satker" id="satkerList"></div>
       </div>
-      <div class="grid pemain" id="pemainList"></div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <section class="section" id="klasemen">
-    <div class="wrap">
-      <div class="sec-head"><div><h2>Klasemen</h2><p>Klasemen per kegiatan &amp; kategori</p></div></div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
-        <span style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)">Kegiatan</span>
-        <select class="filter-select" id="klasemenEventFilter"></select>
+  <!-- HALAMAN PEMAIN -->
+  <div id="page-pemain" class="page-view">
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head"><div><h2>Daftar Pemain</h2><p>Pemain per satker</p></div></div>
+        <div class="filter-bar" id="pemainFilterBar">
+          <span class="lbl">🔍 Filter</span>
+          <select class="filter-select" id="pemainSatkerFilter"><option value="all">Semua Satker</option></select>
+          <select class="filter-select" id="pemainGenderFilter"><option value="all">Semua Gender</option><option value="putra">Putra</option><option value="putri">Putri</option></select>
+          <select class="filter-select" id="pemainJenisFilter"><option value="all">Semua Jenis</option><option value="Tunggal">Tunggal</option><option value="Ganda">Ganda</option></select>
+          <input type="text" class="filter-input filter-search" id="pemainSearchFilter" placeholder="🔎 Cari nama pemain..." autocomplete="off">
+          <button class="btn-ghost" onclick="resetPemainFilter()">↺ Reset</button>
+          <span class="filter-count" id="pemainFilterCount"></span>
+        </div>
+        <div class="grid pemain" id="pemainList"></div>
       </div>
-      <div id="progressPanel"></div>
-      <div id="klasemenContent"></div>
-    </div>
-  </section>
+    </section>
+  </div>
+
+  <!-- HALAMAN TABEL & BAGAN -->
+  <div id="page-tabelbagan" class="page-view">
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head">
+          <div><h2>Tabel & Bagan</h2><p>Visualisasi pertandingan dan skor</p></div>
+        </div>
+        <div class="filter-bar" id="tbFilterBar">
+          <span class="lbl">🔍 Filter</span>
+          <select class="filter-select" id="tbEventFilter"></select>
+          <select class="filter-select" id="tbKatFilter"><option value="all">Semua Kategori</option></select>
+        </div>
+        <div class="tb-layout">
+          <div class="tb-card">
+            <h3>📋 Tabel Pertandingan</h3>
+            <div id="tbTableContent"></div>
+          </div>
+          <div class="tb-card">
+            <h3>🌳 Bagan (Bracket)</h3>
+            <div id="tbBracketContent"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <p>© <span id="footYear">2025</span> <strong id="footTitle">PTWP PTA Sulawesi Barat</strong> — Turnamen Tenis Antar Satker.<br>
       <span id="footLocation">Lapangan Tenis PTA Sulawesi Barat, Mamuju</span> · #SportifBersama</p>
-    <button class="login-dot" id="loginDot" title="Login Admin">🔑</button>
+    <button class="login-dot" id="loginDot" title="Login Admin">🎾</button>
   </div>
 </footer>
 
@@ -569,11 +616,12 @@ let SETTINGS={
   tagline:'Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat',
   heroLead:'Ajang silaturahmi dan sportivitas antar satker.',
   heroImage:DEFAULT_HERO_IMAGE,
+  logo:'🎾',
   adminUser:'admin',adminPass:'admin',
   courts:[]
 };
 let TEAMS=[],PEMAIN=[],EVENTS=[],MATCHES=[];
-let state={admin:false,view:'dashboard',publicEventId:null,publicKatFilter:'all',klasemenEventId:null,adminKegiatan:{view:'list',eventId:null},jadwalFilter:{tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},pemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},adminJadwalFilter:{kategoriId:'all',tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},adminPemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},printFilter:{eventId:'all',kategoriId:'all',status:'all',gender:'all',tanggalFrom:'',tanggalTo:'',satker:'all',jenis:'all'}};
+let state={admin:false,view:'dashboard',publicEventId:null,publicKatFilter:'all',klasemenEventId:null,adminKegiatan:{view:'list',eventId:null},jadwalFilter:{tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},pemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},adminJadwalFilter:{kategoriId:'all',tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},adminPemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},printFilter:{eventId:'all',kategoriId:'all',status:'all',gender:'all',tanggalFrom:'',tanggalTo:'',satker:'all',jenis:'all'},tbFilter:{eventId:'all',kategoriId:'all'}};
 
 /* =====================================================
    CACHE & UI STATE
@@ -711,6 +759,7 @@ async function saveData(){
         id:1,title:SETTINGS.title,sub:SETTINGS.sub,year:SETTINGS.year,
         location:SETTINGS.location,tagline:SETTINGS.tagline,
         hero_lead:SETTINGS.heroLead,hero_image:SETTINGS.heroImage,
+        logo:SETTINGS.logo,
         admin_user:SETTINGS.adminUser,admin_pass:SETTINGS.adminPass
       }).then(r=>{if(r.error) throw r.error;}),
       syncTable('teams',TEAMS,t=>({id:t.id,nama:t.nama,singkat:t.singkat,kota:t.kota,warna:t.warna})),
@@ -753,6 +802,7 @@ async function loadData(){
       SETTINGS.year=s.year||SETTINGS.year;SETTINGS.location=s.location||SETTINGS.location;
       SETTINGS.tagline=s.tagline||SETTINGS.tagline;SETTINGS.heroLead=s.hero_lead||SETTINGS.heroLead;
       SETTINGS.heroImage=s.hero_image||SETTINGS.heroImage;
+      SETTINGS.logo=s.logo||'🎾';
       SETTINGS.adminUser=s.admin_user||'admin';SETTINGS.adminPass=s.admin_pass||'admin';
     }
     SETTINGS.courts=(courtsRes.data||[]).map(c=>({id:c.id,nama:c.nama,lokasi:c.lokasi||''}));
@@ -1025,6 +1075,7 @@ function preserveScores(oldMatches,newMatches){
   const map={};
   oldMatches.forEach(m=>{(m.partai||[]).forEach(p=>{if(!p.menang&&!p.skor) return;const key=`${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;const revKey=`${m.timB}|${m.timA}|${p.kode}|${p.jenis}|${(p.pemainB||[]).join('&')}|${(p.pemainA||[]).join('&')}`;map[key]={menang:p.menang,skor:p.skor||''};if(p.menang==='A') map[revKey]={menang:'B',skor:flipSkor(p.skor||'')};else if(p.menang==='B') map[revKey]={menang:'A',skor:flipSkor(p.skor||'')};});});
   newMatches.forEach(m=>{(m.partai||[]).forEach(p=>{const key=`${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;if(map[key]){p.menang=map[key].menang;p.skor=map[key].skor;}});});}
+}
 async function autoRegenerateSchedule(eventId,katId){
   const ev=getEvent(eventId);if(!ev) return {cleared:false,count:0};
   const kat=ev.kategori.find(k=>k.id===katId);if(!kat) return {cleared:false,count:0};
@@ -1230,48 +1281,87 @@ function applySettings(){
   if(!SETTINGS.heroImage) SETTINGS.heroImage=DEFAULT_HERO_IMAGE;
   if(!SETTINGS.adminUser) SETTINGS.adminUser='admin';
   if(!SETTINGS.adminPass) SETTINGS.adminPass='admin';
+  if(!SETTINGS.logo) SETTINGS.logo='🎾';
+  
   document.getElementById('brandTitle').textContent=SETTINGS.title;
   document.getElementById('brandSub').textContent=SETTINGS.sub;
   document.getElementById('brandYear').textContent=SETTINGS.year;
-  document.getElementById('heroTitle').textContent=SETTINGS.title;
-  document.getElementById('heroYear').textContent=SETTINGS.year;
-  document.getElementById('heroTagline').textContent='● '+SETTINGS.tagline;
-  document.getElementById('heroLead').innerHTML=SETTINGS.heroLead;
   document.getElementById('footTitle').textContent=SETTINGS.title;
   document.getElementById('footYear').textContent=SETTINGS.year;
   document.getElementById('footLocation').textContent=SETTINGS.location;
   document.getElementById('adminBrandYear').textContent=`Turnamen ${SETTINGS.year}`;
   document.title=`${SETTINGS.title} — ${SETTINGS.sub} ${SETTINGS.year}`;
+  
   const heroBg=document.getElementById('heroBg');
   if(heroBg){const imgUrl=(SETTINGS.heroImage||'').trim()||DEFAULT_HERO_IMAGE;heroBg.style.backgroundImage=`url("${imgUrl}")`;}
+  
+  const brandMark=document.getElementById('brandMark');
+  if(brandMark) {
+    if(SETTINGS.logo.startsWith('http')){
+      brandMark.innerHTML = `<img src="${SETTINGS.logo}" alt="Logo">`;
+    } else {
+      brandMark.textContent = SETTINGS.logo;
+    }
+  }
 }
 
 /* =====================================================
    PUBLIC RENDERING
    ===================================================== */
+function showPublicPage(page) {
+  document.querySelectorAll('#publicNav a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
+  
+  if (page === 'home') {
+    document.getElementById('page-home').classList.add('active');
+    document.querySelectorAll('#publicNav a')[0].classList.add('active');
+  } else if (page === 'tabelbagan') {
+    document.getElementById('page-tabelbagan').classList.add('active');
+    document.querySelectorAll('#publicNav a')[2].classList.add('active');
+    renderTabelBagan();
+  } else if (page === 'satker') {
+    document.getElementById('page-satker').classList.add('active');
+    document.querySelectorAll('#publicNav a')[3].classList.add('active');
+    renderSatkerPublic();
+  } else if (page === 'pemain') {
+    document.getElementById('page-pemain').classList.add('active');
+    document.querySelectorAll('#publicNav a')[4].classList.add('active');
+    renderPemainFilterUI();
+    renderPemainPublic();
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior: 'smooth'});
+}
+
 function renderHeroStats(){
-  document.getElementById('stEvent').textContent=EVENTS.length;
-  document.getElementById('stKat').textContent=EVENTS.reduce((n,e)=>n+e.kategori.length,0);
-  document.getElementById('stMatch').textContent=MATCHES.length;
+  const elEvent = document.getElementById('stEvent'); if(elEvent) elEvent.textContent=EVENTS.length;
+  const elKat = document.getElementById('stKat'); if(elKat) elKat.textContent=EVENTS.reduce((n,e)=>n+e.kategori.length,0);
+  const elMatch = document.getElementById('stMatch'); if(elMatch) elMatch.textContent=MATCHES.length;
   const pools=new Set(MATCHES.filter(m=>m.poolId).map(m=>m.eventId+':'+m.kategoriId+':'+m.poolId));
-  document.getElementById('stPool').textContent=pools.size;
+  const elPool = document.getElementById('stPool'); if(elPool) elPool.textContent=pools.size;
 }
 function renderEventTabs(){
-  const el=document.getElementById('eventTabs');if(!EVENTS.length){el.innerHTML='';return;}
+  const el=document.getElementById('eventTabs');if(!el) return;
+  if(!EVENTS.length){el.innerHTML='';return;}
   if(!state.publicEventId) state.publicEventId=EVENTS[0].id;
   el.innerHTML=EVENTS.map(ev=>{
     const tgl=ev.mulai&&ev.selesai?`${ev.mulai} s/d ${ev.selesai}`:(ev.mulai||'');
     const cnt=MATCHES.filter(m=>m.eventId===ev.id).length;
     return `<button class="event-tab ${ev.id===state.publicEventId?'active':''}" data-event="${ev.id}"><span>${esc(ev.nama)}</span><small>${esc(tgl)} · ${cnt} match</small></button>`;
   }).join('');
-  el.querySelectorAll('.event-tab').forEach(btn=>{btn.addEventListener('click',()=>{state.publicEventId=btn.dataset.event;state.publicKatFilter='all';state.jadwalFilter.pool='all';state.jadwalFilter.lapangan='all';saveUIState();renderPublic();});});
+  el.querySelectorAll('.event-tab').forEach(btn=>{btn.addEventListener('click',()=>{state.publicEventId=btn.dataset.event;state.publicKatFilter='all';state.jadwalFilter.pool='all';state.jadwalFilter.lapangan='all';saveUIState();renderJadwalPublic();});});
 }
 function renderKatFilter(){
-  const el=document.getElementById('katFilter');const ev=getEvent(state.publicEventId);
+  const el=document.getElementById('katFilter');if(!el) return;
+  const ev=getEvent(state.publicEventId);
   if(!ev||!ev.kategori.length){el.innerHTML='';return;}
   const items=[{id:'all',nama:'Semua'}].concat(ev.kategori.map(k=>({id:k.id,nama:k.nama})));
   el.innerHTML=items.map(it=>`<button data-kat="${it.id}" class="${state.publicKatFilter===it.id?'active':''}">${esc(it.nama)}</button>`).join('');
-  el.querySelectorAll('button').forEach(b=>{b.addEventListener('click',()=>{state.publicKatFilter=b.dataset.kat;state.jadwalFilter.pool='all';saveUIState();renderPublic();});});
+  el.querySelectorAll('button').forEach(b=>{b.addEventListener('click',()=>{state.publicKatFilter=b.dataset.kat;state.jadwalFilter.pool='all';saveUIState();renderJadwalPublic();});});
 }
 function renderJadwalFilterUI(){
   const ev=getEvent(state.publicEventId);
@@ -1299,7 +1389,8 @@ function renderJadwalFilterUI(){
 }
 function renderJadwalPublic(){
   const ev=getEvent(state.publicEventId);
-  if(!ev){document.getElementById('jadwalList').innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">📅</div><p>Belum ada kegiatan.</p></div>`;document.getElementById('jadwalSub').textContent='Belum ada kegiatan';return;}
+  const listEl = document.getElementById('jadwalList'); if(!listEl) return;
+  if(!ev){listEl.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">📅</div><p>Belum ada kegiatan.</p></div>`;document.getElementById('jadwalSub').textContent='Belum ada kegiatan';return;}
   document.getElementById('jadwalSub').textContent=`${ev.nama} — ${ev.lokasi||''}`;
   const baseMatches=MATCHES.filter(m=>{if(m.eventId!==ev.id) return false;if(state.publicKatFilter!=='all'&&m.kategoriId!==state.publicKatFilter) return false;return true;});
   const filtered=baseMatches.filter(m=>matchMatchesFilter(m,ev,state.jadwalFilter));
@@ -1307,13 +1398,13 @@ function renderJadwalPublic(){
   if(cntEl){if(isJadwalFilterActive()) cntEl.innerHTML=`<b>${filtered.length}</b> / ${baseMatches.length} pertandingan`;else cntEl.innerHTML=`${baseMatches.length} pertandingan`;}
   const bar=document.getElementById('jadwalFilterBar');
   if(bar){if(isJadwalFilterActive()) bar.classList.add('filter-active');else bar.classList.remove('filter-active');}
-  if(!filtered.length){document.getElementById('jadwalList').innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">📅</div><p>${baseMatches.length===0?'Belum ada pertandingan.':'Tidak ada yang cocok dengan filter.'}</p></div>`;return;}
+  if(!filtered.length){listEl.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">📅</div><p>${baseMatches.length===0?'Belum ada pertandingan.':'Tidak ada yang cocok dengan filter.'}</p></div>`;return;}
   filtered.sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||'')||(a.jam||'').localeCompare(b.jam||''));
   const groups={},order=[];
   filtered.forEach(m=>{const key=m.tgl||'Belum dijadwalkan';if(!groups[key]){groups[key]=[];order.push(key);}groups[key].push(m);});
   let html='';
   order.forEach(tgl=>{const items=groups[tgl];const done=items.filter(m=>statusMatch(m)==='selesai').length;html+=`<div class="day-heading" style="grid-column:1/-1">${esc(tgl)}<span>${done}/${items.length} selesai</span></div>`;items.forEach(m=>html+=renderMatchCard(m));});
-  document.getElementById('jadwalList').innerHTML=html;
+  listEl.innerHTML=html;
 }
 function renderMatchCard(m){
   const ev=getEvent(m.eventId);const kat=ev?ev.kategori.find(k=>k.id===m.kategoriId):null;if(!kat) return '';
@@ -1349,7 +1440,7 @@ function renderMatchCard(m){
 }
 function resetJadwalFilter(){state.jadwalFilter={tanggal:'',status:'all',pool:'all',lapangan:'all',search:''};saveUIState();renderJadwalFilterUI();renderJadwalPublic();toast('Filter direset');}
 function renderSatkerPublic(){
-  const el=document.getElementById('satkerList');
+  const el=document.getElementById('satkerList');if(!el) return;
   if(!TEAMS.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><p>Belum ada satker.</p></div>`;return;}
   el.innerHTML=TEAMS.map(t=>{
     const pemain=pemainTim(t.id);const initial=t.singkat.replace(/PA /gi,'').slice(0,3).toUpperCase()||'?';
@@ -1368,7 +1459,7 @@ function renderPemainFilterUI(){
   if(searchInput){searchInput.value=state.pemainFilter.search||'';if(!searchInput._bound){searchInput._bound=true;let timer=null;searchInput.addEventListener('input',e=>{clearTimeout(timer);timer=setTimeout(()=>{state.pemainFilter.search=e.target.value;saveUIState();renderPemainPublic();},200);});}}
 }
 function renderPemainPublic(){
-  const el=document.getElementById('pemainList');
+  const el=document.getElementById('pemainList');if(!el) return;
   if(!TEAMS.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><p>Belum ada pemain.</p></div>`;return;}
   const filter=state.pemainFilter;const activeFilter=isPemainFilterActive();
   const bar=document.getElementById('pemainFilterBar');
@@ -1391,13 +1482,14 @@ function renderPemainPublic(){
 }
 function resetPemainFilter(){state.pemainFilter={satker:'all',gender:'all',jenis:'all',search:''};saveUIState();renderPemainFilterUI();renderPemainPublic();toast('Filter pemain direset');}
 function renderProgress(){
-  const el=document.getElementById('progressPanel');const ev=getEvent(state.klasemenEventId);if(!ev){el.innerHTML='';return;}
+  const el=document.getElementById('progressPanel');if(!el) return;
+  const ev=getEvent(state.klasemenEventId);if(!ev){el.innerHTML='';return;}
   const evMatches=MATCHES.filter(m=>m.eventId===ev.id);const total=evMatches.length,done=evMatches.filter(m=>statusMatch(m)==='selesai').length;const live=evMatches.filter(m=>statusMatch(m)==='berlangsung').length;const pct=total?Math.round(done/total*100):0;
   if(!total){el.innerHTML='';return;}
   el.innerHTML=`<div class="progress-panel"><div><div class="lbl">Progres</div><div class="big">${pct}%</div></div><div class="progress-track"><div class="progress-bar"><div style="width:${pct}%"></div></div><div class="progress-meta"><span>${done} selesai · ${live} berlangsung</span><span>Total ${total} pertandingan</span></div></div></div>`;
 }
 function renderKlasemen(){
-  const ev=getEvent(state.klasemenEventId);const content=document.getElementById('klasemenContent');
+  const ev=getEvent(state.klasemenEventId);const content=document.getElementById('klasemenContent');if(!content) return;
   if(!ev){content.innerHTML=`<div class="empty"><p>Belum ada kegiatan.</p></div>`;return;}
   if(!ev.kategori.length){content.innerHTML=`<div class="empty"><p>Belum ada kategori.</p></div>`;return;}
   let html='';
@@ -1415,15 +1507,97 @@ function renderKlasemen(){
   content.innerHTML=html;
 }
 function renderKlasemenEventFilter(){
-  const el=document.getElementById('klasemenEventFilter');
+  const el=document.getElementById('klasemenEventFilter');if(!el) return;
   el.innerHTML=EVENTS.map(ev=>`<option value="${ev.id}" ${ev.id===state.klasemenEventId?'selected':''}>${esc(ev.nama)}</option>`).join('');
   el.onchange=e=>{state.klasemenEventId=e.target.value;saveUIState();renderProgress();renderKlasemen();};
 }
+
+/* TABEL & BAGAN */
+function renderTabelBagan() {
+  const evSel = document.getElementById('tbEventFilter');
+  const katSel = document.getElementById('tbKatFilter');
+  if(!evSel) return;
+  
+  if(!EVENTS.length) {
+    document.getElementById('tbTableContent').innerHTML = '<p class="muted">Belum ada data.</p>';
+    document.getElementById('tbBracketContent').innerHTML = '';
+    return;
+  }
+  
+  if(evSel.options.length === 0) {
+    evSel.innerHTML = EVENTS.map(e => `<option value="${e.id}">${esc(e.nama)}</option>`).join('');
+    evSel.value = state.tbFilter.eventId === 'all' ? EVENTS[0].id : state.tbFilter.eventId;
+    state.tbFilter.eventId = evSel.value;
+    
+    evSel.onchange = (e) => {
+      state.tbFilter.eventId = e.target.value;
+      state.tbFilter.kategoriId = 'all';
+      renderTabelBagan();
+    };
+  }
+  
+  const ev = getEvent(state.tbFilter.eventId);
+  if(!ev) return;
+  
+  if(katSel) {
+    const currentVal = state.tbFilter.kategoriId;
+    katSel.innerHTML = `<option value="all">Semua Kategori</option>` + ev.kategori.map(k => `<option value="${k.id}" ${k.id===currentVal?'selected':''}>${esc(k.nama)}</option>`).join('');
+    katSel.value = currentVal;
+    katSel.onchange = (e) => {
+      state.tbFilter.kategoriId = e.target.value;
+      renderTabelBagan();
+    };
+  }
+
+  const matches = MATCHES.filter(m => {
+    if (m.eventId !== ev.id) return false;
+    if (state.tbFilter.kategoriId !== 'all' && m.kategoriId !== state.tbFilter.kategoriId) return false;
+    return true;
+  }).sort((a,b) => (a.tgl||'').localeCompare(b.tgl||'') || (a.jam||'').localeCompare(b.jam||''));
+
+  let tblHtml = '<div class="table-wrap" style="margin-bottom:0"><table class="table"><thead><tr><th>Waktu</th><th>Babak</th><th>Pertandingan</th><th>Skor</th></tr></thead><tbody>';
+  if(!matches.length) {
+    tblHtml += `<tr><td colspan="4" class="empty" style="padding:20px">Belum ada pertandingan.</td></tr>`;
+  } else {
+    matches.forEach(m => {
+      const kat = ev.kategori.find(k => k.id === m.kategoriId);
+      const infoA = getPesertaInfo(m.timA, kat);
+      const infoB = getPesertaInfo(m.timB, kat);
+      const st = statusMatch(m), {a,b} = skorMatch(m);
+      const skor = st === 'akan' ? 'VS' : `<b>${a} - ${b}</b>`;
+      tblHtml += `<tr>
+        <td style="font-size:11px">${esc(m.tgl||'')}<br><small class="muted">${esc(m.jam||'')}</small></td>
+        <td><span class="chip ${m.stage==='pool'?'pool':m.stage==='knockout'?'ko':''}">${esc(m.babakLabel||'')}</span></td>
+        <td style="font-size:11px"><b>${esc(infoA.singkat)}</b> vs <b>${esc(infoB.singkat)}</b></td>
+        <td style="color:var(--accent)">${skor}</td>
+      </tr>`;
+    });
+  }
+  tblHtml += '</tbody></table></div>';
+  document.getElementById('tbTableContent').innerHTML = tblHtml;
+
+  let bracketHtml = '';
+  const filteredCats = state.tbFilter.kategoriId === 'all' ? ev.kategori : ev.kategori.filter(k=>k.id===state.tbFilter.kategoriId);
+  filteredCats.forEach(kat => {
+    const catMatches = matches.filter(m => m.kategoriId === kat.id);
+    if(catMatches.length) {
+      bracketHtml += `<div style="margin-bottom:20px"><div style="font-weight:800;font-size:13px;margin-bottom:8px;color:var(--text)">${esc(kat.nama)} <span class="badge" style="background:var(--panel2);border:1px solid var(--line);padding:2px 6px;border-radius:4px;font-size:9px">${esc(formatLabel(kat.sistem))}</span></div>`;
+      if(kat.sistem==='pool'){bracketHtml+=renderPoolGroupsHTML(catMatches,kat);bracketHtml+=renderBracketHTML(catMatches,kat);}
+      else if(kat.sistem==='penyisihan' || kat.sistem==='gugur'){bracketHtml+=renderBracketHTML(catMatches,kat);}
+      else if(kat.sistem==='kompetisi'){bracketHtml+=renderKompetisiHTML(catMatches,kat,ev.id);if(catMatches.filter(m=>m.stage==='knockout').length) bracketHtml+=renderBracketHTML(catMatches,kat);}
+      bracketHtml += `</div>`;
+    }
+  });
+  if(!bracketHtml) bracketHtml = '<p class="muted">Belum ada bagan untuk kategori ini.</p>';
+  document.getElementById('tbBracketContent').innerHTML = bracketHtml;
+}
+
 function renderPublic(){
   applySettings();
   renderHeroStats();
   if(!state.publicEventId&&EVENTS.length) state.publicEventId=EVENTS[0].id;
   if(!state.klasemenEventId&&EVENTS.length) state.klasemenEventId=EVENTS[0].id;
+  
   renderEventTabs();renderKatFilter();renderJadwalFilterUI();renderJadwalPublic();
   renderSatkerPublic();renderPemainFilterUI();renderPemainPublic();
   renderKlasemenEventFilter();renderProgress();renderKlasemen();
@@ -2167,7 +2341,14 @@ function viewPengaturan(){
   const currentHero=(SETTINGS.heroImage||DEFAULT_HERO_IMAGE);
   return `<div class="admin-page-head"><div><h2>⚙️ Pengaturan</h2><p>Identitas, header, gambar hero, kredensial, lapangan, data</p></div></div>
     <form id="settingsForm">
-      <div class="admin-subhead" style="margin-top:0">📝 Identitas</div><div class="form-grid"><div class="field full"><label>Judul</label><input name="title" required value="${esc(SETTINGS.title)}"></div><div class="field"><label>Subjudul</label><input name="sub" required value="${esc(SETTINGS.sub)}"></div><div class="field"><label>Tahun</label><input name="year" type="number" required value="${SETTINGS.year}"></div><div class="field full"><label>Lokasi Default</label><input name="location" required value="${esc(SETTINGS.location)}"></div></div>
+      <div class="admin-subhead" style="margin-top:0">📝 Identitas & Logo</div>
+      <div class="form-grid">
+        <div class="field full"><label>Judul</label><input name="title" required value="${esc(SETTINGS.title)}"></div>
+        <div class="field"><label>Subjudul</label><input name="sub" required value="${esc(SETTINGS.sub)}"></div>
+        <div class="field"><label>Tahun</label><input name="year" type="number" required value="${SETTINGS.year}"></div>
+        <div class="field full"><label>Logo (Emoji atau URL Gambar)</label><input name="logo" required value="${esc(SETTINGS.logo)}" placeholder="Contoh: 🎾 atau https://..."><small>Masukkan emoji (misal: 🎾) atau URL gambar langsung.</small></div>
+        <div class="field full"><label>Lokasi Default</label><input name="location" required value="${esc(SETTINGS.location)}"></div>
+      </div>
       <div class="admin-subhead">🎨 Teks Header &amp; Hero</div><div class="form-grid"><div class="field full"><label>Tagline Hero</label><input name="tagline" value="${esc(SETTINGS.tagline||'')}"></div><div class="field full"><label>Deskripsi Hero</label><textarea name="heroLead" rows="4">${esc(SETTINGS.heroLead||'')}</textarea></div></div>
       <div class="admin-subhead">🖼️ Gambar Hero</div><div class="field"><label>URL Gambar</label><input name="heroImage" id="heroImageInput" value="${esc(currentHero)}" oninput="updateHeroPreview(this.value)"><div class="hero-preview" id="heroPreview" style="background-image:url('${esc(currentHero)}')"><span>🎾 Preview</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"><button type="button" class="btn-ghost" onclick="setHeroPreset('court')">Lapangan</button><button type="button" class="btn-ghost" onclick="setHeroPreset('racket')">Raket</button><button type="button" class="btn-ghost" onclick="setHeroPreset('clay')">Clay</button><button type="button" class="btn-ghost" onclick="setHeroPreset('ball')">Bola</button><button type="button" class="btn-ghost" onclick="setHeroPreset('default')">↺ Default</button></div>
       <div class="admin-subhead">🔐 Kredensial Admin</div><div class="form-grid"><div class="field"><label>Username</label><input name="adminUser" value="${esc(SETTINGS.adminUser||'admin')}" required></div><div class="field"><label>Password</label><input name="adminPass" type="text" value="${esc(SETTINGS.adminPass||'admin')}" required></div></div>
@@ -2190,6 +2371,7 @@ function bindAdminEvents(view){
     document.getElementById('settingsForm').addEventListener('submit',async e=>{
       e.preventDefault();const f=e.target;
       SETTINGS.title=f.title.value.trim();SETTINGS.sub=f.sub.value.trim();SETTINGS.year=parseInt(f.year.value)||new Date().getFullYear();
+      SETTINGS.logo=f.logo.value.trim()||'🎾';
       SETTINGS.location=f.location.value.trim();SETTINGS.tagline=f.tagline.value.trim();SETTINGS.heroLead=f.heroLead.value.trim();
       SETTINGS.heroImage=(f.heroImage.value||'').trim()||DEFAULT_HERO_IMAGE;
       SETTINGS.adminUser=f.adminUser.value.trim()||'admin';SETTINGS.adminPass=f.adminPass.value||'admin';
@@ -2218,7 +2400,7 @@ async function resetData(){
       supa.from('teams').delete().neq('id','00000000-0000-0000-0000-000000000000'),
       supa.from('courts').delete().neq('id','00000000-0000-0000-0000-000000000000')
     ]);
-    await supa.from('settings').upsert({id:1,title:'PTWP PTA Sulawesi Barat',sub:'Turnamen Tenis',year:2025,location:'Lapangan Tenis PTA Sulawesi Barat, Mamuju',tagline:'Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat',hero_lead:'Ajang silaturahmi dan sportivitas antar satker.',hero_image:DEFAULT_HERO_IMAGE,admin_user:'admin',admin_pass:'admin'});
+    await supa.from('settings').upsert({id:1,title:'PTWP PTA Sulawesi Barat',sub:'Turnamen Tenis',year:2025,location:'Lapangan Tenis PTA Sulawesi Barat, Mamuju',tagline:'Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat',hero_lead:'Ajang silaturahmi dan sportivitas antar satker.',hero_image:DEFAULT_HERO_IMAGE,logo:'🎾',admin_user:'admin',admin_pass:'admin'});
     localStorage.removeItem(LS_CACHE);localStorage.removeItem(LS_UI);localStorage.removeItem(LS_SCROLL);
     toast('Data direset. Reload...');
     setTimeout(()=>location.reload(),1000);
@@ -2234,7 +2416,7 @@ function setTheme(t){
 }
 document.getElementById('themeBtn').addEventListener('click',()=>{const now=document.documentElement.getAttribute('data-theme');setTheme(now==='dark'?'light':'dark');});
 const loginModal=document.getElementById('loginModal');const loginDot=document.getElementById('loginDot');const loginErr=document.getElementById('loginErr');const adminPanel=document.getElementById('adminPanel');
-function setAdmin(on){state.admin=on;document.body.classList.toggle('admin',on);loginDot.classList.toggle('on',on);loginDot.textContent=on?'🔓':'🔑';if(on) localStorage.setItem(LS_ADMIN,'1');else localStorage.removeItem(LS_ADMIN);}
+function setAdmin(on){state.admin=on;document.body.classList.toggle('admin',on);loginDot.classList.toggle('on',on);loginDot.textContent=on?'🔓':'🎾';if(on) localStorage.setItem(LS_ADMIN,'1');else localStorage.removeItem(LS_ADMIN);}
 
 /* =====================================================
    HASH ROUTING — back/forward browser (keyboard & HP)
