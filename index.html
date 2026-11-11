@@ -1075,7 +1075,6 @@ function preserveScores(oldMatches,newMatches){
   const map={};
   oldMatches.forEach(m=>{(m.partai||[]).forEach(p=>{if(!p.menang&&!p.skor) return;const key=`${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;const revKey=`${m.timB}|${m.timA}|${p.kode}|${p.jenis}|${(p.pemainB||[]).join('&')}|${(p.pemainA||[]).join('&')}`;map[key]={menang:p.menang,skor:p.skor||''};if(p.menang==='A') map[revKey]={menang:'B',skor:flipSkor(p.skor||'')};else if(p.menang==='B') map[revKey]={menang:'A',skor:flipSkor(p.skor||'')};});});
   newMatches.forEach(m=>{(m.partai||[]).forEach(p=>{const key=`${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;if(map[key]){p.menang=map[key].menang;p.skor=map[key].skor;}});});}
-}
 async function autoRegenerateSchedule(eventId,katId){
   const ev=getEvent(eventId);if(!ev) return {cleared:false,count:0};
   const kat=ev.kategori.find(k=>k.id===katId);if(!kat) return {cleared:false,count:0};
