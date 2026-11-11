@@ -7,8 +7,9 @@
 <title>PTWP PTA Sulawesi Barat — Turnamen Tenis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://rtrejyxdwldhygcnmmvm.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -522,11 +523,10 @@ body.admin .admin-chip{display:inline-flex}
 
 <script>
 /* =====================================================
-   SUPABASE CONFIG — GANTI DENGAN MILIK ANDA!
+   SUPABASE CONFIG
    ===================================================== */
-const SUPABASE_URL = 'https://yalleauesxrimadohwhk.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_eOANkZ5kDxOV-lEQZxaEhw_D7iNdnR8';
-
+const SUPABASE_URL = 'https://rtrejyxdwldhygcnmmvm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_ciQ471M9sytG3PAyprZDvg_7K1Z2W7n';
 const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* =====================================================
@@ -534,6 +534,7 @@ const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
    ===================================================== */
 const DEFAULT_HERO_IMAGE='https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=80';
 const LS_THEME='ptwp_theme_v20', LS_ADMIN='ptwp_admin_v20';
+const LS_CACHE='ptwp_cache_v1', LS_UI='ptwp_ui_v1', LS_SCROLL='ptwp_scroll_v1';
 
 let SETTINGS={
   title:'PTWP PTA Sulawesi Barat',sub:'Turnamen Tenis',year:2025,
@@ -544,11 +545,52 @@ let SETTINGS={
   adminUser:'admin',adminPass:'admin',
   courts:[]
 };
-let TEAMS=[];
-let PEMAIN=[];
-let EVENTS=[];
-let MATCHES=[];
+let TEAMS=[],PEMAIN=[],EVENTS=[],MATCHES=[];
 let state={admin:false,view:'dashboard',publicEventId:null,publicKatFilter:'all',klasemenEventId:null,adminKegiatan:{view:'list',eventId:null},jadwalFilter:{tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},pemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},adminJadwalFilter:{kategoriId:'all',tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},adminPemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},printFilter:{eventId:'all',kategoriId:'all',status:'all',gender:'all',tanggalFrom:'',tanggalTo:'',satker:'all',jenis:'all'}};
+
+/* =====================================================
+   CACHE & UI STATE
+   ===================================================== */
+function saveCache(){
+  try{
+    localStorage.setItem(LS_CACHE, JSON.stringify({
+      v:1, settings:SETTINGS, teams:TEAMS, pemain:PEMAIN, events:EVENTS, matches:MATCHES, ts:Date.now()
+    }));
+  }catch(e){}
+}
+function loadCache(){
+  try{
+    const raw=localStorage.getItem(LS_CACHE); if(!raw) return false;
+    const d=JSON.parse(raw); if(!d||d.v!==1) return false;
+    if(d.settings) Object.assign(SETTINGS,d.settings);
+    if(Array.isArray(d.teams)) TEAMS=d.teams;
+    if(Array.isArray(d.pemain)) PEMAIN=d.pemain;
+    if(Array.isArray(d.events)) EVENTS=d.events;
+    if(Array.isArray(d.matches)) MATCHES=d.matches;
+    return true;
+  }catch(e){ return false; }
+}
+function saveUIState(){
+  try{
+    localStorage.setItem(LS_UI, JSON.stringify({
+      publicEventId:state.publicEventId,
+      publicKatFilter:state.publicKatFilter,
+      klasemenEventId:state.klasemenEventId,
+      jadwalFilter:state.jadwalFilter,
+      pemainFilter:state.pemainFilter
+    }));
+  }catch(e){}
+}
+function loadUIState(){
+  try{
+    const d=JSON.parse(localStorage.getItem(LS_UI)||'{}');
+    if(d.publicEventId) state.publicEventId=d.publicEventId;
+    if(d.publicKatFilter) state.publicKatFilter=d.publicKatFilter;
+    if(d.klasemenEventId) state.klasemenEventId=d.klasemenEventId;
+    if(d.jadwalFilter) state.jadwalFilter={...state.jadwalFilter,...d.jadwalFilter};
+    if(d.pemainFilter) state.pemainFilter={...state.pemainFilter,...d.pemainFilter};
+  }catch(e){}
+}
 
 /* =====================================================
    SUPABASE PERSISTENCE
@@ -556,118 +598,52 @@ let state={admin:false,view:'dashboard',publicEventId:null,publicKatFilter:'all'
 async function saveData(){
   try{
     await supa.from('settings').upsert({
-      id:1,
-      title:SETTINGS.title, sub:SETTINGS.sub, year:SETTINGS.year,
+      id:1, title:SETTINGS.title, sub:SETTINGS.sub, year:SETTINGS.year,
       location:SETTINGS.location, tagline:SETTINGS.tagline,
       hero_lead:SETTINGS.heroLead, hero_image:SETTINGS.heroImage,
       admin_user:SETTINGS.adminUser, admin_pass:SETTINGS.adminPass
     });
-
     const syncTable=async(table,items,mapper,keyField='id')=>{
       const {data:existing}=await supa.from(table).select(keyField);
       const existingKeys=new Set((existing||[]).map(x=>String(x[keyField])));
       const newKeys=new Set(items.map(x=>String(x[keyField])));
       const toDelete=[...existingKeys].filter(k=>!newKeys.has(k));
-      if(toDelete.length){
-        await supa.from(table).delete().in(keyField,toDelete);
-      }
-      if(items.length){
-        const {error}=await supa.from(table).upsert(items.map(mapper));
-        if(error) throw error;
-      }
+      if(toDelete.length) await supa.from(table).delete().in(keyField,toDelete);
+      if(items.length){const {error}=await supa.from(table).upsert(items.map(mapper));if(error) throw error;}
     };
-
-    await syncTable('teams',TEAMS,t=>({
-      id:t.id, nama:t.nama, singkat:t.singkat, kota:t.kota, warna:t.warna
-    }));
-
-    await syncTable('players',PEMAIN,p=>({
-      id:p.id, nama:p.nama, team_id:p.team, jenis:p.jenis, gender:p.gender
-    }));
-
-    await syncTable('courts',SETTINGS.courts||[],(c,i)=>({
-      id:c.id, nama:c.nama, lokasi:c.lokasi, urutan:i
-    }));
-
-    await syncTable('events',EVENTS,e=>({
-      id:e.id, nama:e.nama, mulai:e.mulai, selesai:e.selesai, lokasi:e.lokasi
-    }));
-
-    const allCats=[];
-    EVENTS.forEach(ev=>ev.kategori.forEach(k=>allCats.push({...k,eventId:ev.id})));
-    await syncTable('categories',allCats,c=>({
-      id:c.id, event_id:c.eventId, nama:c.nama,
-      tipe:c.tipe, gender:c.gender, sistem:c.sistem,
-      jumlah_partai:c.jumlahPartai||3, lolos_per_pool:c.lolosPerPool||2
-    }));
-
-    const allPools=[];
-    EVENTS.forEach(ev=>ev.kategori.forEach(k=>
-      (k.pools||[]).forEach((p,i)=>allPools.push({...p,categoryId:k.id,urutan:i}))
-    ));
-    await syncTable('pools',allPools,p=>({
-      id:p.id, category_id:p.categoryId, nama:p.nama, urutan:p.urutan
-    }));
-
-    const allParts=[];
-    EVENTS.forEach(ev=>ev.kategori.forEach(k=>{
-      (k.peserta||[]).forEach(pid=>{
-        allParts.push({
-          category_id:k.id,
-          participant_id:pid,
-          pool_id:(k.poolAssignment&&k.poolAssignment[pid])||null,
-          is_manual:isManualPeserta(pid),
-          manual_name:isManualPeserta(pid)?getManualName(pid):null
-        });
-      });
-    }));
+    await syncTable('teams',TEAMS,t=>({id:t.id,nama:t.nama,singkat:t.singkat,kota:t.kota,warna:t.warna}));
+    await syncTable('players',PEMAIN,p=>({id:p.id,nama:p.nama,team_id:p.team,jenis:p.jenis,gender:p.gender}));
+    await syncTable('courts',SETTINGS.courts||[],(c,i)=>({id:c.id,nama:c.nama,lokasi:c.lokasi,urutan:i}));
+    await syncTable('events',EVENTS,e=>({id:e.id,nama:e.nama,mulai:e.mulai,selesai:e.selesai,lokasi:e.lokasi}));
+    const allCats=[];EVENTS.forEach(ev=>ev.kategori.forEach(k=>allCats.push({...k,eventId:ev.id})));
+    await syncTable('categories',allCats,c=>({id:c.id,event_id:c.eventId,nama:c.nama,tipe:c.tipe,gender:c.gender,sistem:c.sistem,jumlah_partai:c.jumlahPartai||3,lolos_per_pool:c.lolosPerPool||2}));
+    const allPools=[];EVENTS.forEach(ev=>ev.kategori.forEach(k=>(k.pools||[]).forEach((p,i)=>allPools.push({...p,categoryId:k.id,urutan:i}))));
+    await syncTable('pools',allPools,p=>({id:p.id,category_id:p.categoryId,nama:p.nama,urutan:p.urutan}));
+    const allParts=[];EVENTS.forEach(ev=>ev.kategori.forEach(k=>(k.peserta||[]).forEach(pid=>{
+      allParts.push({category_id:k.id,participant_id:pid,pool_id:(k.poolAssignment&&k.poolAssignment[pid])||null,is_manual:isManualPeserta(pid),manual_name:isManualPeserta(pid)?getManualName(pid):null});
+    })));
     const {data:existingParts}=await supa.from('category_participants').select('category_id,participant_id');
     const newPartKeys=new Set(allParts.map(p=>`${p.category_id}|${p.participant_id}`));
     for(const ep of (existingParts||[])){
       if(!newPartKeys.has(`${ep.category_id}|${ep.participant_id}`)){
-        await supa.from('category_participants').delete()
-          .eq('category_id',ep.category_id).eq('participant_id',ep.participant_id);
+        await supa.from('category_participants').delete().eq('category_id',ep.category_id).eq('participant_id',ep.participant_id);
       }
     }
-    if(allParts.length){
-      const {error}=await supa.from('category_participants').upsert(allParts);
-      if(error) throw error;
-    }
-
-    await syncTable('matches',MATCHES,m=>({
-      id:m.id, event_id:m.eventId, category_id:m.kategoriId,
-      pool_id:m.poolId, stage:m.stage, babak_label:m.babakLabel,
-      hari:m.hari, tgl:m.tgl, jam:m.jam,
-      lapangan:m.lapangan, lokasi_lapangan:m.lokasiLapangan,
-      tim_a:m.timA, tim_b:m.timB
-    }));
-
-    const allPartai=[];
-    MATCHES.forEach(m=>(m.partai||[]).forEach((p,i)=>{
-      allPartai.push({
-        match_id:m.id, urutan:i, kode:p.kode||('P'+(i+1)),
-        jenis:p.jenis||'Tunggal',
-        pemain_a:p.pemainA||[], pemain_b:p.pemainB||[],
-        menang:p.menang||null, skor:p.skor||''
-      });
+    if(allParts.length){const {error}=await supa.from('category_participants').upsert(allParts);if(error) throw error;}
+    await syncTable('matches',MATCHES,m=>({id:m.id,event_id:m.eventId,category_id:m.kategoriId,pool_id:m.poolId,stage:m.stage,babak_label:m.babakLabel,hari:m.hari,tgl:m.tgl,jam:m.jam,lapangan:m.lapangan,lokasi_lapangan:m.lokasiLapangan,tim_a:m.timA,tim_b:m.timB}));
+    const allPartai=[];MATCHES.forEach(m=>(m.partai||[]).forEach((p,i)=>{
+      allPartai.push({match_id:m.id,urutan:i,kode:p.kode||('P'+(i+1)),jenis:p.jenis||'Tunggal',pemain_a:p.pemainA||[],pemain_b:p.pemainB||[],menang:p.menang||null,skor:p.skor||''});
     }));
     const {data:existingPartai}=await supa.from('match_partai').select('match_id,urutan');
     const newPartaiKeys=new Set(allPartai.map(p=>`${p.match_id}|${p.urutan}`));
     for(const ep of (existingPartai||[])){
       if(!newPartaiKeys.has(`${ep.match_id}|${ep.urutan}`)){
-        await supa.from('match_partai').delete()
-          .eq('match_id',ep.match_id).eq('urutan',ep.urutan);
+        await supa.from('match_partai').delete().eq('match_id',ep.match_id).eq('urutan',ep.urutan);
       }
     }
-    if(allPartai.length){
-      const {error}=await supa.from('match_partai').upsert(allPartai);
-      if(error) throw error;
-    }
-
-  }catch(err){
-    console.error('Save error:',err);
-    toast('⚠️ Gagal simpan: '+(err.message||err));
-  }
+    if(allPartai.length){const {error}=await supa.from('match_partai').upsert(allPartai);if(error) throw error;}
+    saveCache();
+  }catch(err){console.error('Save error:',err);toast('⚠️ Gagal simpan: '+(err.message||err));}
 }
 
 async function loadData(){
@@ -684,67 +660,37 @@ async function loadData(){
       supa.from('matches').select('*').order('created_at'),
       supa.from('match_partai').select('*').order('urutan')
     ]);
-
     const s=setRes.data;
     if(s){
-      SETTINGS.title=s.title||SETTINGS.title;
-      SETTINGS.sub=s.sub||SETTINGS.sub;
-      SETTINGS.year=s.year||SETTINGS.year;
-      SETTINGS.location=s.location||SETTINGS.location;
-      SETTINGS.tagline=s.tagline||SETTINGS.tagline;
-      SETTINGS.heroLead=s.hero_lead||SETTINGS.heroLead;
+      SETTINGS.title=s.title||SETTINGS.title;SETTINGS.sub=s.sub||SETTINGS.sub;
+      SETTINGS.year=s.year||SETTINGS.year;SETTINGS.location=s.location||SETTINGS.location;
+      SETTINGS.tagline=s.tagline||SETTINGS.tagline;SETTINGS.heroLead=s.hero_lead||SETTINGS.heroLead;
       SETTINGS.heroImage=s.hero_image||SETTINGS.heroImage;
-      SETTINGS.adminUser=s.admin_user||'admin';
-      SETTINGS.adminPass=s.admin_pass||'admin';
+      SETTINGS.adminUser=s.admin_user||'admin';SETTINGS.adminPass=s.admin_pass||'admin';
     }
-
     SETTINGS.courts=(courtsRes.data||[]).map(c=>({id:c.id,nama:c.nama,lokasi:c.lokasi||''}));
     TEAMS=(teamsRes.data||[]).map(t=>({id:t.id,nama:t.nama,singkat:t.singkat,kota:t.kota||'',warna:t.warna||'#2ee07a'}));
     PEMAIN=(playersRes.data||[]).map(p=>({id:p.id,nama:p.nama,team:p.team_id,jenis:p.jenis,gender:p.gender}));
-
-    const cats=catsRes.data||[], pools=poolsRes.data||[], parts=partsRes.data||[];
+    const cats=catsRes.data||[],pools=poolsRes.data||[],parts=partsRes.data||[];
     EVENTS=(eventsRes.data||[]).map(ev=>({id:ev.id,nama:ev.nama,mulai:ev.mulai,selesai:ev.selesai,lokasi:ev.lokasi||'',kategori:[]}));
-
     cats.forEach(c=>{
-      const ev=EVENTS.find(e=>e.id===c.event_id);
-      if(!ev) return;
+      const ev=EVENTS.find(e=>e.id===c.event_id);if(!ev) return;
       const catPools=pools.filter(p=>p.category_id===c.id).map(p=>({id:p.id,nama:p.nama}));
       const catParts=parts.filter(p=>p.category_id===c.id);
       const peserta=catParts.map(p=>p.participant_id);
-      const poolAssignment={};
-      catParts.forEach(p=>{if(p.pool_id) poolAssignment[p.participant_id]=p.pool_id;});
-      ev.kategori.push({
-        id:c.id,nama:c.nama,tipe:c.tipe,gender:c.gender,
-        sistem:c.sistem,jumlahPartai:c.jumlah_partai||3,
-        lolosPerPool:c.lolos_per_pool||2,
-        pools:catPools,peserta,poolAssignment
-      });
+      const poolAssignment={};catParts.forEach(p=>{if(p.pool_id) poolAssignment[p.participant_id]=p.pool_id;});
+      ev.kategori.push({id:c.id,nama:c.nama,tipe:c.tipe,gender:c.gender,sistem:c.sistem,jumlahPartai:c.jumlah_partai||3,lolosPerPool:c.lolos_per_pool||2,pools:catPools,peserta,poolAssignment});
     });
-
     const partaiByMatch={};
-    (partaiRes.data||[]).forEach(p=>{
-      if(!partaiByMatch[p.match_id]) partaiByMatch[p.match_id]=[];
-      partaiByMatch[p.match_id].push(p);
-    });
-
+    (partaiRes.data||[]).forEach(p=>{if(!partaiByMatch[p.match_id]) partaiByMatch[p.match_id]=[];partaiByMatch[p.match_id].push(p);});
     MATCHES=(matchesRes.data||[]).map(m=>({
-      id:m.id,eventId:m.event_id,kategoriId:m.category_id,
-      poolId:m.pool_id,stage:m.stage,babakLabel:m.babak_label,
-      hari:m.hari||'',tgl:m.tgl||'',jam:m.jam||'',
-      lapangan:m.lapangan||'',lokasiLapangan:m.lokasi_lapangan||'',
+      id:m.id,eventId:m.event_id,kategoriId:m.category_id,poolId:m.pool_id,stage:m.stage,babakLabel:m.babak_label,
+      hari:m.hari||'',tgl:m.tgl||'',jam:m.jam||'',lapangan:m.lapangan||'',lokasiLapangan:m.lokasi_lapangan||'',
       timA:m.tim_a,timB:m.tim_b,
-      partai:(partaiByMatch[m.id]||[]).sort((a,b)=>a.urutan-b.urutan).map(p=>({
-        kode:p.kode,jenis:p.jenis,
-        pemainA:p.pemain_a||[],pemainB:p.pemain_b||[],
-        menang:p.menang,skor:p.skor||''
-      }))
+      partai:(partaiByMatch[m.id]||[]).sort((a,b)=>a.urutan-b.urutan).map(p=>({kode:p.kode,jenis:p.jenis,pemainA:p.pemain_a||[],pemainB:p.pemain_b||[],menang:p.menang,skor:p.skor||''}))
     }));
-
     return true;
-  }catch(err){
-    console.error('Load error:',err);
-    return false;
-  }
+  }catch(err){console.error('Load error:',err);return false;}
 }
 
 /* =====================================================
@@ -806,18 +752,15 @@ function makePartaiDefault(kat,timA,timB){
     return {tunggal:ps.filter(p=>p.jenis==='Tunggal'),ganda:ps.filter(p=>p.jenis==='Ganda')};
   };
   const A=getPlayers(timA),B=getPlayers(timB);
-  const count=kat.jumlahPartai||3;
-  const partai=[];let tIdx=0,gIdx=0;
+  const count=kat.jumlahPartai||3;const partai=[];let tIdx=0,gIdx=0;
   for(let i=0;i<count;i++){
     const isGanda=i%2===1;
     if(isGanda){
       const aNames=[];if(A.ganda[gIdx]) aNames.push(A.ganda[gIdx].nama);if(A.ganda[gIdx+1]) aNames.push(A.ganda[gIdx+1].nama);
       const bNames=[];if(B.ganda[gIdx]) bNames.push(B.ganda[gIdx].nama);if(B.ganda[gIdx+1]) bNames.push(B.ganda[gIdx+1].nama);
-      partai.push({kode:'GD'+(Math.floor(i/2)+1),jenis:'Ganda',pemainA:aNames,pemainB:bNames,menang:null,skor:''});
-      gIdx+=2;
+      partai.push({kode:'GD'+(Math.floor(i/2)+1),jenis:'Ganda',pemainA:aNames,pemainB:bNames,menang:null,skor:''});gIdx+=2;
     }else{
-      partai.push({kode:'T'+(tIdx+1),jenis:'Tunggal',pemainA:A.tunggal[tIdx]?[A.tunggal[tIdx].nama]:[],pemainB:B.tunggal[tIdx]?[B.tunggal[tIdx].nama]:[],menang:null,skor:''});
-      tIdx++;
+      partai.push({kode:'T'+(tIdx+1),jenis:'Tunggal',pemainA:A.tunggal[tIdx]?[A.tunggal[tIdx].nama]:[],pemainB:B.tunggal[tIdx]?[B.tunggal[tIdx].nama]:[],menang:null,skor:''});tIdx++;
     }
   }
   return partai;
@@ -844,27 +787,17 @@ function rebuildPartaiNames(m,kat){
       const aNames=[];if(A.ganda[gIdxA]) aNames.push(A.ganda[gIdxA].nama);if(A.ganda[gIdxA+1]) aNames.push(A.ganda[gIdxA+1].nama);
       p.pemainA=aNames.length?aNames:['TBD'];
       const bNames=[];if(B.ganda[gIdxB]) bNames.push(B.ganda[gIdxB].nama);if(B.ganda[gIdxB+1]) bNames.push(B.ganda[gIdxB+1].nama);
-      p.pemainB=bNames.length?bNames:['TBD'];
-      gIdxA+=2;gIdxB+=2;
+      p.pemainB=bNames.length?bNames:['TBD'];gIdxA+=2;gIdxB+=2;
     }else{
       p.pemainA=A.tunggal[tIdxA]?[A.tunggal[tIdxA].nama]:['TBD'];
-      p.pemainB=B.tunggal[tIdxB]?[B.tunggal[tIdxB].nama]:['TBD'];
-      tIdxA++;tIdxB++;
+      p.pemainB=B.tunggal[tIdxB]?[B.tunggal[tIdxB].nama]:['TBD'];tIdxA++;tIdxB++;
     }
   });
 }
 function createMatch(event,kat,opts){
-  return {id:genId('m'),eventId:event.id,kategoriId:kat.id,tipe:kat.tipe,
-    poolId:opts.poolId||null,stage:opts.stage,babakLabel:opts.babakLabel,
-    hari:'',tgl:'',jam:'',lapangan:'',lokasiLapangan:'',timA:opts.timA,timB:opts.timB,
-    partai:makePartaiDefault(kat,opts.timA,opts.timB)};
+  return {id:genId('m'),eventId:event.id,kategoriId:kat.id,tipe:kat.tipe,poolId:opts.poolId||null,stage:opts.stage,babakLabel:opts.babakLabel,hari:'',tgl:'',jam:'',lapangan:'',lokasiLapangan:'',timA:opts.timA,timB:opts.timB,partai:makePartaiDefault(kat,opts.timA,opts.timB)};
 }
-function generateRoundRobin(event,kat,peserta,poolId,label){
-  const out=[];
-  for(let i=0;i<peserta.length;i++)for(let j=i+1;j<peserta.length;j++)
-    out.push(createMatch(event,kat,{poolId,stage:poolId?'pool':'kompetisi',babakLabel:label,timA:peserta[i],timB:peserta[j]}));
-  return out;
-}
+function generateRoundRobin(event,kat,peserta,poolId,label){const out=[];for(let i=0;i<peserta.length;i++)for(let j=i+1;j<peserta.length;j++)out.push(createMatch(event,kat,{poolId,stage:poolId?'pool':'kompetisi',babakLabel:label,timA:peserta[i],timB:peserta[j]}));return out;}
 function generateKnockoutBracket(event,kat,peserta){
   const n=peserta.length;if(n<2) return [];
   let size=1;while(size<n) size*=2;
@@ -885,14 +818,11 @@ function generateKnockoutBracket(event,kat,peserta){
   return matches;
 }
 function buildCrossPoolSeeds(pools,lolos){
-  const n=pools.length;
-  if(n<2) return [];
+  const n=pools.length;if(n<2) return [];
   const result=[];
   if(n===2){
     if(lolos===1) return [{p:0,r:0},{p:1,r:0}];
-    for(let i=0;i<Math.floor(lolos/2);i++){
-      result.push({p:0,r:i},{p:1,r:lolos-1-i},{p:1,r:i},{p:0,r:lolos-1-i});
-    }
+    for(let i=0;i<Math.floor(lolos/2);i++){result.push({p:0,r:i},{p:1,r:lolos-1-i},{p:1,r:i},{p:0,r:lolos-1-i});}
     if(lolos%2===1){const mid=Math.floor(lolos/2);result.push({p:0,r:mid},{p:1,r:mid});}
     return result;
   }
@@ -901,9 +831,7 @@ function buildCrossPoolSeeds(pools,lolos){
       const pA=i,pB=i+1;
       if(lolos===1){result.push({p:pA,r:0},{p:pB,r:0});}
       else{
-        for(let r=0;r<Math.floor(lolos/2);r++){
-          result.push({p:pA,r:r},{p:pB,r:lolos-1-r},{p:pB,r:r},{p:pA,r:lolos-1-r});
-        }
+        for(let r=0;r<Math.floor(lolos/2);r++){result.push({p:pA,r:r},{p:pB,r:lolos-1-r},{p:pB,r:r},{p:pA,r:lolos-1-r});}
         if(lolos%2===1){const mid=Math.floor(lolos/2);result.push({p:pA,r:mid},{p:pB,r:mid});}
       }
     }
@@ -920,8 +848,7 @@ function buildCrossPoolSeeds(pools,lolos){
   return result;
 }
 function generateKnockoutFromPools(event,kat,pools,lolos){
-  const seeds=buildCrossPoolSeeds(pools,lolos);
-  if(seeds.length<2) return [];
+  const seeds=buildCrossPoolSeeds(pools,lolos);if(seeds.length<2) return [];
   const slotStrings=seeds.map(s=>`${String.fromCharCode(65+s.p)}${s.r+1}`);
   let size=1;while(size<slotStrings.length) size*=2;
   while(slotStrings.length<size) slotStrings.push('TBD');
@@ -946,14 +873,10 @@ function autoSchedule(matches,event){
   const times=['08.00','10.30','13.00','15.30'];
   const courts=(SETTINGS.courts&&SETTINGS.courts.length>0)?SETTINGS.courts:[{nama:'Lap. 1',lokasi:''}];
   const slots=[];const cur=new Date(start);
-  while(cur<=end){
-    for(const jam of times) for(const court of courts) slots.push({date:new Date(cur),jam,court});
-    cur.setDate(cur.getDate()+1);
-  }
+  while(cur<=end){for(const jam of times) for(const court of courts) slots.push({date:new Date(cur),jam,court});cur.setDate(cur.getDate()+1);}
   if(!slots.length){for(const jam of times)for(const court of courts)slots.push({date:new Date(start),jam,court});}
   matches.forEach((m,i)=>{
-    const slot=slots[i%slots.length];
-    const d=formatDateID(slot.date);
+    const slot=slots[i%slots.length];const d=formatDateID(slot.date);
     m.hari=d.hari;m.tgl=d.tgl;m.jam=slot.jam;m.lapangan=slot.court.nama;m.lokasiLapangan=slot.court.lokasi||'';
   });
 }
@@ -962,13 +885,9 @@ function autoScheduleFrom(matches,event,startDate){
   const times=['08.00','10.30','13.00','15.30'];
   const courts=(SETTINGS.courts&&SETTINGS.courts.length>0)?SETTINGS.courts:[{nama:'Lap. 1',lokasi:''}];
   const slots=[];const cur=new Date(startDate);
-  for(let d=0;d<7;d++){
-    for(const jam of times) for(const court of courts) slots.push({date:new Date(cur),jam,court});
-    cur.setDate(cur.getDate()+1);
-  }
+  for(let d=0;d<7;d++){for(const jam of times) for(const court of courts) slots.push({date:new Date(cur),jam,court});cur.setDate(cur.getDate()+1);}
   matches.forEach((m,i)=>{
-    const slot=slots[i%slots.length];
-    const dd=formatDateID(slot.date);
+    const slot=slots[i%slots.length];const dd=formatDateID(slot.date);
     m.hari=dd.hari;m.tgl=dd.tgl;m.jam=slot.jam;m.lapangan=slot.court.nama;m.lokasiLapangan=slot.court.lokasi||'';
   });
 }
@@ -1041,18 +960,15 @@ function advanceFromPools(ev,kat){
   koMatches.forEach(m=>{
     let changed=false;
     ['A','B'].forEach(side=>{
-      const timField=side==='A'?'timA':'timB';
-      if(m[timField]!=='TBD') return;
-      const partaiKey=side==='A'?'pemainA':'pemainB';
-      let placeholder=null;
+      const timField=side==='A'?'timA':'timB';if(m[timField]!=='TBD') return;
+      const partaiKey=side==='A'?'pemainA':'pemainB';let placeholder=null;
       for(const p of (m.partai||[])){for(const name of (p[partaiKey]||[])){const parsed=parsePlaceholder(name);if(parsed){placeholder=parsed;break;}}if(placeholder) break;}
       if(!placeholder) return;
       const poolIdx=pools.findIndex((_,idx)=>String.fromCharCode(65+idx)===placeholder.prefix);
       if(poolIdx<0) return;
       const poolWinners=poolStandings[poolIdx];
       if(!poolWinners||!poolWinners[placeholder.rank-1]) return;
-      m[timField]=poolWinners[placeholder.rank-1].id;
-      changed=true;
+      m[timField]=poolWinners[placeholder.rank-1].id;changed=true;
     });
     if(changed){rebuildPartaiNames(m,kat);updated++;}
   });
@@ -1064,15 +980,11 @@ function advancePenyisihan(ev,kat){
   if(koMatches.length<2) return 0;
   const rounds={};koMatches.forEach(m=>{if(!rounds[m.babakLabel]) rounds[m.babakLabel]=[];rounds[m.babakLabel].push(m);});
   const roundOrder=Object.keys(rounds).sort((a,b)=>rounds[b].length-rounds[a].length);
-  if(roundOrder.length<2) return 0;
-  let updated=0;
+  if(roundOrder.length<2) return 0;let updated=0;
   for(let ri=0;ri<roundOrder.length-1;ri++){
-    const thisRound=rounds[roundOrder[ri]];
-    const nextRound=rounds[roundOrder[ri+1]];
+    const thisRound=rounds[roundOrder[ri]];const nextRound=rounds[roundOrder[ri+1]];
     for(let mi=0;mi<nextRound.length;mi++){
-      const nextMatch=nextRound[mi];
-      const srcMatchA=thisRound[mi*2];
-      const srcMatchB=thisRound[mi*2+1];
+      const nextMatch=nextRound[mi];const srcMatchA=thisRound[mi*2];const srcMatchB=thisRound[mi*2+1];
       let changed=false;
       if(srcMatchA&&nextMatch.timA==='TBD'&&statusMatch(srcMatchA)==='selesai'){const {a,b}=skorMatch(srcMatchA);const winner=a>b?srcMatchA.timA:b>a?srcMatchA.timB:null;if(winner){nextMatch.timA=winner;changed=true;}}
       if(srcMatchB&&nextMatch.timB==='TBD'&&statusMatch(srcMatchB)==='selesai'){const {a,b}=skorMatch(srcMatchB);const winner=a>b?srcMatchB.timA:b>a?srcMatchB.timB:null;if(winner){nextMatch.timB=winner;changed=true;}}
@@ -1089,8 +1001,7 @@ function createKompetisiKnockout(ev,kat,force){
   if(!force&&!kompMatches.every(m=>statusMatch(m)==='selesai')) return 0;
   const existingKO=MATCHES.filter(m=>m.eventId===ev.id&&m.kategoriId===kat.id&&m.stage==='knockout');
   if(existingKO.length) return 0;
-  const standings=hitungKlasemen(kat,ev.id);
-  if(standings.length<2) return 0;
+  const standings=hitungKlasemen(kat,ev.id);if(standings.length<2) return 0;
   const newMatches=[];
   if(standings.length>=4){
     newMatches.push(createMatch(ev,kat,{poolId:null,stage:'knockout',babakLabel:'Semifinal',timA:standings[0].id,timB:standings[3].id}));
@@ -1116,8 +1027,7 @@ function autoAdvanceKnockout(ev,kat){
   return total;
 }
 function manualAdvance(eventId,katId){
-  const ev=getEvent(eventId);const kat=ev.kategori.find(k=>k.id===katId);
-  if(!kat) return;
+  const ev=getEvent(eventId);const kat=ev.kategori.find(k=>k.id===katId);if(!kat) return;
   let result=0;
   if(kat.sistem==='kompetisi'){result+=createKompetisiKnockout(ev,kat,true);}
   else if(kat.sistem==='pool'){result+=advanceFromPools(ev,kat);}
@@ -1130,16 +1040,14 @@ function getKategoriStatus(kat,evId){
   const catMatches=MATCHES.filter(m=>m.eventId===evId&&m.kategoriId===kat.id);
   const st={total:catMatches.length};
   if(kat.sistem==='pool'){
-    const pool=catMatches.filter(m=>m.stage==='pool');
-    const ko=catMatches.filter(m=>m.stage==='knockout');
+    const pool=catMatches.filter(m=>m.stage==='pool');const ko=catMatches.filter(m=>m.stage==='knockout');
     st.pool={total:pool.length,done:pool.filter(m=>statusMatch(m)==='selesai').length};
     st.ko={total:ko.length,filled:ko.filter(m=>m.timA!=='TBD'&&m.timB!=='TBD').length,done:ko.filter(m=>statusMatch(m)==='selesai').length};
   } else if(kat.sistem==='penyisihan'){
     const ko=catMatches.filter(m=>m.stage==='knockout');
     st.ko={total:ko.length,filled:ko.filter(m=>m.timA!=='TBD'&&m.timB!=='TBD').length,done:ko.filter(m=>statusMatch(m)==='selesai').length};
   } else if(kat.sistem==='kompetisi'){
-    const rr=catMatches.filter(m=>m.stage==='kompetisi'||m.stage==='pool');
-    const ko=catMatches.filter(m=>m.stage==='knockout');
+    const rr=catMatches.filter(m=>m.stage==='kompetisi'||m.stage==='pool');const ko=catMatches.filter(m=>m.stage==='knockout');
     st.rr={total:rr.length,done:rr.filter(m=>statusMatch(m)==='selesai').length};
     st.ko={total:ko.length,filled:ko.filter(m=>m.timA!=='TBD'&&m.timB!=='TBD').length,done:ko.filter(m=>statusMatch(m)==='selesai').length};
   }
@@ -1157,8 +1065,7 @@ function matchMatchesFilter(m,ev,filter){
   if(filter.lapangan!=='all'&&m.lapangan!==filter.lapangan) return false;
   if(filter.search&&filter.search.trim()){
     const q=filter.search.trim().toLowerCase();
-    const kat=ev?ev.kategori.find(k=>k.id===m.kategoriId):null;
-    if(!kat) return false;
+    const kat=ev?ev.kategori.find(k=>k.id===m.kategoriId):null;if(!kat) return false;
     const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);
     const hay=[infoA.nama,infoB.nama,m.lapangan||'',m.lokasiLapangan||'',m.babakLabel||''];
     (m.partai||[]).forEach(p=>{(p.pemainA||[]).forEach(n=>hay.push(n));(p.pemainB||[]).forEach(n=>hay.push(n));});
@@ -1226,23 +1133,21 @@ function renderHeroStats(){
   document.getElementById('stPool').textContent=pools.size;
 }
 function renderEventTabs(){
-  const el=document.getElementById('eventTabs');
-  if(!EVENTS.length){el.innerHTML='';return;}
+  const el=document.getElementById('eventTabs');if(!EVENTS.length){el.innerHTML='';return;}
   if(!state.publicEventId) state.publicEventId=EVENTS[0].id;
   el.innerHTML=EVENTS.map(ev=>{
     const tgl=ev.mulai&&ev.selesai?`${ev.mulai} s/d ${ev.selesai}`:(ev.mulai||'');
     const cnt=MATCHES.filter(m=>m.eventId===ev.id).length;
     return `<button class="event-tab ${ev.id===state.publicEventId?'active':''}" data-event="${ev.id}"><span>${esc(ev.nama)}</span><small>${esc(tgl)} · ${cnt} match</small></button>`;
   }).join('');
-  el.querySelectorAll('.event-tab').forEach(btn=>{btn.addEventListener('click',()=>{state.publicEventId=btn.dataset.event;state.publicKatFilter='all';state.jadwalFilter.pool='all';state.jadwalFilter.lapangan='all';renderPublic();});});
+  el.querySelectorAll('.event-tab').forEach(btn=>{btn.addEventListener('click',()=>{state.publicEventId=btn.dataset.event;state.publicKatFilter='all';state.jadwalFilter.pool='all';state.jadwalFilter.lapangan='all';saveUIState();renderPublic();});});
 }
 function renderKatFilter(){
-  const el=document.getElementById('katFilter');
-  const ev=getEvent(state.publicEventId);
+  const el=document.getElementById('katFilter');const ev=getEvent(state.publicEventId);
   if(!ev||!ev.kategori.length){el.innerHTML='';return;}
   const items=[{id:'all',nama:'Semua'}].concat(ev.kategori.map(k=>({id:k.id,nama:k.nama})));
   el.innerHTML=items.map(it=>`<button data-kat="${it.id}" class="${state.publicKatFilter===it.id?'active':''}">${esc(it.nama)}</button>`).join('');
-  el.querySelectorAll('button').forEach(b=>{b.addEventListener('click',()=>{state.publicKatFilter=b.dataset.kat;state.jadwalFilter.pool='all';renderPublic();});});
+  el.querySelectorAll('button').forEach(b=>{b.addEventListener('click',()=>{state.publicKatFilter=b.dataset.kat;state.jadwalFilter.pool='all';saveUIState();renderPublic();});});
 }
 function renderJadwalFilterUI(){
   const ev=getEvent(state.publicEventId);
@@ -1250,24 +1155,23 @@ function renderJadwalFilterUI(){
   if(poolSel){
     const opts=[`<option value="all">Semua Pool</option>`];
     if(ev){ev.kategori.forEach(kat=>{if(kat.sistem!=='pool'||!kat.pools) return;if(state.publicKatFilter!=='all'&&kat.id!==state.publicKatFilter) return;kat.pools.forEach(p=>{opts.push(`<option value="${esc(p.id)}">${esc(kat.nama+' · '+p.nama)}</option>`);});});}
-    poolSel.innerHTML=opts.join('');
-    poolSel.value=state.jadwalFilter.pool;
+    poolSel.innerHTML=opts.join('');poolSel.value=state.jadwalFilter.pool;
     if(poolSel.value!==state.jadwalFilter.pool) state.jadwalFilter.pool='all';
-    poolSel.onchange=e=>{state.jadwalFilter.pool=e.target.value;renderJadwalPublic();};
+    poolSel.onchange=e=>{state.jadwalFilter.pool=e.target.value;saveUIState();renderJadwalPublic();};
   }
   const lapSel=document.getElementById('jadwalLapanganFilter');
   if(lapSel){
     const courts=SETTINGS.courts||[];
     const opts=[`<option value="all">Semua Lapangan</option>`].concat(courts.map(c=>`<option value="${esc(c.nama)}">${esc(c.nama)}</option>`));
     lapSel.innerHTML=opts.join('');lapSel.value=state.jadwalFilter.lapangan;
-    lapSel.onchange=e=>{state.jadwalFilter.lapangan=e.target.value;renderJadwalPublic();};
+    lapSel.onchange=e=>{state.jadwalFilter.lapangan=e.target.value;saveUIState();renderJadwalPublic();};
   }
   const tglInput=document.getElementById('jadwalTglFilter');
-  if(tglInput){tglInput.value=state.jadwalFilter.tanggal||'';tglInput.onchange=e=>{state.jadwalFilter.tanggal=e.target.value;renderJadwalPublic();};}
+  if(tglInput){tglInput.value=state.jadwalFilter.tanggal||'';tglInput.onchange=e=>{state.jadwalFilter.tanggal=e.target.value;saveUIState();renderJadwalPublic();};}
   const stSel=document.getElementById('jadwalStatusFilter');
-  if(stSel){stSel.value=state.jadwalFilter.status;stSel.onchange=e=>{state.jadwalFilter.status=e.target.value;renderJadwalPublic();};}
+  if(stSel){stSel.value=state.jadwalFilter.status;stSel.onchange=e=>{state.jadwalFilter.status=e.target.value;saveUIState();renderJadwalPublic();};}
   const searchInput=document.getElementById('jadwalSearchFilter');
-  if(searchInput){searchInput.value=state.jadwalFilter.search||'';if(!searchInput._bound){searchInput._bound=true;let timer=null;searchInput.addEventListener('input',e=>{clearTimeout(timer);timer=setTimeout(()=>{state.jadwalFilter.search=e.target.value;renderJadwalPublic();},200);});}}
+  if(searchInput){searchInput.value=state.jadwalFilter.search||'';if(!searchInput._bound){searchInput._bound=true;let timer=null;searchInput.addEventListener('input',e=>{clearTimeout(timer);timer=setTimeout(()=>{state.jadwalFilter.search=e.target.value;saveUIState();renderJadwalPublic();},200);});}}
 }
 function renderJadwalPublic(){
   const ev=getEvent(state.publicEventId);
@@ -1288,9 +1192,7 @@ function renderJadwalPublic(){
   document.getElementById('jadwalList').innerHTML=html;
 }
 function renderMatchCard(m){
-  const ev=getEvent(m.eventId);
-  const kat=ev?ev.kategori.find(k=>k.id===m.kategoriId):null;
-  if(!kat) return '';
+  const ev=getEvent(m.eventId);const kat=ev?ev.kategori.find(k=>k.id===m.kategoriId):null;if(!kat) return '';
   const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);
   const st=statusMatch(m),{a,b}=skorMatch(m);
   const chipClass=st==='selesai'?'done':st==='berlangsung'?'live':'next';
@@ -1299,8 +1201,7 @@ function renderMatchCard(m){
   const manualA=isManualPeserta(m.timA),manualB=isManualPeserta(m.timB);
   const scHtml=st==='akan'?`<div class="sc wait">VS</div>`:`<div class="sc">${a} - ${b}</div>`;
   const partaiHtml=(m.partai||[]).map((p,pi)=>{
-    const menang=p.menang,skor=(menang&&p.skor)?p.skor:'';
-    const label=p.jenis||'Tunggal';
+    const menang=p.menang,skor=(menang&&p.skor)?p.skor:'';const label=p.jenis||'Tunggal';
     return `<div class="partai ${menang==='A'?'win-a':menang==='B'?'win-b':''}">
       <div class="plabel">${kat.tipe==='beregu'?'Partai '+(pi+1)+' · '+esc(label):esc(label)}</div>
       <div class="pside ${menang==='A'?'win':''}">${partaiNamesDisplay(p,'A')}</div>
@@ -1322,7 +1223,7 @@ function renderMatchCard(m){
       <div class="t r">${esc(infoB.singkat)}<span class="dot" style="background:${infoB.warna}"></span></div>
     </div>${partaiHtml}</article>`;
 }
-function resetJadwalFilter(){state.jadwalFilter={tanggal:'',status:'all',pool:'all',lapangan:'all',search:''};renderJadwalFilterUI();renderJadwalPublic();toast('Filter direset');}
+function resetJadwalFilter(){state.jadwalFilter={tanggal:'',status:'all',pool:'all',lapangan:'all',search:''};saveUIState();renderJadwalFilterUI();renderJadwalPublic();toast('Filter direset');}
 function renderSatkerPublic(){
   const el=document.getElementById('satkerList');
   if(!TEAMS.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><p>Belum ada satker.</p></div>`;return;}
@@ -1334,13 +1235,13 @@ function renderSatkerPublic(){
 }
 function renderPemainFilterUI(){
   const satkerSel=document.getElementById('pemainSatkerFilter');
-  if(satkerSel){const opts=[`<option value="all">Semua Satker</option>`].concat(TEAMS.map(t=>`<option value="${t.id}">${esc(t.nama)}</option>`));satkerSel.innerHTML=opts.join('');satkerSel.value=state.pemainFilter.satker;satkerSel.onchange=e=>{state.pemainFilter.satker=e.target.value;renderPemainPublic();};}
+  if(satkerSel){const opts=[`<option value="all">Semua Satker</option>`].concat(TEAMS.map(t=>`<option value="${t.id}">${esc(t.nama)}</option>`));satkerSel.innerHTML=opts.join('');satkerSel.value=state.pemainFilter.satker;satkerSel.onchange=e=>{state.pemainFilter.satker=e.target.value;saveUIState();renderPemainPublic();};}
   const genderSel=document.getElementById('pemainGenderFilter');
-  if(genderSel){genderSel.value=state.pemainFilter.gender;genderSel.onchange=e=>{state.pemainFilter.gender=e.target.value;renderPemainPublic();};}
+  if(genderSel){genderSel.value=state.pemainFilter.gender;genderSel.onchange=e=>{state.pemainFilter.gender=e.target.value;saveUIState();renderPemainPublic();};}
   const jenisSel=document.getElementById('pemainJenisFilter');
-  if(jenisSel){jenisSel.value=state.pemainFilter.jenis;jenisSel.onchange=e=>{state.pemainFilter.jenis=e.target.value;renderPemainPublic();};}
+  if(jenisSel){jenisSel.value=state.pemainFilter.jenis;jenisSel.onchange=e=>{state.pemainFilter.jenis=e.target.value;saveUIState();renderPemainPublic();};}
   const searchInput=document.getElementById('pemainSearchFilter');
-  if(searchInput){searchInput.value=state.pemainFilter.search||'';if(!searchInput._bound){searchInput._bound=true;let timer=null;searchInput.addEventListener('input',e=>{clearTimeout(timer);timer=setTimeout(()=>{state.pemainFilter.search=e.target.value;renderPemainPublic();},200);});}}
+  if(searchInput){searchInput.value=state.pemainFilter.search||'';if(!searchInput._bound){searchInput._bound=true;let timer=null;searchInput.addEventListener('input',e=>{clearTimeout(timer);timer=setTimeout(()=>{state.pemainFilter.search=e.target.value;saveUIState();renderPemainPublic();},200);});}}
 }
 function renderPemainPublic(){
   const el=document.getElementById('pemainList');
@@ -1351,8 +1252,7 @@ function renderPemainPublic(){
   const filteredTeams=TEAMS.filter(t=>{if(filter.satker!=='all'&&t.id!==filter.satker) return false;return true;});
   let totalMatched=0;const cards=[];
   filteredTeams.forEach(t=>{
-    const allPemain=pemainTim(t.id);
-    const filteredPemain=allPemain.filter(p=>playerMatchesFilter(p,filter));
+    const allPemain=pemainTim(t.id);const filteredPemain=allPemain.filter(p=>playerMatchesFilter(p,filter));
     totalMatched+=filteredPemain.length;
     if(activeFilter&&!filteredPemain.length) return;
     const list=filteredPemain.map((p,i)=>`<li><span class="pnum">${i+1}</span><span class="pname">${esc(p.nama)}</span><span class="ptag ${p.gender==='putra'?'putra':'putri'}">${esc(p.gender||'putra')}</span><span class="ptag ${p.jenis==='Tunggal'?'tunggal':'ganda'}">${esc(p.jenis)}</span></li>`).join('');
@@ -1365,7 +1265,7 @@ function renderPemainPublic(){
   if(!cards.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">👥</div><p>Tidak ada pemain yang cocok.</p></div>`;return;}
   el.innerHTML=cards.join('');
 }
-function resetPemainFilter(){state.pemainFilter={satker:'all',gender:'all',jenis:'all',search:''};renderPemainFilterUI();renderPemainPublic();toast('Filter pemain direset');}
+function resetPemainFilter(){state.pemainFilter={satker:'all',gender:'all',jenis:'all',search:''};saveUIState();renderPemainFilterUI();renderPemainPublic();toast('Filter pemain direset');}
 function renderProgress(){
   const el=document.getElementById('progressPanel');const ev=getEvent(state.klasemenEventId);if(!ev){el.innerHTML='';return;}
   const evMatches=MATCHES.filter(m=>m.eventId===ev.id);const total=evMatches.length,done=evMatches.filter(m=>statusMatch(m)==='selesai').length;const live=evMatches.filter(m=>statusMatch(m)==='berlangsung').length;const pct=total?Math.round(done/total*100):0;
@@ -1393,7 +1293,7 @@ function renderKlasemen(){
 function renderKlasemenEventFilter(){
   const el=document.getElementById('klasemenEventFilter');
   el.innerHTML=EVENTS.map(ev=>`<option value="${ev.id}" ${ev.id===state.klasemenEventId?'selected':''}>${esc(ev.nama)}</option>`).join('');
-  el.onchange=e=>{state.klasemenEventId=e.target.value;renderProgress();renderKlasemen();};
+  el.onchange=e=>{state.klasemenEventId=e.target.value;saveUIState();renderProgress();renderKlasemen();};
 }
 function renderPublic(){
   applySettings();
@@ -1408,7 +1308,15 @@ function renderPublic(){
 /* =====================================================
    ADMIN VIEWS
    ===================================================== */
-function adminGo(view){state.view=view;document.querySelectorAll('#adminNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));renderAdminView(view);}
+function adminGo(view){
+  state.view=view;
+  document.querySelectorAll('#adminNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  renderAdminView(view);
+  if(document.getElementById('adminPanel').classList.contains('open')){
+    const target='#admin/'+view;
+    if(location.hash!==target) history.pushState({admin:true,view},'',target);
+  }
+}
 function renderAdminView(view){
   const main=document.getElementById('adminMain');
   if(view==='dashboard') main.innerHTML=viewDashboard();
@@ -1552,9 +1460,7 @@ function adminResetJadwalFilter(){state.adminJadwalFilter={kategoriId:'all',tang
 
 /* EDIT MATCH */
 function renderPartaiEditorHTML(p, pi, isPerorangan){
-  const jenis=p.jenis||'Tunggal';
-  const namesA=p.pemainA||[];
-  const namesB=p.pemainB||[];
+  const jenis=p.jenis||'Tunggal';const namesA=p.pemainA||[];const namesB=p.pemainB||[];
   const removeBtn=!isPerorangan?`<button type="button" class="icon-act del" onclick="removePartaiEditor(this)" title="Hapus" style="margin-left:8px">×</button>`:'';
   return `<div class="partai-editor" data-idx="${pi}">
     <div class="pe-head"><span class="pe-label">PARTAI ${pi+1}</span>
@@ -1583,8 +1489,7 @@ function renumberPartaiEditors(){const cont=document.getElementById('partaiEdito
 function attachPartaiEditorListeners(node){const jenisSel=node.querySelector('.pe-jenis');if(!jenisSel) return;jenisSel.addEventListener('change',e=>{const isGanda=e.target.value==='Ganda';node.querySelectorAll('.pe-a, .pe-b').forEach(inp=>{if(parseInt(inp.dataset.slot)===1){inp.style.display=isGanda?'':'none';if(!isGanda)inp.value='';}});});}
 function editMatch(id){
   const m=id?MATCHES.find(x=>x.id===id):null;
-  const defaultEvent=getEvent(state.publicEventId)||EVENTS[0];
-  if(!defaultEvent){toast('Belum ada kegiatan');return;}
+  const defaultEvent=getEvent(state.publicEventId)||EVENTS[0];if(!defaultEvent){toast('Belum ada kegiatan');return;}
   const ev=m?getEvent(m.eventId):defaultEvent;
   const kat=m?ev.kategori.find(k=>k.id===m.kategoriId):ev.kategori[0];
   if(!kat){toast('Belum ada kategori');return;}
@@ -1593,8 +1498,7 @@ function editMatch(id){
   const buildOpts=(selectedId)=>kat.peserta.map(pid=>{const info=getPesertaInfo(pid,kat);const isMan=isManualPeserta(pid);return `<option value="${esc(pid)}" ${selectedId===pid?'selected':''}>${esc(info.nama)}${isMan?' [MANUAL]':''}</option>`;}).join('');
   const pesertaOpts=buildOpts(m?m.timA:null);
   const pesertaOptsB=buildOpts(m?m.timB:null);
-  let partaiList;
-  if(m){partaiList=m.partai;}else{partaiList=makePartaiDefault(kat,kat.peserta[0]||'',kat.peserta[1]||'');}
+  let partaiList;if(m){partaiList=m.partai;}else{partaiList=makePartaiDefault(kat,kat.peserta[0]||'',kat.peserta[1]||'');}
   const partaiHtml=partaiList.map((p,pi)=>renderPartaiEditorHTML(p,pi,isPerorangan)).join('');
   const addBtn=!isPerorangan?`<button type="button" class="btn-ghost" style="margin-bottom:12px" onclick="addPartaiEditor()">+ Tambah Partai</button>`:'';
   const courts=SETTINGS.courts||[];
@@ -1609,21 +1513,17 @@ function editMatch(id){
   openAdminForm(m?'✏️ Edit Pertandingan':'➕ Tambah Pertandingan','',body);
   document.querySelectorAll('#partaiEditorsContainer .partai-editor').forEach(ed=>attachPartaiEditorListeners(ed));
   setTimeout(()=>{refreshPlayerDatalists();document.querySelectorAll('.pe-a').forEach(inp=>inp.setAttribute('list','playerListA'));document.querySelectorAll('.pe-b').forEach(inp=>inp.setAttribute('list','playerListB'));},60);
-  const lapSel=document.getElementById('lapanganSelect');
-  const lokInp=document.getElementById('lokasiLapanganInput');
+  const lapSel=document.getElementById('lapanganSelect');const lokInp=document.getElementById('lokasiLapanganInput');
   if(lapSel&&lokInp){if(m&&currentCourt&&currentCourt.id) lapSel.value=currentCourt.id;const syncLokasi=()=>{const cid=lapSel.value;if(cid&&cid!=='__custom__'){const court=(SETTINGS.courts||[]).find(c=>c.id===cid);if(court) lokInp.value=court.lokasi||'';}};syncLokasi();}
   document.getElementById('matchForm').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const f=e.target;
+    e.preventDefault();const f=e.target;
     const newEventId=f.eventId.value,newKatId=f.kategoriId.value;
     const newEv=getEvent(newEventId),newKat=newEv.kategori.find(k=>k.id===newKatId);
     if(!newKat){toast('Kategori tidak valid');return;}
     const partaiEditors=document.querySelectorAll('#partaiEditorsContainer .partai-editor');
-    const partai=[];
-    let validationError=null;
+    const partai=[];let validationError=null;
     partaiEditors.forEach((ed,pi)=>{
-      const jenis=ed.querySelector('.pe-jenis').value;
-      const pemainA=[],pemainB=[];
+      const jenis=ed.querySelector('.pe-jenis').value;const pemainA=[],pemainB=[];
       ed.querySelectorAll('.pe-a').forEach(inp=>{if(inp.style.display!=='none'&&inp.value.trim())pemainA.push(inp.value.trim());});
       ed.querySelectorAll('.pe-b').forEach(inp=>{if(inp.style.display!=='none'&&inp.value.trim())pemainB.push(inp.value.trim());});
       const required=jenis==='Ganda'?2:1;
@@ -1632,8 +1532,7 @@ function editMatch(id){
       partai.push({kode:'P'+(pi+1),jenis,pemainA,pemainB,menang:ed.querySelector('.pe-menang').value||null,skor:ed.querySelector('.pe-skor').value.trim()});
     });
     if(validationError){toast(validationError);return;}
-    const tglInput=f.tgl.value.trim();
-    let hari='',tgl='';
+    const tglInput=f.tgl.value.trim();let hari='',tgl='';
     if(tglInput.includes('/')){const parts=tglInput.split('/');hari=parts[0].trim();tgl=parts.slice(1).join('/').trim();}else{tgl=tglInput;}
     let lapanganName='',lokasiLapangan=f.lokasiLapangan.value.trim();
     const lapId=f.lapangan.value;
@@ -1655,7 +1554,7 @@ async function hapusMatch(id){if(!confirm('Hapus pertandingan ini?')) return;MAT
 /* Klasemen Admin, Satker, Pemain, Cetak, Pengaturan */
 function viewKlasemenAdmin(){
   const ev=getEvent(state.klasemenEventId)||EVENTS[0];if(!ev) return `<div class="empty"><p>Belum ada kegiatan.</p></div>`;
-  let html=`<div class="admin-page-head"><div><h2>📈 Klasemen</h2><p>Klasemen per kategori</p></div></div><div class="admin-toolbar"><select class="filter-select" onchange="state.klasemenEventId=this.value;renderAdminView('klasemen')" style="min-width:220px">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div>`;
+  let html=`<div class="admin-page-head"><div><h2>📈 Klasemen</h2><p>Klasemen per kategori</p></div></div><div class="admin-toolbar"><select class="filter-select" onchange="state.klasemenEventId=this.value;saveUIState();renderAdminView('klasemen')" style="min-width:220px">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div>`;
   if(!ev.kategori.length) return html+`<div class="empty"><p>Belum ada kategori.</p></div>`;
   ev.kategori.forEach(kat=>{
     const rows=hitungKlasemen(kat,ev.id);const isBeregu=kat.tipe==='beregu';const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;const poolInfo=kat.sistem==='pool'?getPoolSummary(kat):'';
@@ -1675,9 +1574,7 @@ function editSatker(id){
 }
 async function hapusSatker(id){if(!confirm('Hapus satker ini?')) return;TEAMS=TEAMS.filter(t=>t.id!==id);PEMAIN=PEMAIN.filter(p=>p.team!==id);MATCHES=MATCHES.filter(m=>m.timA!==id&&m.timB!==id);EVENTS.forEach(ev=>ev.kategori.forEach(k=>{k.peserta=k.peserta.filter(p=>p!==id);if(k.poolAssignment) delete k.poolAssignment[id];}));await saveData();renderAdminView('satker');renderPublic();toast('Satker dihapus');}
 
-/* =====================================================
-   VIEW PEMAIN ADMIN — dengan checkbox & bulk delete
-   ===================================================== */
+/* VIEW PEMAIN ADMIN — dengan checkbox & bulk delete */
 function viewPemainAdmin(){
   const f=state.adminPemainFilter;
   const filtered=PEMAIN.filter(p=>{if(f.satker!=='all'&&p.team!==f.satker) return false;if(f.gender!=='all'&&p.gender!==f.gender) return false;if(f.jenis!=='all'&&p.jenis!==f.jenis) return false;if(f.search&&f.search.trim()&&!p.nama.toLowerCase().includes(f.search.trim().toLowerCase())) return false;return true;});
@@ -1694,14 +1591,10 @@ function adminPemainSearch(value){clearTimeout(_admPemainSearchTimer);_admPemain
 function adminPemainFilter(key,value){state.adminPemainFilter[key]=value;renderAdminView('pemain');}
 function adminResetPemainFilter(){state.adminPemainFilter={satker:'all',gender:'all',jenis:'all',search:''};renderAdminView('pemain');toast('Filter pemain direset');}
 
-/* === BULK DELETE PEMAIN === */
-function toggleAllPemain(checked){
-  document.querySelectorAll('.pemain-check').forEach(cb=>{cb.checked=checked;});
-  updatePemainSelection();
-}
+/* BULK DELETE PEMAIN */
+function toggleAllPemain(checked){document.querySelectorAll('.pemain-check').forEach(cb=>{cb.checked=checked;});updatePemainSelection();}
 function updatePemainSelection(){
-  const checks=document.querySelectorAll('.pemain-check');
-  const selected=[...checks].filter(cb=>cb.checked);
+  const checks=document.querySelectorAll('.pemain-check');const selected=[...checks].filter(cb=>cb.checked);
   const headCheck=document.getElementById('checkAllPemainHead');
   if(headCheck) headCheck.checked=checks.length>0&&selected.length===checks.length;
   const btn=document.getElementById('bulkDeletePemainBtn');
@@ -1713,15 +1606,9 @@ async function bulkDeletePemain(){
   if(!confirm(`Hapus ${ids.length} pemain terpilih? Tindakan ini juga menghapus mereka dari kategori dan pertandingan terkait.`)) return;
   const idSet=new Set(ids);
   PEMAIN=PEMAIN.filter(p=>!idSet.has(p.id));
-  EVENTS.forEach(ev=>ev.kategori.forEach(k=>{
-    k.peserta=k.peserta.filter(pid=>!idSet.has(pid));
-    if(k.poolAssignment) ids.forEach(id=>{delete k.poolAssignment[id];});
-  }));
+  EVENTS.forEach(ev=>ev.kategori.forEach(k=>{k.peserta=k.peserta.filter(pid=>!idSet.has(pid));if(k.poolAssignment) ids.forEach(id=>{delete k.poolAssignment[id];});}));
   MATCHES=MATCHES.filter(m=>!idSet.has(m.timA)&&!idSet.has(m.timB));
-  await saveData();
-  renderAdminView('pemain');
-  renderPublic();
-  toast(`✓ ${ids.length} pemain dihapus`);
+  await saveData();renderAdminView('pemain');renderPublic();toast(`✓ ${ids.length} pemain dihapus`);
 }
 
 function editPemain(id){
@@ -1764,10 +1651,23 @@ function showImportPemainModal(){
     <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="button" class="btn-primary" style="flex:1" onclick="doImportPemain()" id="doImportBtn" disabled>Import</button></div>`;
   openAdminForm('📥 Import Data Pemain','Batch import',body);
 }
-function handleImportFile(input){
+/* Lazy-load XLSX hanya saat dibutuhkan */
+let _xlsxLoaded=false;
+function ensureXLSX(){
+  return new Promise((resolve,reject)=>{
+    if(_xlsxLoaded||typeof XLSX!=='undefined'){_xlsxLoaded=true;return resolve();}
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload=()=>{_xlsxLoaded=true;resolve();};
+    s.onerror=()=>reject(new Error('Gagal memuat XLSX'));
+    document.head.appendChild(s);
+  });
+}
+async function handleImportFile(input){
   const file=input.files[0];if(!file) return;
   const isExcel=/\.(xlsx|xls)$/i.test(file.name);
-  if(isExcel&&typeof XLSX!=='undefined'){
+  if(isExcel){
+    try{await ensureXLSX();}catch(e){toast('Gagal load Excel parser');return;}
     const reader=new FileReader();
     reader.onload=(e)=>{try{const data=new Uint8Array(e.target.result);const wb=XLSX.read(data,{type:'array'});const sheet=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''});document.getElementById('importPasteArea').value=rows.map(r=>r.join('\t')).join('\n');parseImportPaste();toast('Excel dibaca ✓');}catch(err){toast('Gagal: '+err.message);}};
     reader.readAsArrayBuffer(file);
@@ -1939,10 +1839,7 @@ function printHasil(){
       html+=`<h3>${esc(kat.nama)}</h3><table><thead><tr><th>Partai</th><th>Tim A</th><th style="text-align:center;width:80px">Skor</th><th>Tim B</th><th>Pemenang</th></tr></thead><tbody>`;
       catMatches.forEach(m=>{
         const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);
-        m.partai.forEach((p,pi)=>{
-          const menang=p.menang;const skor=menang?(p.skor||'—'):'—';const winner=menang==='A'?infoA.singkat:menang==='B'?infoB.singkat:'—';
-          html+=`<tr><td><b>${pi+1}. ${esc(p.jenis||'Tunggal')}</b></td><td>${esc(partaiNamesDisplay(p,'A'))}</td><td style="text-align:center" class="skor-cell">${esc(skor)}</td><td>${esc(partaiNamesDisplay(p,'B'))}</td><td class="win-cell"><b>${esc(winner)}</b></td></tr>`;
-        });
+        m.partai.forEach((p,pi)=>{const menang=p.menang;const skor=menang?(p.skor||'—'):'—';const winner=menang==='A'?infoA.singkat:menang==='B'?infoB.singkat:'—';html+=`<tr><td><b>${pi+1}. ${esc(p.jenis||'Tunggal')}</b></td><td>${esc(partaiNamesDisplay(p,'A'))}</td><td style="text-align:center" class="skor-cell">${esc(skor)}</td><td>${esc(partaiNamesDisplay(p,'B'))}</td><td class="win-cell"><b>${esc(winner)}</b></td></tr>`;});
       });
       html+=`</tbody></table>`;
     });
@@ -2033,6 +1930,7 @@ async function resetData(){
       supa.from('courts').delete().neq('id','00000000-0000-0000-0000-000000000000')
     ]);
     await supa.from('settings').upsert({id:1,title:'PTWP PTA Sulawesi Barat',sub:'Turnamen Tenis',year:2025,location:'Lapangan Tenis PTA Sulawesi Barat, Mamuju',tagline:'Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat',hero_lead:'Ajang silaturahmi dan sportivitas antar satker.',hero_image:DEFAULT_HERO_IMAGE,admin_user:'admin',admin_pass:'admin'});
+    localStorage.removeItem(LS_CACHE);localStorage.removeItem(LS_UI);localStorage.removeItem(LS_SCROLL);
     toast('Data direset. Reload...');
     setTimeout(()=>location.reload(),1000);
   }catch(err){toast('Gagal reset: '+err.message);}
@@ -2041,8 +1939,68 @@ function setTheme(t){document.documentElement.setAttribute('data-theme',t);docum
 document.getElementById('themeBtn').addEventListener('click',()=>{const now=document.documentElement.getAttribute('data-theme');setTheme(now==='dark'?'light':'dark');});
 const loginModal=document.getElementById('loginModal');const loginDot=document.getElementById('loginDot');const loginErr=document.getElementById('loginErr');const adminPanel=document.getElementById('adminPanel');
 function setAdmin(on){state.admin=on;document.body.classList.toggle('admin',on);loginDot.classList.toggle('on',on);loginDot.textContent=on?'🔓':'🔑';if(on) localStorage.setItem(LS_ADMIN,'1');else localStorage.removeItem(LS_ADMIN);}
-function openAdminPanel(){adminPanel.classList.add('open');document.body.style.overflow='hidden';adminGo(state.view||'dashboard');}
-function closeAdminPanel(){adminPanel.classList.remove('open');document.body.style.overflow='';}
+
+/* =====================================================
+   HASH ROUTING — back/forward browser (keyboard & HP)
+   ===================================================== */
+let _lastPublicHash='#jadwal';
+function parseHash(){
+  const h=(location.hash||'').replace(/^#/,'');
+  if(!h) return {type:'top'};
+  const parts=h.split('/');
+  if(parts[0]==='admin') return {type:'admin',view:parts[1]||'dashboard'};
+  return {type:'section',id:parts[0]};
+}
+function openAdminPanel(){
+  const h=location.hash;
+  if(h && !h.startsWith('#admin')) _lastPublicHash=h;
+  else if(!h) _lastPublicHash='#jadwal';
+  adminPanel.classList.add('open');document.body.style.overflow='hidden';
+  const view=state.view||'dashboard';
+  history.pushState({admin:true,view},'','#admin/'+view);
+  document.querySelectorAll('#adminNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  renderAdminView(view);
+}
+function closeAdminPanel(){
+  adminPanel.classList.remove('open');document.body.style.overflow='';
+  if(location.hash.startsWith('#admin')){
+    history.replaceState(null,'',_lastPublicHash||'#jadwal');
+    const id=(_lastPublicHash||'#jadwal').replace(/^#/,'');
+    const el=document.getElementById(id);
+    if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),30);
+  }
+}
+function applyRoute(){
+  const r=parseHash();
+  if(r.type==='admin'){
+    if(localStorage.getItem(LS_ADMIN)!=='1'){
+      // Not logged in — ignore admin route
+      if(location.hash.startsWith('#admin')) history.replaceState(null,'',_lastPublicHash||'#jadwal');
+      return;
+    }
+    if(!adminPanel.classList.contains('open')){
+      adminPanel.classList.add('open');document.body.style.overflow='hidden';
+    }
+    state.view=r.view;
+    document.querySelectorAll('#adminNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===r.view));
+    renderAdminView(r.view);
+  } else {
+    if(adminPanel.classList.contains('open')){
+      adminPanel.classList.remove('open');document.body.style.overflow='';
+    }
+    // Browser handles anchor scroll — no manual scroll
+  }
+}
+let _routeGuard=false;
+function onRouteChange(){
+  if(_routeGuard) return;
+  _routeGuard=true;
+  applyRoute();
+  setTimeout(()=>_routeGuard=false,80);
+}
+window.addEventListener('hashchange',onRouteChange);
+window.addEventListener('popstate',onRouteChange);
+
 document.getElementById('openDashboardBtn').addEventListener('click',openAdminPanel);
 document.getElementById('closeAdminBtn').addEventListener('click',closeAdminPanel);
 document.getElementById('logoutBtn').addEventListener('click',()=>{setAdmin(false);closeAdminPanel();toast('Logout berhasil 👋');});
@@ -2054,46 +2012,78 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){loginModal.classLis
 document.getElementById('loginForm').addEventListener('submit',e=>{e.preventDefault();const u=document.getElementById('inUser').value.trim();const p=document.getElementById('inPass').value;if(u===SETTINGS.adminUser&&p===SETTINGS.adminPass){loginModal.classList.remove('open');setAdmin(true);toast('Login berhasil 🔓');setTimeout(openAdminPanel,300);}else{loginErr.textContent='Username atau password salah!';document.getElementById('inPass').value='';document.getElementById('inPass').focus();}});
 
 /* =====================================================
-   INIT — LOAD FROM SUPABASE
+   SCROLL POSITION PERSISTENCE
+   ===================================================== */
+let _scrollTimer;
+window.addEventListener('scroll',()=>{
+  clearTimeout(_scrollTimer);
+  _scrollTimer=setTimeout(()=>{try{localStorage.setItem(LS_SCROLL,String(window.scrollY));}catch(e){}},300);
+},{passive:true});
+function restoreScrollIfNeeded(){
+  if(location.hash && location.hash.length>1 && !location.hash.startsWith('#admin')) return;
+  const sy=parseInt(localStorage.getItem(LS_SCROLL)||'0');
+  if(sy>0) setTimeout(()=>window.scrollTo({top:sy,behavior:'auto'}),80);
+}
+['beforeunload','pagehide'].forEach(ev=>window.addEventListener(ev,()=>{saveUIState();saveCache();}));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveUIState();saveCache();}});
+
+/* =====================================================
+   INIT — CACHE-FIRST INSTANT RENDER
    ===================================================== */
 (async function init(){
-  const savedTheme=localStorage.getItem(LS_THEME);
-  setTheme(savedTheme||'dark');
+  setTheme(localStorage.getItem(LS_THEME)||'dark');
+  loadUIState();
 
-  const ok=await loadData();
-  const loading=document.getElementById('loadingScreen');
-  if(loading) loading.remove();
+  const isAdminSession = localStorage.getItem(LS_ADMIN)==='1';
+  const wantsAdmin = location.hash.startsWith('#admin');
+  const hadCache = loadCache();
 
-  if(!ok){
-    document.body.innerHTML=`<div style="padding:60px 20px;text-align:center;font-family:sans-serif;max-width:600px;margin:0 auto">
-      <div style="font-size:60px;margin-bottom:20px">⚠️</div>
-      <h1 style="margin-bottom:12px;color:#e9f2f7">Gagal Memuat Data</h1>
-      <p style="color:#89a2b8;line-height:1.7;margin-bottom:24px">Periksa:<br>
-      1. <b>SUPABASE_URL</b> dan <b>SUPABASE_ANON_KEY</b> di kode HTML<br>
-      2. Koneksi internet<br>
-      3. RLS policy di Supabase (harus allow anon read/write)<br>
-      4. SQL schema sudah dijalankan?</p>
-      <button onclick="location.reload()" style="padding:12px 28px;font-size:14px;font-weight:800;border:0;border-radius:10px;background:#2ee07a;color:#04170d;cursor:pointer">🔄 Coba Lagi</button>
-    </div>`;
-    return;
+  if(hadCache){
+    const ls=document.getElementById('loadingScreen'); if(ls) ls.remove();
+    if(isAdminSession) setAdmin(true);
+    renderPublic();
+    applyRoute();
+    if(!wantsAdmin) restoreScrollIfNeeded();
   }
 
-  if(localStorage.getItem(LS_ADMIN)==='1') setAdmin(true);
+  const ok=await loadData();
+  const ls=document.getElementById('loadingScreen'); if(ls) ls.remove();
 
+  if(!ok){
+    if(!hadCache){
+      document.body.innerHTML=`<div style="padding:60px 20px;text-align:center;font-family:sans-serif;max-width:600px;margin:0 auto">
+        <div style="font-size:60px;margin-bottom:20px">⚠️</div>
+        <h1 style="margin-bottom:12px;color:#e9f2f7">Gagal Memuat Data</h1>
+        <p style="color:#89a2b8;line-height:1.7;margin-bottom:24px">Periksa:<br>
+        1. <b>SUPABASE_URL</b> dan <b>SUPABASE_ANON_KEY</b> di kode HTML<br>
+        2. Koneksi internet<br>
+        3. RLS policy di Supabase (harus allow anon read/write)<br>
+        4. SQL schema sudah dijalankan?</p>
+        <button onclick="location.reload()" style="padding:12px 28px;font-size:14px;font-weight:800;border:0;border-radius:10px;background:#2ee07a;color:#04170d;cursor:pointer">🔄 Coba Lagi</button>
+      </div>`;
+      return;
+    }
+    toast('⚠️ Offline — menggunakan data cache');
+  } else {
+    saveCache();
+  }
+
+  if(isAdminSession) setAdmin(true);
   renderPublic();
+  applyRoute();
+  if(!hadCache) restoreScrollIfNeeded();
 
-  let needsSave=false;
-  EVENTS.forEach(ev=>{
-    ev.kategori.forEach(kat=>{
+  // Auto-generate jadwal yang belum ada
+  if(ok){
+    let needsRender=false;
+    EVENTS.forEach(ev=>ev.kategori.forEach(kat=>{
       if(kat.peserta.length>=2){
-        const existing=MATCHES.filter(m=>m.eventId===ev.id&&m.kategoriId===kat.id);
-        if(existing.length===0){
-          autoRegenerateSchedule(ev.id,kat.id);
-          needsSave=true;
-        }
+        const ex=MATCHES.filter(m=>m.eventId===ev.id&&m.kategoriId===kat.id);
+        if(ex.length===0){autoRegenerateSchedule(ev.id,kat.id);needsRender=true;}
       }
-    });
-  });
+    }));
+    if(needsRender){renderPublic();applyRoute();}
+  }
 })();
 </script>
 </body>
