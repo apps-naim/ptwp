@@ -250,6 +250,11 @@ body.admin .admin-chip{display:inline-flex}
 .admin-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
 .admin-table tbody tr:last-child td{border-bottom:0}
 .admin-table tbody tr:hover{background:var(--panel2)}
+.admin-table input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);vertical-align:middle}
+#checkAllPemainHead{cursor:pointer}
+#bulkDeletePemainBtn{transition:.2s}
+#bulkDeletePemainBtn:disabled{opacity:.45;cursor:not-allowed}
+#bulkDeletePemainBtn:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.1)}
 .act-btns{display:flex;gap:5px;justify-content:flex-end}
 .icon-act{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;font-size:12px;display:grid;place-items:center;transition:.18s}
 .icon-act:hover{color:var(--accent);border-color:var(--accent)}
@@ -354,7 +359,6 @@ body.admin .admin-chip{display:inline-flex}
 </head>
 <body>
 
-<!-- LOADING SCREEN (removed after load) -->
 <div class="loading-screen" id="loadingScreen">
   <div class="loading-inner">
     <div class="spinner">🎾</div>
@@ -519,7 +523,6 @@ body.admin .admin-chip{display:inline-flex}
 <script>
 /* =====================================================
    SUPABASE CONFIG — GANTI DENGAN MILIK ANDA!
-   Ambil dari: Supabase Dashboard → Settings → API
    ===================================================== */
 const SUPABASE_URL = 'https://rtrejyxdwldhygcnmmvm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ciQ471M9sytG3PAyprZDvg_7K1Z2W7n';
@@ -552,7 +555,6 @@ let state={admin:false,view:'dashboard',publicEventId:null,publicKatFilter:'all'
    ===================================================== */
 async function saveData(){
   try{
-    // 1. Settings
     await supa.from('settings').upsert({
       id:1,
       title:SETTINGS.title, sub:SETTINGS.sub, year:SETTINGS.year,
@@ -561,7 +563,6 @@ async function saveData(){
       admin_user:SETTINGS.adminUser, admin_pass:SETTINGS.adminPass
     });
 
-    // Sync helper: upsert items + delete orphans
     const syncTable=async(table,items,mapper,keyField='id')=>{
       const {data:existing}=await supa.from(table).select(keyField);
       const existingKeys=new Set((existing||[]).map(x=>String(x[keyField])));
@@ -576,27 +577,22 @@ async function saveData(){
       }
     };
 
-    // 2. Teams
     await syncTable('teams',TEAMS,t=>({
       id:t.id, nama:t.nama, singkat:t.singkat, kota:t.kota, warna:t.warna
     }));
 
-    // 3. Players
     await syncTable('players',PEMAIN,p=>({
       id:p.id, nama:p.nama, team_id:p.team, jenis:p.jenis, gender:p.gender
     }));
 
-    // 4. Courts
     await syncTable('courts',SETTINGS.courts||[],(c,i)=>({
       id:c.id, nama:c.nama, lokasi:c.lokasi, urutan:i
     }));
 
-    // 5. Events
     await syncTable('events',EVENTS,e=>({
       id:e.id, nama:e.nama, mulai:e.mulai, selesai:e.selesai, lokasi:e.lokasi
     }));
 
-    // 6. Categories
     const allCats=[];
     EVENTS.forEach(ev=>ev.kategori.forEach(k=>allCats.push({...k,eventId:ev.id})));
     await syncTable('categories',allCats,c=>({
@@ -605,7 +601,6 @@ async function saveData(){
       jumlah_partai:c.jumlahPartai||3, lolos_per_pool:c.lolosPerPool||2
     }));
 
-    // 7. Pools
     const allPools=[];
     EVENTS.forEach(ev=>ev.kategori.forEach(k=>
       (k.pools||[]).forEach((p,i)=>allPools.push({...p,categoryId:k.id,urutan:i}))
@@ -614,7 +609,6 @@ async function saveData(){
       id:p.id, category_id:p.categoryId, nama:p.nama, urutan:p.urutan
     }));
 
-    // 8. Participants
     const allParts=[];
     EVENTS.forEach(ev=>ev.kategori.forEach(k=>{
       (k.peserta||[]).forEach(pid=>{
@@ -640,7 +634,6 @@ async function saveData(){
       if(error) throw error;
     }
 
-    // 9. Matches
     await syncTable('matches',MATCHES,m=>({
       id:m.id, event_id:m.eventId, category_id:m.kategoriId,
       pool_id:m.poolId, stage:m.stage, babak_label:m.babakLabel,
@@ -649,7 +642,6 @@ async function saveData(){
       tim_a:m.timA, tim_b:m.timB
     }));
 
-    // 10. Match Partai
     const allPartai=[];
     MATCHES.forEach(m=>(m.partai||[]).forEach((p,i)=>{
       allPartai.push({
@@ -1660,7 +1652,7 @@ function refreshPlayerDatalists(){const form=document.getElementById('matchForm'
 function reloadMatchFormEvent(eventId){const ev=getEvent(eventId);const katSel=document.querySelector('#matchForm [name="kategoriId"]');if(katSel&&ev){katSel.innerHTML=ev.kategori.map(k=>`<option value="${k.id}">${esc(k.nama)} (${k.tipe})</option>`).join('');refreshPlayerDatalists();}}
 async function hapusMatch(id){if(!confirm('Hapus pertandingan ini?')) return;MATCHES=MATCHES.filter(m=>m.id!==id);await saveData();renderAdminView(state.view);renderPublic();toast('Pertandingan dihapus');}
 
-/* Klasemen Admin, Satker, Pemain, Cetak, Pengaturan — dipadatkan */
+/* Klasemen Admin, Satker, Pemain, Cetak, Pengaturan */
 function viewKlasemenAdmin(){
   const ev=getEvent(state.klasemenEventId)||EVENTS[0];if(!ev) return `<div class="empty"><p>Belum ada kegiatan.</p></div>`;
   let html=`<div class="admin-page-head"><div><h2>📈 Klasemen</h2><p>Klasemen per kategori</p></div></div><div class="admin-toolbar"><select class="filter-select" onchange="state.klasemenEventId=this.value;renderAdminView('klasemen')" style="min-width:220px">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div>`;
@@ -1682,20 +1674,56 @@ function editSatker(id){
   document.getElementById('satkerForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;const data={nama:f.nama.value.trim(),singkat:f.singkat.value.trim(),kota:f.kota.value.trim(),warna:f.warna.value};if(t) Object.assign(t,data); else TEAMS.push({id:genId('t'),...data});await saveData();closeAdminForm();renderAdminView('satker');renderPublic();toast(t?'Satker diperbarui':'Satker ditambahkan');});
 }
 async function hapusSatker(id){if(!confirm('Hapus satker ini?')) return;TEAMS=TEAMS.filter(t=>t.id!==id);PEMAIN=PEMAIN.filter(p=>p.team!==id);MATCHES=MATCHES.filter(m=>m.timA!==id&&m.timB!==id);EVENTS.forEach(ev=>ev.kategori.forEach(k=>{k.peserta=k.peserta.filter(p=>p!==id);if(k.poolAssignment) delete k.poolAssignment[id];}));await saveData();renderAdminView('satker');renderPublic();toast('Satker dihapus');}
+
+/* =====================================================
+   VIEW PEMAIN ADMIN — dengan checkbox & bulk delete
+   ===================================================== */
 function viewPemainAdmin(){
   const f=state.adminPemainFilter;
   const filtered=PEMAIN.filter(p=>{if(f.satker!=='all'&&p.team!==f.satker) return false;if(f.gender!=='all'&&p.gender!==f.gender) return false;if(f.jenis!=='all'&&p.jenis!==f.jenis) return false;if(f.search&&f.search.trim()&&!p.nama.toLowerCase().includes(f.search.trim().toLowerCase())) return false;return true;});
   const filterActive=!!(f.satker!=='all'||f.gender!=='all'||f.jenis!=='all'||(f.search&&f.search.trim()));
   const satkerOpts=[`<option value="all">Semua Satker</option>`].concat(TEAMS.map(t=>`<option value="${t.id}" ${f.satker===t.id?'selected':''}>${esc(t.nama)}</option>`)).join('');
-  const rows=filtered.map(p=>{const t=tim(p.team);return `<tr><td><b>${esc(p.nama)}</b></td><td>${esc(t.singkat)}</td><td><span class="ptag ${p.gender==='putra'?'putra':'putri'}">${esc(p.gender||'putra')}</span></td><td><span class="ptag ${p.jenis==='Tunggal'?'tunggal':'ganda'}">${esc(p.jenis)}</span></td><td><div class="act-btns"><button class="icon-act" onclick="editPemain('${p.id}')">✏️</button><button class="icon-act del" onclick="hapusPemain('${p.id}')">🗑️</button></div></td></tr>`;}).join('');
+  const rows=filtered.map(p=>{const t=tim(p.team);return `<tr><td style="text-align:center;width:36px"><input type="checkbox" class="pemain-check" value="${p.id}" onchange="updatePemainSelection()"></td><td><b>${esc(p.nama)}</b></td><td>${esc(t.singkat)}</td><td><span class="ptag ${p.gender==='putra'?'putra':'putri'}">${esc(p.gender||'putra')}</span></td><td><span class="ptag ${p.jenis==='Tunggal'?'tunggal':'ganda'}">${esc(p.jenis)}</span></td><td><div class="act-btns"><button class="icon-act" onclick="editPemain('${p.id}')">✏️</button><button class="icon-act del" onclick="hapusPemain('${p.id}')">🗑️</button></div></td></tr>`;}).join('');
   return `<div class="admin-page-head"><div><h2>👥 Pemain</h2><p>Kelola pemain — bisa import Excel/CSV</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="showImportPemainModal()" style="padding:9px 16px">📥 Import</button><button class="btn-primary" style="width:auto;padding:9px 16px" onclick="editPemain(null)">+ Tambah</button></div></div>
     <div class="filter-bar ${filterActive?'filter-active':''}" style="margin-bottom:14px"><span class="lbl">🔍 Filter</span><select class="filter-select" onchange="adminPemainFilter('satker',this.value)">${satkerOpts}</select><select class="filter-select" onchange="adminPemainFilter('gender',this.value)"><option value="all" ${f.gender==='all'?'selected':''}>Semua Gender</option><option value="putra" ${f.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${f.gender==='putri'?'selected':''}>Putri</option></select><select class="filter-select" onchange="adminPemainFilter('jenis',this.value)"><option value="all" ${f.jenis==='all'?'selected':''}>Semua Jenis</option><option value="Tunggal" ${f.jenis==='Tunggal'?'selected':''}>Tunggal</option><option value="Ganda" ${f.jenis==='Ganda'?'selected':''}>Ganda</option></select><input type="text" class="filter-input filter-search" id="adminPemainSearch" placeholder="🔎 Cari..." value="${esc(f.search)}" oninput="adminPemainSearch(this.value)" autocomplete="off"><button class="btn-ghost" onclick="adminResetPemainFilter()">↺ Reset</button>${filterActive?`<span class="filter-count"><b>${filtered.length}</b> / ${PEMAIN.length}</span>`:''}</div>
-    <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Nama</th><th>Satker</th><th>Gender</th><th>Jenis</th><th style="text-align:right">Aksi</th></tr></thead><tbody>${rows||`<tr><td colspan="5" class="empty" style="padding:32px">${PEMAIN.length===0?'Belum ada pemain.':'Tidak ada yang cocok.'}</td></tr>`}</tbody></table></div>`;
+    <div class="admin-toolbar" style="margin-bottom:10px"><button class="btn-danger" id="bulkDeletePemainBtn" onclick="bulkDeletePemain()" disabled style="padding:9px 16px">🗑️ Hapus Terpilih (0)</button><span class="muted" style="font-size:12px;font-weight:600">💡 Centang pemain pada tabel untuk hapus massal</span><div class="grow"></div><span class="muted" style="font-size:12px;font-weight:600">${filtered.length} pemain ditampilkan</span></div>
+    <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th style="text-align:center;width:36px"><input type="checkbox" id="checkAllPemainHead" onchange="toggleAllPemain(this.checked)" title="Pilih semua"></th><th>Nama</th><th>Satker</th><th>Gender</th><th>Jenis</th><th style="text-align:right">Aksi</th></tr></thead><tbody>${rows||`<tr><td colspan="6" class="empty" style="padding:32px">${PEMAIN.length===0?'Belum ada pemain.':'Tidak ada yang cocok.'}</td></tr>`}</tbody></table></div>`;
 }
 let _admPemainSearchTimer=null;
 function adminPemainSearch(value){clearTimeout(_admPemainSearchTimer);_admPemainSearchTimer=setTimeout(()=>{state.adminPemainFilter.search=value;renderAdminView('pemain');setTimeout(()=>{const inp=document.getElementById('adminPemainSearch');if(inp){inp.focus();inp.setSelectionRange(value.length,value.length);}},30);},220);}
 function adminPemainFilter(key,value){state.adminPemainFilter[key]=value;renderAdminView('pemain');}
 function adminResetPemainFilter(){state.adminPemainFilter={satker:'all',gender:'all',jenis:'all',search:''};renderAdminView('pemain');toast('Filter pemain direset');}
+
+/* === BULK DELETE PEMAIN === */
+function toggleAllPemain(checked){
+  document.querySelectorAll('.pemain-check').forEach(cb=>{cb.checked=checked;});
+  updatePemainSelection();
+}
+function updatePemainSelection(){
+  const checks=document.querySelectorAll('.pemain-check');
+  const selected=[...checks].filter(cb=>cb.checked);
+  const headCheck=document.getElementById('checkAllPemainHead');
+  if(headCheck) headCheck.checked=checks.length>0&&selected.length===checks.length;
+  const btn=document.getElementById('bulkDeletePemainBtn');
+  if(btn){btn.disabled=selected.length===0;btn.textContent=`🗑️ Hapus Terpilih (${selected.length})`;}
+}
+async function bulkDeletePemain(){
+  const ids=[...document.querySelectorAll('.pemain-check')].filter(cb=>cb.checked).map(cb=>cb.value);
+  if(!ids.length){toast('Tidak ada pemain dipilih');return;}
+  if(!confirm(`Hapus ${ids.length} pemain terpilih? Tindakan ini juga menghapus mereka dari kategori dan pertandingan terkait.`)) return;
+  const idSet=new Set(ids);
+  PEMAIN=PEMAIN.filter(p=>!idSet.has(p.id));
+  EVENTS.forEach(ev=>ev.kategori.forEach(k=>{
+    k.peserta=k.peserta.filter(pid=>!idSet.has(pid));
+    if(k.poolAssignment) ids.forEach(id=>{delete k.poolAssignment[id];});
+  }));
+  MATCHES=MATCHES.filter(m=>!idSet.has(m.timA)&&!idSet.has(m.timB));
+  await saveData();
+  renderAdminView('pemain');
+  renderPublic();
+  toast(`✓ ${ids.length} pemain dihapus`);
+}
+
 function editPemain(id){
   const p=id?PEMAIN.find(x=>x.id===id):null;
   const teamOpts=TEAMS.map(t=>`<option value="${t.id}" ${p&&p.team===t.id?'selected':''}>${esc(t.nama)}</option>`).join('');
