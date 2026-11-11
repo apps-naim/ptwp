@@ -432,6 +432,25 @@ body.admin .admin-chip{display:inline-flex}
 
 <main id="top">
   <div id="page-home" class="page-view active">
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="hero-bg" id="heroBg"></div>
+      <div class="hero-ball b1"></div>
+      <div class="hero-ball b2"></div>
+      <div class="hero-ball b3"></div>
+      <div class="wrap">
+        <span class="tagline">🎾 <span id="heroTagline">Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat</span></span>
+        <h1 id="heroTitle">PTWP PTA <span class="grad">Sulawesi Barat</span></h1>
+        <p class="lead" id="heroLead">Ajang silaturahmi dan sportivitas antar satker.</p>
+        <div class="stats">
+          <div class="stat"><b id="stEvent">0</b><span>Kegiatan</span></div>
+          <div class="stat"><b id="stKat">0</b><span>Kategori</span></div>
+          <div class="stat"><b id="stMatch">0</b><span>Pertandingan</span></div>
+          <div class="stat"><b id="stPool">0</b><span>Pool</span></div>
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="jadwal">
       <div class="wrap">
         <div class="sec-head">
@@ -962,8 +981,11 @@ function rebuildPartaiNames(m,kat){
     }
   });
 }
+/* ========== FIXED: createMatch converts null to 'TBD' so auto-advance works ========== */
 function createMatch(event,kat,opts){
-  return {id:genId('m'),eventId:event.id,kategoriId:kat.id,tipe:kat.tipe,poolId:opts.poolId||null,stage:opts.stage,babakLabel:opts.babakLabel,hari:'',tgl:'',jam:'',lapangan:'',lokasiLapangan:'',timA:opts.timA,timB:opts.timB,partai:makePartaiDefault(kat,opts.timA,opts.timB)};
+  const timA = (opts.timA===null||opts.timA===undefined)?'TBD':opts.timA;
+  const timB = (opts.timB===null||opts.timB===undefined)?'TBD':opts.timB;
+  return {id:genId('m'),eventId:event.id,kategoriId:kat.id,tipe:kat.tipe,poolId:opts.poolId||null,stage:opts.stage,babakLabel:opts.babakLabel,hari:'',tgl:'',jam:'',lapangan:'',lokasiLapangan:'',timA:timA,timB:timB,partai:makePartaiDefault(kat,timA,timB)};
 }
 function generateRoundRobin(event,kat,peserta,poolId,label){const out=[];for(let i=0;i<peserta.length;i++)for(let j=i+1;j<peserta.length;j++)out.push(createMatch(event,kat,{poolId,stage:poolId?'pool':'kompetisi',babakLabel:label,timA:peserta[i],timB:peserta[j]}));return out;}
 function generateKnockoutBracket(event,kat,peserta,useSeeding){
@@ -1041,7 +1063,7 @@ function generateKnockoutFromPools(event,kat,pools,lolos){
     for(let i=0;i<numMatches;i++){
       const a=remaining[i*2],b=remaining[i*2+1];
       const m=createMatch(event,kat,{poolId:null,stage:'knockout',babakLabel:roundName,timA:'TBD',timB:'TBD'});
-      m.partai.forEach(p=>{p.pemainA=[a||'TBD'];p.pemainB=[b||'TBD'];});
+      m.partai.forEach(p=>{p.pemainA=[a||'TBD'];p.pemainB=[b||'TBD']});
       matches.push(m);nextRound.push(null);
     }
     remaining=nextRound;
@@ -1285,6 +1307,7 @@ function getFilteredPrintMatches(opts){
   });
 }
 
+/* ========== UPDATED: applySettings now also updates hero content ========== */
 function applySettings(){
   if(!SETTINGS.tagline) SETTINGS.tagline='Persatuan Tenis Warga Peradilan — PTA Sulawesi Barat';
   if(!SETTINGS.heroLead) SETTINGS.heroLead='Ajang silaturahmi dan sportivitas antar satker.';
@@ -1308,6 +1331,21 @@ function applySettings(){
       brandMark.innerHTML = `<img src="${SETTINGS.logo}" alt="Logo">`;
     } else {
       brandMark.textContent = SETTINGS.logo;
+    }
+  }
+  // Update hero content
+  const heroTagline=document.getElementById('heroTagline');
+  if(heroTagline) heroTagline.textContent=SETTINGS.tagline;
+  const heroLead=document.getElementById('heroLead');
+  if(heroLead) heroLead.textContent=SETTINGS.heroLead;
+  const heroTitle=document.getElementById('heroTitle');
+  if(heroTitle){
+    const words=SETTINGS.title.split(' ');
+    if(words.length>1){
+      const last=words.pop();
+      heroTitle.innerHTML=`${esc(words.join(' '))} <span class="grad">${esc(last)}</span>`;
+    } else {
+      heroTitle.innerHTML=`<span class="grad">${esc(SETTINGS.title)}</span>`;
     }
   }
 }
@@ -1645,6 +1683,7 @@ function viewKegiatanDetail(eventId){
     else if(kat.sistem==='penyisihan' || kat.sistem==='gugur'){progressHTML=`<div class="kat-progress"><span class="pitem ${st.ko.filled===st.ko.total?'done':''}">🎯 <b>${st.ko.filled}/${st.ko.total}</b> terisi</span><span class="pitem ${st.ko.done===st.ko.total&&st.ko.total>0?'done':''}">🏁 <b>${st.ko.done}/${st.ko.total}</b> selesai</span></div>`;}
     else if(kat.sistem==='kompetisi'){const koInfo=st.ko.total>0?`<span class="pitem ${st.ko.done===st.ko.total?'done':''}">🏁 KO: <b>${st.ko.done}/${st.ko.total}</b></span>`:`<span class="pitem" style="color:var(--muted)">🏁 KO: belum dibuat</span>`;progressHTML=`<div class="kat-progress"><span class="pitem ${st.rr.done===st.rr.total?'done':''}">🔄 Kompetisi: <b>${st.rr.done}/${st.rr.total}</b></span>${koInfo}</div>`;}
     const partaiInfo=kat.tipe==='beregu'?` · <b>${kat.jumlahPartai||3}</b> partai`:'';
+
     return `<div class="kat-card"><div class="kat-card-head"><span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span></div><h4 style="margin-bottom:8px">${esc(kat.nama)}</h4><div class="kat-card-body"><div class="kat-info"><b>${kat.peserta.length}</b> peserta${manualCount?` · <span style="color:var(--purple);font-weight:700">${manualCount} manual</span>`:''}${partaiInfo} · <b>${catMatches.length}</b> pertandingan${catMatches.length?` (${done} selesai)`:''}</div>${kat.sistem==='pool'?`<div class="kat-info">Pool: <b>${kat.pools?kat.pools.length:0}</b> · ${poolInfo||'—'} · Lolos/pool: <b>${kat.lolosPerPool||2}</b> · <i>Cross-pool SF: A1 vs B2</i></div>`:''}</div>${progressHTML}<div class="kat-card-actions" style="margin-top:10px"><button class="btn-ghost advance" onclick="manualAdvance('${ev.id}','${kat.id}')">⚡ Advance</button><button class="btn-ghost regen" onclick="regenerateManual('${ev.id}','${kat.id}')">🔄 Reset & Regenerate</button><button class="btn-ghost" onclick="editKategori('${ev.id}','${kat.id}')">✏️ Edit</button><button class="btn-primary" style="width:auto;padding:7px 11px;font-size:11px" onclick="managePeserta('${ev.id}','${kat.id}')">👥 Peserta</button>${catMatches.length?`<button class="btn-ghost" onclick="viewKatMatches('${ev.id}','${kat.id}')">📋 Lihat</button>`:''}<button class="btn-danger" onclick="hapusKategori('${ev.id}','${kat.id}')">🗑️</button></div></div>`;
   }).join('');
   return `<button class="kegiatan-back" onclick="closeKegiatanDetail()">← Kembali</button><div class="admin-page-head"><div><h2>🏆 ${esc(ev.nama)}</h2><p>📅 ${esc(tgl)} · 📍 ${esc(ev.lokasi||'-')}</p></div><div style="display:flex;gap:8px"><button class="btn-ghost" onclick="editEvent('${ev.id}')">✏️ Edit</button><button class="btn-danger" onclick="hapusEvent('${ev.id}')">🗑️ Hapus</button></div></div><div class="auto-note" style="margin-bottom:12px">⚡ Tombol <b>Advance</b> memicu pembentukan semifinal & final. Pool: <b>cross-pool</b> A1 vs B2, B1 vs A2.<br>🔄 <b>Reset & Regenerate</b>: reset jadwal dari awal, pertahankan skor, dan otomatis generate babak lanjutan berdasarkan skor yang ada.</div><div class="admin-subhead">Kategori Pertandingan</div><div class="admin-toolbar"><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="editKategori('${ev.id}',null)">+ Tambah Kategori</button></div><div class="kat-grid">${katCards||`<div class="empty" style="grid-column:1/-1"><p>Belum ada kategori.</p></div>`}</div>`;
@@ -1802,9 +1841,6 @@ async function addPesertaManual(eventId,katId){
 async function removePesertaAt(eventId,katId,idx){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(idx<0||idx>=kat.peserta.length) return;const pid=kat.peserta[idx];const info=getPesertaInfo(pid,kat);kat.peserta.splice(idx,1);if(kat.poolAssignment) delete kat.poolAssignment[pid];const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`"${info.nama}" dihapus`:`✓ "${info.nama}" dihapus`);}
 async function clearManualPeserta(eventId,katId){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);const manuals=kat.peserta.filter(p=>isManualPeserta(p));if(!manuals.length){toast('Tidak ada peserta manual');return;}if(!confirm(`Hapus ${manuals.length} peserta manual?`)) return;kat.peserta=kat.peserta.filter(p=>!isManualPeserta(p));if(kat.poolAssignment) manuals.forEach(pid=>delete kat.poolAssignment[pid]);const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(`✓ ${manuals.length} manual dihapus`);}
 
-/* =====================================================
-   🔄 REGENERATE FROM SCRATCH + AUTO ADVANCE
-   ===================================================== */
 async function regenerateManual(eventId, katId){
   const ev = getEvent(eventId);
   const kat = ev && ev.kategori.find(k => k.id === katId);
@@ -1823,7 +1859,6 @@ async function regenerateManual(eventId, katId){
   setBtnLoading(btn, true);
 
   try{
-    // ====== 1. SIMPAN SEMUA SKOR BERDASARKAN MATCHUP ======
     const scoreMap = {};
     const oldMatches = MATCHES.filter(m => m.eventId === eventId && m.kategoriId === katId);
     oldMatches.forEach(m => {
@@ -1837,18 +1872,15 @@ async function regenerateManual(eventId, katId){
         else if(p.menang === 'B') scoreMap[keyBA] = { menang: 'A', skor: flipSkor(p.skor || '') };
       });
     });
-    const savedScoreCount = Object.keys(scoreMap).length;
 
-    // ====== 2. REGENERATE JADWAL DARI AWAL ======
     const result = await autoRegenerateSchedule(eventId, katId);
 
-    // ====== 3. FUNGSI BANTU UNTUK APPLY SKOR & ADVANCE ======
     const applyScores = () => {
       let applied = 0;
       MATCHES.filter(m => m.eventId === eventId && m.kategoriId === katId).forEach(m => {
         if(m.timA === 'TBD' || m.timB === 'TBD') return;
         (m.partai || []).forEach(p => {
-          if(p.menang) return; // sudah ada skor
+          if(p.menang) return;
           const key = `${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;
           if(scoreMap[key]){
             p.menang = scoreMap[key].menang;
@@ -1874,19 +1906,11 @@ async function regenerateManual(eventId, katId){
       return total;
     };
 
-    // ====== 4. APPLY SKOR YANG TERSIMPAN ======
     let applied = applyScores();
-
-    // ====== 5. ADVANCE (loop hingga stabil) ======
     const advanced1 = runAdvance();
-
-    // ====== 6. RE-APPLY SKOR (untuk match yang baru terisi timnya setelah advancement) ======
     const applied2 = applyScores();
-
-    // ====== 7. ADVANCE LAGI JIKA ADA SKOR BARU ======
     const advanced2 = applied2 > 0 ? runAdvance() : 0;
 
-    // ====== 8. SAVE & RENDER ======
     await saveData();
     closeAdminForm();
     renderPublic();
