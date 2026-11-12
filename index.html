@@ -1374,25 +1374,22 @@ async function autoRegenerateSchedule(eventId,katId){
    ============================================================ */
 function hitungKlasemen(kat,eventId,matchesPool){
   const src=matchesPool||MATCHES;
-  // Sertakan match 'berlangsung' (parsial) agar poin muncul walau belum selesai
   const catMatches=src.filter(m=>{
     if(m.eventId!==eventId||m.kategoriId!==kat.id) return false;
     const st=statusMatch(m);
-    return st==='selesai'||st==='berlangsung';
+    return st==='selesai'||st==='berlangsung';   // ✅ sertakan partial
   });
 
   if(kat.tipe==='beregu'){
     const s={};
-    kat.peserta.forEach(id=>s[id]={id,main:0,menang:0,kalah:0,pm:0,pk:0,poin:0,isPartial:false});
+    (kat.peserta||[]).forEach(id=>s[id]={id,main:0,menang:0,kalah:0,pm:0,pk:0,poin:0,isPartial:false});
     catMatches.forEach(m=>{
       const {a,b}=skorMatch(m);
       if(!s[m.timA]||!s[m.timB]) return;
-      if(a+b===0) return; // belum ada partai diputuskan
+      if(a+b===0) return;
       s[m.timA].pm+=a; s[m.timA].pk+=b;
       s[m.timB].pm+=b; s[m.timB].pk+=a;
-      // Poin beregu = 1 per partai menang (akumulatif)
-      s[m.timA].poin+=a;
-      s[m.timB].poin+=b;
+      s[m.timA].poin+=a; s[m.timB].poin+=b;
       if(statusMatch(m)==='selesai'){
         s[m.timA].main++; s[m.timB].main++;
         if(a>b){s[m.timA].menang++; s[m.timB].kalah++;}
@@ -1404,6 +1401,22 @@ function hitungKlasemen(kat,eventId,matchesPool){
     return Object.values(s).map(r=>({...r,selisih:r.pm-r.pk,info:getPesertaInfo(r.id,kat)}))
       .sort((x,y)=>y.poin-x.poin||y.selisih-x.selisih||y.pm-x.pm||x.id.localeCompare(y.id));
   }
+
+  const s={};
+  (kat.peserta||[]).forEach(id=>s[id]={id,main:0,menang:0,kalah:0,poin:0,isPartial:false});
+  catMatches.forEach(m=>{
+    if(!m.partai||!m.partai[0]) return;
+    const p=m.partai[0];
+    if(!p.menang) return;
+    const winner=p.menang==='A'?m.timA:m.timB, loser=p.menang==='A'?m.timB:m.timA;
+    if(s[m.timA]) s[m.timA].main++;
+    if(s[m.timB]) s[m.timB].main++;
+    if(s[winner]){s[winner].menang++; s[winner].poin+=2;}
+    if(s[loser]){s[loser].kalah++; s[loser].poin+=1;}
+  });
+  return Object.values(s).map(r=>({...r,info:getPesertaInfo(r.id,kat)}))
+    .sort((x,y)=>y.poin-x.poin||y.menang-x.menang||x.id.localeCompare(y.id));
+}
 
   // Perorangan: Menang=2, Kalah=1
   const s={};
@@ -1816,11 +1829,16 @@ function renderProgress(){
    RENDER KLASEMEN — tampil walau pertandingan belum selesai
    ============================================================ */
 function renderKlasemen(){
-  const ev=getEvent(state.klasemenEventId);const content=document.getElementById('klasemenContent');if(!content) return;
+  // Pastikan event ID valid
+  if(!state.klasemenEventId || !getEvent(state.klasemenEventId)){
+    if(EVENTS.length) state.klasemenEventId = EVENTS[0].id;
+  }
+  const ev=getEvent(state.klasemenEventId);
+  const content=document.getElementById('klasemenContent');if(!content) return;
   if(!ev){content.innerHTML=`<div class="empty"><p>Belum ada kegiatan.</p></div>`;return;}
   if(!ev.kategori.length){content.innerHTML=`<div class="empty"><p>Belum ada kategori.</p></div>`;return;}
 
-  let html=`<div class="auto-note" style="margin-bottom:14px">🏆 <b>Sistem Poin:</b> Perorangan — Menang = <b>2 poin</b>, Kalah = <b>1 poin</b>. Beregu — <b>1 poin per partai menang</b> (akumulatif). Poin dihitung dari semua pertandingan yang sudah berjalan (selesai <i>maupun</i> berlangsung).</div>`;
+  let html=`<div class="auto-note" style="margin-bottom:14px">🏆 <b>Sistem Poin:</b> Perorangan — Menang = <b>2 poin</b>, Kalah = <b>1 poin</b>. Beregu — <b>1 poin per partai menang</b> (akumulatif). Poin dihitung otomatis dari pertandingan yang sudah berjalan (selesai maupun berlangsung).</div>`;
 
   ev.kategori.forEach(kat=>{
     const rows=hitungKlasemen(kat,ev.id);
@@ -1829,22 +1847,27 @@ function renderKlasemen(){
     const catMatches=MATCHES.filter(m=>m.eventId===ev.id&&m.kategoriId===kat.id);
     const selesaiCount=catMatches.filter(m=>statusMatch(m)==='selesai').length;
     const liveCount=catMatches.filter(m=>statusMatch(m)==='berlangsung').length;
+    const skorCount=catMatches.filter(m=>statusMatch(m)!=='akan').length;
 
     html+=`<div class="kat-block"><div class="kat-head"><span class="kat-icon">${isP?'👤':'👥'}</span><span>${esc(kat.nama)}</span><span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span><span class="kat-meta">${kat.peserta.length} peserta · ${selesaiCount}/${catMatches.length} selesai${liveCount?` · <b style="color:var(--accent)">${liveCount} live</b>`:''}${poolInfo}</span></div>`;
 
-    const hasData = rows.length && rows.some(r=>r.main>0 || r.poin>0);
-    if(!hasData){
-      html+=`<div class="empty" style="padding:24px"><p>Belum ada pertandingan.${liveCount?` <b>${liveCount}</b> pertandingan menunggu skor.`:''}</p></div>`;
+    // Jika tidak ada peserta — beri panduan
+    if(!kat.peserta || kat.peserta.length===0){
+      html+=`<div class="empty" style="padding:24px"><p>Belum ada peserta. Tambahkan lewat menu <b>Admin → Kegiatan → 👥 Peserta</b>.</p></div></div>`;
+      return;
     }
-    else if(kat.tipe==='beregu'){
+
+    // Hint jika belum ada skor sama sekali
+    if(skorCount===0 && catMatches.length>0){
+      html+=`<div class="seed-info-bar" style="margin-bottom:10px">⏳ Belum ada skor. Isi kolom <b>Pemenang</b> (A/B) di menu <b>Admin → Jadwal → Edit Match</b> agar poin muncul otomatis.</div>`;
+    }
+
+    // ✅ SELALU tampilkan tabel (walau semua poin 0)
+    if(kat.tipe==='beregu'){
       html+=`<div class="table-wrap"><table class="table"><thead><tr>
-        <th style="width:40px">#</th>
-        <th>Satker</th>
-        <th class="hide-sm">Main</th>
-        <th>M</th>
-        <th class="hide-sm">K</th>
-        <th>Partai</th>
-        <th style="text-align:center">Poin</th>
+        <th style="width:40px">#</th><th>Satker</th>
+        <th class="hide-sm">Main</th><th>M</th><th class="hide-sm">K</th>
+        <th>Partai</th><th style="text-align:center">Poin</th>
       </tr></thead><tbody>${rows.map((r,i)=>{
         const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
         return `<tr>
@@ -1858,13 +1881,9 @@ function renderKlasemen(){
         </tr>`;}).join('')}</tbody></table></div>`;
     } else {
       html+=`<div class="table-wrap"><table class="table"><thead><tr>
-        <th style="width:40px">#</th>
-        <th>Pemain</th>
-        <th class="hide-sm">Satker</th>
-        <th>Main</th>
-        <th>M</th>
-        <th class="hide-sm">K</th>
-        <th style="text-align:center">Poin</th>
+        <th style="width:40px">#</th><th>Pemain</th>
+        <th class="hide-sm">Satker</th><th>Main</th><th>M</th>
+        <th class="hide-sm">K</th><th style="text-align:center">Poin</th>
       </tr></thead><tbody>${rows.map((r,i)=>{
         const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
         return `<tr>
