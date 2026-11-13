@@ -104,6 +104,7 @@ body.admin .admin-chip{display:inline-flex}
 .chip.manual{color:var(--purple);border-color:color-mix(in srgb,var(--purple) 45%,transparent);background:color-mix(in srgb,var(--purple) 10%,transparent)}
 .chip.seed{color:var(--orange);border-color:color-mix(in srgb,var(--orange) 45%,transparent);background:color-mix(in srgb,var(--orange) 10%,transparent)}
 .chip.bye{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 10%,transparent)}
+.chip.sport{color:var(--accent2);border-color:color-mix(in srgb,var(--accent2) 45%,transparent);background:color-mix(in srgb,var(--accent2) 8%,transparent)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 .match-meta{font-size:10.5px;color:var(--muted);font-weight:600;margin-left:auto;letter-spacing:.2px;text-align:right;line-height:1.35}
 .match-meta .mloc{display:block;font-size:9.5px;color:color-mix(in srgb,var(--muted) 80%,transparent);font-weight:500;margin-top:1px}
@@ -147,6 +148,11 @@ body.admin .admin-chip{display:inline-flex}
 .ptag.putri{background:color-mix(in srgb,var(--pink) 18%,transparent);color:var(--pink)}
 .ptag.tunggal{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
 .ptag.ganda{background:color-mix(in srgb,var(--accent2) 18%,transparent);color:var(--accent2)}
+.ptag[class*="sport-"]{background:color-mix(in srgb,var(--accent2) 16%,transparent);color:var(--accent2)}
+.ptag.sport-tennis{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.ptag.sport-tenis_meja{background:color-mix(in srgb,var(--blue) 16%,transparent);color:var(--blue)}
+.ptag.sport-pickleball{background:color-mix(in srgb,var(--orange) 16%,transparent);color:var(--orange)}
+.ptag.sport-padel{background:color-mix(in srgb,var(--purple) 16%,transparent);color:var(--purple)}
 .tabs{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);flex-wrap:wrap}
 .tabs button{font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:10px;border:0;background:transparent;color:var(--muted);cursor:pointer;transition:.2s}
 .tabs button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04170d;box-shadow:var(--glow)}
@@ -331,6 +337,7 @@ body.admin .admin-chip{display:inline-flex}
 .mv-btn.disabled{opacity:.25;cursor:not-allowed}
 .pool-row,.court-row{display:flex;gap:8px;margin-bottom:6px;align-items:center}
 .court-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px}
+.court-row.sport-row{grid-template-columns:70px 1fr auto}
 .pool-row input,.court-row input{font-family:inherit;font-size:13px;padding:9px 11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--text);outline:none;transition:.2s}
 .pool-row input:focus,.court-row input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
 .pool-row .pool-name{flex:1}
@@ -502,6 +509,7 @@ body.admin .admin-chip{display:inline-flex}
   .pe-cols,.pe-result{grid-template-columns:1fr}
   .pool-assign-grid{grid-template-columns:1fr}
   .court-row{grid-template-columns:1fr 1fr auto}
+  .court-row.sport-row{grid-template-columns:60px 1fr auto}
   .filter-bar,.print-filter-bar{padding:10px}
   .filter-select,.filter-input{flex:1;min-width:110px}
   .filter-search{max-width:none;min-width:100%}
@@ -573,7 +581,7 @@ body.admin .admin-chip{display:inline-flex}
     </a>
     <nav class="nav" id="publicNav">
       <a href="#jadwal" onclick="showPublicPage('home');scrollToSection('jadwal');return false;">Jadwal</a>
-      <a href="#klasemen" onclick="showPublicPage('home');scrollToSection('klasemen');return false;">Klasemen</a>
+      <a href="#" onclick="showPublicPage('klasemen');return false;">Klasemen</a>
       <a href="#" onclick="showPublicPage('tabelbagan');return false;">Tabel & Bagan</a>
       <a href="#" onclick="showPublicPage('satker');return false;">Satker</a>
       <a href="#" onclick="showPublicPage('pemain');return false;">Pemain</a>
@@ -623,13 +631,19 @@ body.admin .admin-chip{display:inline-flex}
         <div id="jadwalList"></div>
       </div>
     </section>
+  </div>
 
-    <section class="section" id="klasemen">
+  <div id="page-klasemen" class="page-view">
+    <section class="section">
       <div class="wrap">
-        <div class="sec-head"><div><h2>Klasemen</h2><p>Klasemen per kegiatan &amp; kategori</p></div></div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
-          <span style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)">Kegiatan</span>
+        <div class="sec-head"><div><h2>Klasemen</h2><p>Klasemen per kegiatan, cabang olahraga, dan kategori</p></div></div>
+        <div class="filter-bar" id="klasemenFilterBar">
+          <span class="lbl">🔍 Filter</span>
           <select class="filter-select" id="klasemenEventFilter"></select>
+          <select class="filter-select" id="klasemenSportFilter"><option value="all">Semua Cabor</option></select>
+          <select class="filter-select" id="klasemenKatFilter"><option value="all">Semua Kategori</option></select>
+          <button class="btn-ghost" onclick="resetKlasemenFilter()">↺ Reset</button>
+          <span class="filter-count" id="klasemenFilterCount"></span>
         </div>
         <div id="progressPanel"></div>
         <div id="klasemenContent"></div>
@@ -640,7 +654,13 @@ body.admin .admin-chip{display:inline-flex}
   <div id="page-satker" class="page-view">
     <section class="section">
       <div class="wrap">
-        <div class="sec-head"><div><h2>Daftar Satker</h2><p id="satkerSub">Peserta turnamen</p></div></div>
+        <div class="sec-head"><div><h2>Daftar Satker</h2><p id="satkerSub">Peserta turnamen per cabang olahraga</p></div></div>
+        <div class="filter-bar" id="satkerFilterBar">
+          <span class="lbl">🔍 Filter</span>
+          <select class="filter-select" id="satkerSportFilter"><option value="all">Semua Cabor</option></select>
+          <button class="btn-ghost" onclick="resetSatkerFilter()">↺ Reset</button>
+          <span class="filter-count" id="satkerFilterCount"></span>
+        </div>
         <div class="grid satker" id="satkerList"></div>
       </div>
     </section>
@@ -649,9 +669,10 @@ body.admin .admin-chip{display:inline-flex}
   <div id="page-pemain" class="page-view">
     <section class="section">
       <div class="wrap">
-        <div class="sec-head"><div><h2>Daftar Pemain</h2><p>Pemain per satker</p></div></div>
+        <div class="sec-head"><div><h2>Daftar Pemain</h2><p>Pemain per satker &amp; cabang olahraga</p></div></div>
         <div class="filter-bar" id="pemainFilterBar">
           <span class="lbl">🔍 Filter</span>
+          <select class="filter-select" id="pemainSportFilter"><option value="all">Semua Cabor</option></select>
           <select class="filter-select" id="pemainSatkerFilter"><option value="all">Semua Satker</option></select>
           <select class="filter-select" id="pemainGenderFilter"><option value="all">Semua Gender</option><option value="putra">Putra</option><option value="putri">Putri</option></select>
           <select class="filter-select" id="pemainJenisFilter"><option value="all">Semua Jenis</option><option value="Tunggal">Tunggal</option><option value="Ganda">Ganda</option></select>
@@ -767,9 +788,53 @@ let SETTINGS={
   courts:[]
 };
 let TEAMS=[],PEMAIN=[],EVENTS=[],MATCHES=[];
-let state={admin:false,view:'dashboard',publicEventId:null,publicKatFilter:'all',klasemenEventId:null,adminKegiatan:{view:'list',eventId:null},jadwalFilter:{tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},pemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},adminJadwalFilter:{kategoriId:'all',tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},adminPemainFilter:{satker:'all',gender:'all',jenis:'all',search:''},printFilter:{eventId:'all',kategoriId:'all',status:'all',gender:'all',tanggalFrom:'',tanggalTo:'',satker:'all',jenis:'all'},tbFilter:{eventId:'all',kategoriId:'all'}};
 
-/* Flag dirty untuk seeding/byes agar tidak auto-save */
+/* ============ CABANG OLAHRAGA (dinamis) ============ */
+let SPORTS=[
+  {id:'tennis',     nama:'Tenis',      icon:'🎾'},
+  {id:'tenis_meja', nama:'Tenis Meja', icon:'🏓'},
+  {id:'pickleball', nama:'Pickleball', icon:'🥎'},
+  {id:'padel',      nama:'Padel',      icon:'🥍'}
+];
+const getSport = id => SPORTS.find(s => s.id === id) || {id, nama:id||'?', icon:'🏅'};
+function getSportsOf(p){
+  if(!p) return ['tennis'];
+  if(Array.isArray(p.sports) && p.sports.length) return p.sports;
+  if(p.sport) return [p.sport];
+  return ['tennis'];
+}
+function playerHasSport(p, sid){
+  if(!sid || sid==='all') return true;
+  return getSportsOf(p).includes(sid);
+}
+function slugifySport(name){
+  return String(name).toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g,'_')
+    .replace(/^_|_$/g,'')
+    .substring(0,30) || ('sport_'+Date.now().toString(36));
+}
+function getSportColor(id){
+  const colors=['#0fa958','#0284c7','#ea580c','#7c3aed','#db2777','#f59e0b','#14b8a6','#8b5cf6','#f43f5e','#06b6d4'];
+  let hash=0; for(let i=0;i<id.length;i++) hash=((hash<<5)-hash+id.charCodeAt(i))|0;
+  return colors[Math.abs(hash)%colors.length];
+}
+/* ==================================================== */
+
+let state={
+  admin:false,view:'dashboard',
+  publicEventId:null,publicKatFilter:'all',
+  klasemenFilter:{eventId:'all',sport:'all',kategoriId:'all'},
+  adminKegiatan:{view:'list',eventId:null},
+  jadwalFilter:{tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},
+  pemainFilter:{satker:'all',gender:'all',jenis:'all',sport:'all',search:''},
+  satkerFilter:{sport:'all'},
+  adminJadwalFilter:{kategoriId:'all',tanggal:'',status:'all',pool:'all',lapangan:'all',search:''},
+  adminPemainFilter:{satker:'all',gender:'all',jenis:'all',sport:'all',search:''},
+  adminSatkerFilter:{sport:'all'},
+  printFilter:{eventId:'all',kategoriId:'all',status:'all',gender:'all',tanggalFrom:'',tanggalTo:'',satker:'all',jenis:'all'},
+  tbFilter:{eventId:'all',kategoriId:'all'}
+};
+
 let _seedingDirty = false;
 
 const META_OPEN='⟪', META_CLOSE='⟫';
@@ -799,7 +864,7 @@ function decodeKatName(fullName){
 function saveCache(){
   try{
     localStorage.setItem(LS_CACHE, JSON.stringify({
-      v:2, settings:SETTINGS, teams:TEAMS, pemain:PEMAIN, events:EVENTS, matches:MATCHES, ts:Date.now()
+      v:2, settings:SETTINGS, teams:TEAMS, pemain:PEMAIN, events:EVENTS, matches:MATCHES, sports:SPORTS, ts:Date.now()
     }));
   }catch(e){}
 }
@@ -812,6 +877,7 @@ function loadCache(){
     if(Array.isArray(d.pemain)) PEMAIN=d.pemain;
     if(Array.isArray(d.events)) EVENTS=d.events;
     if(Array.isArray(d.matches)) MATCHES=d.matches;
+    if(Array.isArray(d.sports) && d.sports.length) SPORTS=d.sports;
     return true;
   }catch(e){ return false; }
 }
@@ -820,9 +886,10 @@ function saveUIState(){
     localStorage.setItem(LS_UI, JSON.stringify({
       publicEventId:state.publicEventId,
       publicKatFilter:state.publicKatFilter,
-      klasemenEventId:state.klasemenEventId,
+      klasemenFilter:state.klasemenFilter,
       jadwalFilter:state.jadwalFilter,
-      pemainFilter:state.pemainFilter
+      pemainFilter:state.pemainFilter,
+      satkerFilter:state.satkerFilter
     }));
   }catch(e){}
 }
@@ -831,9 +898,10 @@ function loadUIState(){
     const d=JSON.parse(localStorage.getItem(LS_UI)||'{}');
     if(d.publicEventId) state.publicEventId=d.publicEventId;
     if(d.publicKatFilter) state.publicKatFilter=d.publicKatFilter;
-    if(d.klasemenEventId) state.klasemenEventId=d.klasemenEventId;
+    if(d.klasemenFilter) state.klasemenFilter={...state.klasemenFilter,...d.klasemenFilter};
     if(d.jadwalFilter) state.jadwalFilter={...state.jadwalFilter,...d.jadwalFilter};
     if(d.pemainFilter) state.pemainFilter={...state.pemainFilter,...d.pemainFilter};
+    if(d.satkerFilter) state.satkerFilter={...state.satkerFilter,...d.satkerFilter};
   }catch(e){}
 }
 
@@ -923,16 +991,21 @@ async function saveData(){
         location:SETTINGS.location,tagline:SETTINGS.tagline,
         hero_lead:SETTINGS.heroLead,hero_image:SETTINGS.heroImage,
         logo:SETTINGS.logo,
-        admin_user:SETTINGS.adminUser,admin_pass:SETTINGS.adminPass
+        admin_user:SETTINGS.adminUser,admin_pass:SETTINGS.adminPass,
+        sports:SPORTS
       }).then(r=>{if(r.error) throw r.error;}),
       syncTable('teams',TEAMS,t=>({id:t.id,nama:t.nama,singkat:t.singkat,kota:t.kota,warna:t.warna})),
-      syncTable('players',PEMAIN,p=>({id:p.id,nama:p.nama,team_id:p.team,jenis:p.jenis,gender:p.gender})),
+      syncTable('players',PEMAIN,p=>{
+        const sports=getSportsOf(p);
+        return {id:p.id,nama:p.nama,team_id:p.team,jenis:p.jenis,gender:p.gender,sport:sports[0],sports};
+      }),
       syncTable('courts',SETTINGS.courts||[],(c,i)=>({id:c.id,nama:c.nama,lokasi:c.lokasi,urutan:i})),
       syncTable('events',EVENTS,e=>({id:e.id,nama:e.nama,mulai:e.mulai,selesai:e.selesai,lokasi:e.lokasi})),
       syncTable('categories',allCats,c=>({
         id:c.id,event_id:c.eventId,
         nama:c.nama + encodeKatMeta(c),
         tipe:c.tipe,gender:c.gender,sistem:c.sistem,
+        sport:(c.sport && c.sport!=='all')?c.sport:null,
         jumlah_partai:c.jumlahPartai||3,
         lolos_per_pool:c.lolosPerPool||2,
         seeding:c.seeding||false
@@ -976,10 +1049,14 @@ async function loadData(){
       SETTINGS.heroImage=s.hero_image||SETTINGS.heroImage;
       SETTINGS.logo=s.logo||'🎾';
       SETTINGS.adminUser=s.admin_user||'admin';SETTINGS.adminPass=s.admin_pass||'admin';
+      if(s.sports && Array.isArray(s.sports) && s.sports.length) SPORTS=s.sports;
     }
     SETTINGS.courts=(courtsRes.data||[]).map(c=>({id:c.id,nama:c.nama,lokasi:c.lokasi||''}));
     TEAMS=(teamsRes.data||[]).map(t=>({id:t.id,nama:t.nama,singkat:t.singkat,kota:t.kota||'',warna:t.warna||'#2ee07a'}));
-    PEMAIN=(playersRes.data||[]).map(p=>({id:p.id,nama:p.nama,team:p.team_id,jenis:p.jenis,gender:p.gender}));
+    PEMAIN=(playersRes.data||[]).map(p=>{
+      const sports=(Array.isArray(p.sports)&&p.sports.length)?p.sports:(p.sport?[p.sport]:['tennis']);
+      return {id:p.id,nama:p.nama,team:p.team_id,jenis:p.jenis,gender:p.gender,sport:sports[0],sports};
+    });
     const cats=catsRes.data||[],pools=poolsRes.data||[],parts=partsRes.data||[];
     EVENTS=(eventsRes.data||[]).map(ev=>({id:ev.id,nama:ev.nama,mulai:ev.mulai,selesai:ev.selesai,lokasi:ev.lokasi||'',kategori:[]}));
     cats.forEach(c=>{
@@ -991,6 +1068,7 @@ async function loadData(){
       const decoded = decodeKatName(c.nama||'');
       ev.kategori.push({
         id:c.id,nama:decoded.nama,tipe:c.tipe,gender:c.gender,sistem:c.sistem,
+        sport:c.sport||null,
         jumlahPartai:c.jumlah_partai||3,lolosPerPool:c.lolos_per_pool||2,
         seeding:c.seeding||false,
         seeds:decoded.seeds,byes:decoded.byes,
@@ -1374,7 +1452,7 @@ function hitungKlasemen(kat,eventId,matchesPool){
   const catMatches=src.filter(m=>{
     if(m.eventId!==eventId||m.kategoriId!==kat.id) return false;
     const st=statusMatch(m);
-    return st==='selesai'||st==='berlangsung';   // ✅ sertakan partial
+    return st==='selesai'||st==='berlangsung';
   });
 
   if(kat.tipe==='beregu'){
@@ -1557,12 +1635,16 @@ function matchMatchesFilter(m,ev,filter){
   return true;
 }
 function isJadwalFilterActive(){const f=state.jadwalFilter;return !!(f.tanggal||f.status!=='all'||f.pool!=='all'||f.lapangan!=='all'||(f.search&&f.search.trim()));}
-function isPemainFilterActive(){const f=state.pemainFilter;return !!(f.satker!=='all'||f.gender!=='all'||f.jenis!=='all'||(f.search&&f.search.trim()));}
+function isPemainFilterActive(){
+  const f=state.pemainFilter;
+  return !!(f.satker!=='all'||f.gender!=='all'||f.jenis!=='all'||(f.sport&&f.sport!=='all')||(f.search&&f.search.trim()));
+}
 function playerMatchesFilter(p,filter){
   if(!filter) return true;
   if(filter.satker!=='all'&&p.team!==filter.satker) return false;
   if(filter.gender!=='all'&&p.gender!==filter.gender) return false;
   if(filter.jenis!=='all'&&p.jenis!==filter.jenis) return false;
+  if(filter.sport && filter.sport!=='all' && !playerHasSport(p, filter.sport)) return false;
   if(filter.search&&filter.search.trim()&&!p.nama.toLowerCase().includes(filter.search.trim().toLowerCase())) return false;
   return true;
 }
@@ -1627,6 +1709,10 @@ function showPublicPage(page) {
   if (page === 'home') {
     document.getElementById('page-home').classList.add('active');
     document.querySelectorAll('#publicNav a')[0].classList.add('active');
+  } else if (page === 'klasemen') {
+    document.getElementById('page-klasemen').classList.add('active');
+    document.querySelectorAll('#publicNav a')[1].classList.add('active');
+    renderKlasemenPage();
   } else if (page === 'tabelbagan') {
     document.getElementById('page-tabelbagan').classList.add('active');
     document.querySelectorAll('#publicNav a')[2].classList.add('active');
@@ -1634,6 +1720,7 @@ function showPublicPage(page) {
   } else if (page === 'satker') {
     document.getElementById('page-satker').classList.add('active');
     document.querySelectorAll('#publicNav a')[3].classList.add('active');
+    renderSatkerFilterUI();
     renderSatkerPublic();
   } else if (page === 'pemain') {
     document.getElementById('page-pemain').classList.add('active');
@@ -1727,6 +1814,7 @@ function renderMatchCard(m){
   const manualA=isManualPeserta(m.timA),manualB=isManualPeserta(m.timB);
   const seedA = kat.seeds && kat.seeds[m.timA];
   const seedB = kat.seeds && kat.seeds[m.timB];
+  const spInfo = kat.sport ? getSport(kat.sport) : null;
   const scHtml=isBye ? `<div class="sc wait">BYE</div>` : (st==='akan'?`<div class="sc wait">VS</div>`:`<div class="sc">${a} - ${b}</div>`);
   const partaiHtml=(m.partai||[]).map((p,pi)=>{
     const menang=p.menang,skor=(menang&&p.skor)?p.skor:'';const label=p.jenis||'Tunggal';
@@ -1742,6 +1830,7 @@ function renderMatchCard(m){
     <div class="match-top">
       <span class="chip ${chipClass}">${chipText}</span>
       <span class="chip ${isPool?'pool':isKO?'ko':''}">${esc(m.babakLabel||'')}</span>
+      ${spInfo?`<span class="chip sport">${spInfo.icon} ${esc(spInfo.nama)}</span>`:''}
       ${seedA?`<span class="chip seed">Seed ${seedA} A</span>`:''}
       ${seedB?`<span class="chip seed">Seed ${seedB} B</span>`:''}
       ${manualA||manualB?`<span class="chip manual">MANUAL</span>`:''}
@@ -1754,16 +1843,84 @@ function renderMatchCard(m){
     </div>${partaiHtml}</article>`;
 }
 function resetJadwalFilter(){state.jadwalFilter={tanggal:'',status:'all',pool:'all',lapangan:'all',search:''};saveUIState();renderJadwalFilterUI();renderJadwalPublic();toast('Filter direset');}
+
+/* === Satker Publik === */
+function renderSatkerFilterUI(){
+  const sel=document.getElementById('satkerSportFilter');
+  if(!sel) return;
+  sel.innerHTML='<option value="all">Semua Cabor</option>'+
+    SPORTS.map(s=>`<option value="${s.id}">${s.icon} ${esc(s.nama)}</option>`).join('');
+  sel.value=(state.satkerFilter&&state.satkerFilter.sport)||'all';
+  sel.onchange=e=>{state.satkerFilter={sport:e.target.value};saveUIState();renderSatkerPublic();};
+}
+function resetSatkerFilter(){
+  state.satkerFilter={sport:'all'};
+  saveUIState();renderSatkerFilterUI();renderSatkerPublic();toast('Filter satker direset');
+}
 function renderSatkerPublic(){
   const el=document.getElementById('satkerList');if(!el) return;
+  renderSatkerFilterUI();
   if(!TEAMS.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><p>Belum ada satker.</p></div>`;return;}
-  el.innerHTML=TEAMS.map(t=>{
-    const pemain=pemainTim(t.id);const initial=t.singkat.replace(/PA /gi,'').slice(0,3).toUpperCase()||'?';
-    return `<div class="card"><div class="satker-top"><div class="logo" style="background:linear-gradient(135deg,${t.warna},${t.warna}99)">${esc(initial)}</div><div><h3>${esc(t.nama)}</h3><small>${esc(t.kota)}</small></div></div>
-      <div class="mini-stats"><span class="mini"><b>${pemain.filter(p=>p.gender==='putra').length}</b> Putra</span><span class="mini"><b>${pemain.filter(p=>p.gender==='putri').length}</b> Putri</span><span class="mini"><b>${pemain.length}</b> Total</span></div></div>`;
+  
+  const f = state.satkerFilter || {sport:'all'};
+  const isFiltered = f.sport !== 'all';
+  
+  const teamsFiltered = isFiltered
+    ? TEAMS.filter(t => pemainTim(t.id).some(p => playerHasSport(p, f.sport)))
+    : TEAMS;
+  
+  const bar = document.getElementById('satkerFilterBar');
+  if(bar){ if(isFiltered) bar.classList.add('filter-active'); else bar.classList.remove('filter-active'); }
+  
+  const cntEl = document.getElementById('satkerFilterCount');
+  if(cntEl) cntEl.innerHTML = isFiltered
+    ? `<b>${teamsFiltered.length}</b> / ${TEAMS.length} satker`
+    : `${TEAMS.length} satker`;
+  
+  if(!teamsFiltered.length){
+    el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">🏛️</div><p>Tidak ada satker dengan pemain di cabang ini.</p></div>`;
+    return;
+  }
+  
+  el.innerHTML = teamsFiltered.map(t => {
+    const allP = pemainTim(t.id);
+    const filteredP = isFiltered ? allP.filter(p => playerHasSport(p, f.sport)) : allP;
+    const initial = t.singkat.replace(/PA /gi,'').slice(0,3).toUpperCase() || '?';
+    
+    let sportTagsHtml = '';
+    if(!isFiltered){
+      const counts = {};
+      allP.forEach(p => { getSportsOf(p).forEach(sid => { counts[sid] = (counts[sid]||0)+1; }); });
+      sportTagsHtml = Object.entries(counts).map(([sid, cnt]) => {
+        const sp = getSport(sid);
+        const color = getSportColor(sid);
+        return `<span class="ptag" style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}" title="${esc(sp.nama)}">${sp.icon} ${cnt}</span>`;
+      }).join(' ');
+    }
+    
+    return `<div class="card">
+      <div class="satker-top">
+        <div class="logo" style="background:linear-gradient(135deg,${t.warna},${t.warna}99)">${esc(initial)}</div>
+        <div><h3>${esc(t.nama)}</h3><small>${esc(t.kota)}</small></div>
+      </div>
+      <div class="mini-stats">
+        <span class="mini"><b>${filteredP.filter(p=>p.gender==='putra').length}</b> Putra</span>
+        <span class="mini"><b>${filteredP.filter(p=>p.gender==='putri').length}</b> Putri</span>
+        <span class="mini"><b>${filteredP.length}</b> Total</span>
+      </div>
+      ${sportTagsHtml?`<div class="mini-stats" style="margin-top:8px">${sportTagsHtml}</div>`:''}
+    </div>`;
   }).join('');
 }
+/* === End Satker Publik === */
+
 function renderPemainFilterUI(){
+  const sportSel=document.getElementById('pemainSportFilter');
+  if(sportSel){
+    sportSel.innerHTML='<option value="all">Semua Cabor</option>'+SPORTS.map(s=>`<option value="${s.id}">${esc(s.nama)}</option>`).join('');
+    sportSel.value=state.pemainFilter.sport||'all';
+    sportSel.onchange=e=>{state.pemainFilter.sport=e.target.value;saveUIState();renderPemainPublic();};
+  }
   const satkerSel=document.getElementById('pemainSatkerFilter');
   if(satkerSel){const opts=[`<option value="all">Semua Satker</option>`].concat(TEAMS.map(t=>`<option value="${t.id}">${esc(t.nama)}</option>`));satkerSel.innerHTML=opts.join('');satkerSel.value=state.pemainFilter.satker;satkerSel.onchange=e=>{state.pemainFilter.satker=e.target.value;saveUIState();renderPemainPublic();};}
   const genderSel=document.getElementById('pemainGenderFilter');
@@ -1775,51 +1932,153 @@ function renderPemainFilterUI(){
 }
 function renderPemainPublic(){
   const el=document.getElementById('pemainList');if(!el) return;
-  if(!TEAMS.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><p>Belum ada pemain.</p></div>`;return;}
-  const filter=state.pemainFilter;const activeFilter=isPemainFilterActive();
+  if(!PEMAIN.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><p>Belum ada pemain.</p></div>`;return;}
+
+  const filter=state.pemainFilter;
+  const activeFilter=isPemainFilterActive();
   const bar=document.getElementById('pemainFilterBar');
   if(bar){if(activeFilter) bar.classList.add('filter-active');else bar.classList.remove('filter-active');}
-  const filteredTeams=TEAMS.filter(t=>{if(filter.satker!=='all'&&t.id!==filter.satker) return false;return true;});
-  let totalMatched=0;const cards=[];
-  filteredTeams.forEach(t=>{
-    const allPemain=pemainTim(t.id);const filteredPemain=allPemain.filter(p=>playerMatchesFilter(p,filter));
-    totalMatched+=filteredPemain.length;
-    if(activeFilter&&!filteredPemain.length) return;
-    const list=filteredPemain.map((p,i)=>`<li><span class="pnum">${i+1}</span><span class="pname">${esc(p.nama)}</span><span class="ptag ${p.gender==='putra'?'putra':'putri'}">${esc(p.gender||'putra')}</span><span class="ptag ${p.jenis==='Tunggal'?'tunggal':'ganda'}">${esc(p.jenis)}</span></li>`).join('');
-    const initial=t.singkat.replace(/PA /gi,'').slice(0,3).toUpperCase()||'?';
-    const totalInfo=activeFilter?`${filteredPemain.length} dari ${allPemain.length} pemain`:`${allPemain.length} pemain`;
-    cards.push(`<div class="card"><div class="satker-top"><div class="logo" style="background:linear-gradient(135deg,${t.warna},${t.warna}99)">${esc(initial)}</div><div><h3>${esc(t.nama)}</h3><small>${totalInfo}</small></div></div><ul class="plist">${list||'<li class="muted">Tidak ada pemain yang cocok.</li>'}</ul></div>`);
+
+  const sportsToShow = (filter.sport && filter.sport!=='all')
+    ? SPORTS.filter(s=>s.id===filter.sport)
+    : SPORTS;
+
+  let totalMatched=0;
+  let blocks='';
+
+  sportsToShow.forEach(sp=>{
+    const sportPlayers=PEMAIN.filter(p=>playerHasSport(p, sp.id));
+    if(!sportPlayers.length) return;
+
+    let cards=[];
+    let sportMatched=0;
+
+    TEAMS.forEach(t=>{
+      if(filter.satker!=='all' && t.id!==filter.satker) return;
+      const allP=sportPlayers.filter(p=>p.team===t.id);
+      if(!allP.length) return;
+      const filteredP=allP.filter(p=>playerMatchesFilter(p,filter));
+      sportMatched += filteredP.length;
+      if(activeFilter && !filteredP.length) return;
+
+      const list=filteredP.map((p,i)=>`<li>
+        <span class="pnum">${i+1}</span>
+        <span class="pname">${esc(p.nama)}</span>
+        <span class="ptag ${p.gender==='putra'?'putra':'putri'}">${esc(p.gender||'putra')}</span>
+        <span class="ptag ${p.jenis==='Tunggal'?'tunggal':'ganda'}">${esc(p.jenis)}</span>
+      </li>`).join('');
+
+      const initial=t.singkat.replace(/PA /gi,'').slice(0,3).toUpperCase()||'?';
+      const totalInfo=activeFilter?`${filteredP.length} dari ${allP.length} pemain`:`${allP.length} pemain`;
+      cards.push(`<div class="card">
+        <div class="satker-top">
+          <div class="logo" style="background:linear-gradient(135deg,${t.warna},${t.warna}99)">${esc(initial)}</div>
+          <div><h3>${esc(t.nama)}</h3><small>${totalInfo}</small></div>
+        </div>
+        <ul class="plist">${list||'<li class="muted">Tidak ada pemain yang cocok.</li>'}</ul>
+      </div>`);
+    });
+
+    totalMatched += sportMatched;
+    if(!cards.length) return;
+
+    blocks += `<div class="kat-head" style="grid-column:1/-1;margin-bottom:0;margin-top:8px">
+      <span class="kat-icon">${sp.icon}</span>
+      <span>${esc(sp.nama)}</span>
+      <span class="kat-meta">${sportPlayers.length} pemain</span>
+    </div>`;
+    blocks += cards.join('');
   });
+
   const cntEl=document.getElementById('pemainFilterCount');
-  if(cntEl){if(activeFilter) cntEl.innerHTML=`<b>${totalMatched}</b> / ${PEMAIN.length} pemain`;else cntEl.innerHTML=`${PEMAIN.length} pemain`;}
-  if(!cards.length){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">👥</div><p>Tidak ada pemain yang cocok.</p></div>`;return;}
-  el.innerHTML=cards.join('');
+  if(cntEl){
+    if(activeFilter) cntEl.innerHTML=`<b>${totalMatched}</b> / ${PEMAIN.length} pemain`;
+    else cntEl.innerHTML=`${PEMAIN.length} pemain`;
+  }
+
+  if(!blocks){
+    el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="big">👥</div><p>Tidak ada pemain yang cocok.</p></div>`;
+    return;
+  }
+  el.innerHTML=blocks;
 }
-function resetPemainFilter(){state.pemainFilter={satker:'all',gender:'all',jenis:'all',search:''};saveUIState();renderPemainFilterUI();renderPemainPublic();toast('Filter pemain direset');}
+function resetPemainFilter(){state.pemainFilter={satker:'all',gender:'all',jenis:'all',sport:'all',search:''};saveUIState();renderPemainFilterUI();renderPemainPublic();toast('Filter pemain direset');}
+
+/* === KLASEMEN (Halaman Sendiri dengan Filter) === */
+function renderKlasemenPage(){
+  const f = state.klasemenFilter;
+  const evSel = document.getElementById('klasemenEventFilter');
+  if(evSel){
+    evSel.innerHTML = EVENTS.map(ev=>`<option value="${ev.id}" ${f.eventId===ev.id?'selected':''}>${esc(ev.nama)}</option>`).join('');
+    if(!EVENTS.some(e=>e.id===f.eventId) && EVENTS.length){ f.eventId = EVENTS[0].id; evSel.value = f.eventId; }
+    evSel.onchange = e => { f.eventId = e.target.value; f.kategoriId = 'all'; saveUIState(); renderKlasemenPage(); };
+  }
+  const sportSel = document.getElementById('klasemenSportFilter');
+  if(sportSel){
+    sportSel.innerHTML = '<option value="all">Semua Cabor</option>' + SPORTS.map(s=>`<option value="${s.id}" ${f.sport===s.id?'selected':''}>${s.icon} ${esc(s.nama)}</option>`).join('');
+    sportSel.value = f.sport;
+    sportSel.onchange = e => { f.sport = e.target.value; f.kategoriId = 'all'; saveUIState(); renderKlasemenPage(); };
+  }
+  const katSel = document.getElementById('klasemenKatFilter');
+  if(katSel){
+    const ev = getEvent(f.eventId);
+    let kats = ev ? ev.kategori : [];
+    if(f.sport !== 'all') kats = kats.filter(k => k.sport === f.sport);
+    katSel.innerHTML = '<option value="all">Semua Kategori</option>' + kats.map(k=>`<option value="${k.id}" ${f.kategoriId===k.id?'selected':''}>${esc(k.nama)}</option>`).join('');
+    if(!kats.some(k=>k.id===f.kategoriId)) f.kategoriId = 'all';
+    katSel.value = f.kategoriId;
+    katSel.onchange = e => { f.kategoriId = e.target.value; saveUIState(); renderKlasemenPage(); };
+  }
+  const bar = document.getElementById('klasemenFilterBar');
+  if(bar){
+    const isActive = f.sport!=='all' || f.kategoriId!=='all';
+    if(isActive) bar.classList.add('filter-active'); else bar.classList.remove('filter-active');
+  }
+  renderProgress();
+  renderKlasemen();
+}
+function resetKlasemenFilter(){
+  state.klasemenFilter = {eventId: state.klasemenFilter.eventId || (EVENTS[0]?EVENTS[0].id:'all'), sport:'all', kategoriId:'all'};
+  saveUIState(); renderKlasemenPage(); toast('Filter klasemen direset');
+}
 function renderProgress(){
   const el=document.getElementById('progressPanel');if(!el) return;
-  const ev=getEvent(state.klasemenEventId);if(!ev){el.innerHTML='';return;}
-  const evMatches=MATCHES.filter(m=>m.eventId===ev.id);const total=evMatches.length,done=evMatches.filter(m=>statusMatch(m)==='selesai').length;const live=evMatches.filter(m=>statusMatch(m)==='berlangsung').length;const pct=total?Math.round(done/total*100):0;
+  const f = state.klasemenFilter || {eventId:'all',sport:'all',kategoriId:'all'};
+  const ev = getEvent(f.eventId) || EVENTS[0];
+  if(!ev){el.innerHTML='';return;}
+  let cats = ev.kategori;
+  if(f.sport !== 'all') cats = cats.filter(k=>k.sport===f.sport);
+  if(f.kategoriId !== 'all') cats = cats.filter(k=>k.id===f.kategoriId);
+  const catIds = new Set(cats.map(k=>k.id));
+  const evMatches = MATCHES.filter(m=>m.eventId===ev.id && catIds.has(m.kategoriId));
+  const total=evMatches.length, done=evMatches.filter(m=>statusMatch(m)==='selesai').length;
+  const live=evMatches.filter(m=>statusMatch(m)==='berlangsung').length;
+  const pct=total?Math.round(done/total*100):0;
   if(!total){el.innerHTML='';return;}
   el.innerHTML=`<div class="progress-panel"><div><div class="lbl">Progres</div><div class="big">${pct}%</div></div><div class="progress-track"><div class="progress-bar"><div style="width:${pct}%"></div></div><div class="progress-meta"><span>${done} selesai · ${live} berlangsung</span><span>Total ${total} pertandingan</span></div></div></div>`;
 }
-
-/* ============================================================
-   KLASEMEN — versi dengan badge poin besar
-   ============================================================ */
 function renderKlasemen(){
-  // Pastikan event ID valid
-  if(!state.klasemenEventId || !getEvent(state.klasemenEventId)){
-    if(EVENTS.length) state.klasemenEventId = EVENTS[0].id;
-  }
-  const ev=getEvent(state.klasemenEventId);
+  const f = state.klasemenFilter || {eventId:'all',sport:'all',kategoriId:'all'};
+  const ev = getEvent(f.eventId) || EVENTS[0];
   const content=document.getElementById('klasemenContent');if(!content) return;
   if(!ev){content.innerHTML=`<div class="empty"><p>Belum ada kegiatan.</p></div>`;return;}
   if(!ev.kategori.length){content.innerHTML=`<div class="empty"><p>Belum ada kategori.</p></div>`;return;}
+  
+  let cats = ev.kategori;
+  if(f.sport !== 'all') cats = cats.filter(k=>k.sport===f.sport);
+  if(f.kategoriId !== 'all') cats = cats.filter(k=>k.id===f.kategoriId);
+  
+  const cntEl = document.getElementById('klasemenFilterCount');
+  if(cntEl) cntEl.innerHTML = `<b>${cats.length}</b> / ${ev.kategori.length} kategori`;
+  
+  if(!cats.length){
+    content.innerHTML = `<div class="empty"><div class="big">🏆</div><p>Tidak ada kategori yang cocok dengan filter.</p></div>`;
+    return;
+  }
+  
+  let html=`<div class="auto-note" style="margin-bottom:14px">🏆 <b>Sistem Poin:</b> Perorangan — Menang = <b>2 poin</b>, Kalah = <b>1 poin</b>. Beregu — <b>1 poin per partai menang</b> (akumulatif).</div>`;
 
-  let html=`<div class="auto-note" style="margin-bottom:14px">🏆 <b>Sistem Poin:</b> Perorangan — Menang = <b>2 poin</b>, Kalah = <b>1 poin</b>. Beregu — <b>1 poin per partai menang</b> (akumulatif). Poin dihitung otomatis dari pertandingan yang sudah berjalan (selesai maupun berlangsung).</div>`;
-
-  ev.kategori.forEach(kat=>{
+  cats.forEach(kat=>{
     const rows=hitungKlasemen(kat,ev.id);
     const isP=kat.tipe!=='beregu';
     const poolInfo=kat.sistem==='pool'?` · ${getPoolSummary(kat)}`:'';
@@ -1827,21 +2086,25 @@ function renderKlasemen(){
     const selesaiCount=catMatches.filter(m=>statusMatch(m)==='selesai').length;
     const liveCount=catMatches.filter(m=>statusMatch(m)==='berlangsung').length;
     const skorCount=catMatches.filter(m=>statusMatch(m)!=='akan').length;
+    const spInfo = kat.sport ? getSport(kat.sport) : null;
 
-    html+=`<div class="kat-block"><div class="kat-head"><span class="kat-icon">${isP?'👤':'👥'}</span><span>${esc(kat.nama)}</span><span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span><span class="kat-meta">${kat.peserta.length} peserta · ${selesaiCount}/${catMatches.length} selesai${liveCount?` · <b style="color:var(--accent)">${liveCount} live</b>`:''}${poolInfo}</span></div>`;
+    html+=`<div class="kat-block"><div class="kat-head">
+      <span class="kat-icon">${isP?'👤':'👥'}</span>
+      <span>${esc(kat.nama)}</span>
+      ${spInfo?`<span class="kat-tag" style="background:color-mix(in srgb,${getSportColor(spInfo.id)} 16%,transparent);color:${getSportColor(spInfo.id)}">${spInfo.icon} ${esc(spInfo.nama)}</span>`:''}
+      <span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span>
+      <span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span>
+      <span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span>
+      <span class="kat-meta">${kat.peserta.length} peserta · ${selesaiCount}/${catMatches.length} selesai${liveCount?` · <b style="color:var(--accent)">${liveCount} live</b>`:''}${poolInfo}</span></div>`;
 
-    // Jika tidak ada peserta — beri panduan
     if(!kat.peserta || kat.peserta.length===0){
-      html+=`<div class="empty" style="padding:24px"><p>Belum ada peserta. Tambahkan lewat menu <b>Admin → Kegiatan → 👥 Peserta</b>.</p></div></div>`;
+      html+=`<div class="empty" style="padding:24px"><p>Belum ada peserta.</p></div></div>`;
       return;
     }
-
-    // Hint jika belum ada skor sama sekali
     if(skorCount===0 && catMatches.length>0){
-      html+=`<div class="seed-info-bar" style="margin-bottom:10px">⏳ Belum ada skor. Isi kolom <b>Pemenang</b> (A/B) di menu <b>Admin → Jadwal → Edit Match</b> agar poin muncul otomatis.</div>`;
+      html+=`<div class="seed-info-bar" style="margin-bottom:10px">⏳ Belum ada skor.</div>`;
     }
 
-    // ✅ SELALU tampilkan tabel (walau semua poin 0)
     if(kat.tipe==='beregu'){
       html+=`<div class="table-wrap"><table class="table"><thead><tr>
         <th style="width:40px">#</th><th>Satker</th>
@@ -1851,7 +2114,7 @@ function renderKlasemen(){
         const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
         return `<tr>
           <td><span class="rank ${rc}">${i+1}</span></td>
-          <td><div class="tname"><span class="dot" style="background:${r.info.warna}"></span>${esc(r.info.nama)}${r.info.manual?' <span class="chip manual" style="font-size:8px;padding:1px 5px">MANUAL</span>':''}${r.isPartial?' <span class="chip live" style="font-size:8px;padding:1px 5px">LIVE</span>':''}</div></td>
+          <td><div class="tname"><span class="dot" style="background:${r.info.warna}"></span>${esc(r.info.nama)}</div></td>
           <td class="hide-sm num">${r.main}</td>
           <td class="num" style="color:var(--accent);font-weight:800">${r.menang}</td>
           <td class="hide-sm num">${r.kalah}</td>
@@ -1867,7 +2130,7 @@ function renderKlasemen(){
         const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';
         return `<tr>
           <td><span class="rank ${rc}">${i+1}</span></td>
-          <td style="font-weight:700">${esc(r.info.nama)}${r.info.manual?' <span class="chip manual" style="font-size:8px;padding:1px 5px">MANUAL</span>':''}${r.isPartial?' <span class="chip live" style="font-size:8px;padding:1px 5px">LIVE</span>':''}</td>
+          <td style="font-weight:700">${esc(r.info.nama)}</td>
           <td class="hide-sm"><span style="display:inline-flex;align-items:center;gap:7px"><span class="dot" style="background:${r.info.warna}"></span>${esc(r.info.singkat)}</span></td>
           <td class="num">${r.main}</td>
           <td class="num" style="color:var(--accent);font-weight:800">${r.menang}</td>
@@ -1879,15 +2142,7 @@ function renderKlasemen(){
   });
   content.innerHTML=html;
 }
-function renderKlasemenEventFilter(){
-  const el=document.getElementById('klasemenEventFilter');if(!el) return;
-  el.innerHTML=EVENTS.map(ev=>`<option value="${ev.id}" ${ev.id===state.klasemenEventId?'selected':''}>${esc(ev.nama)}</option>`).join('');
-  el.onchange=e=>{state.klasemenEventId=e.target.value;saveUIState();renderProgress();renderKlasemen();};
-}
 
-/* ============================================================
-   TABEL & BAGAN — dengan kolom Poin
-   ============================================================ */
 function renderTabelBagan() {
   const evSel = document.getElementById('tbEventFilter');
   const katSel = document.getElementById('tbKatFilter');
@@ -1975,10 +2230,9 @@ function renderPublic(){
   applySettings();
   renderHeroStats();
   if(!state.publicEventId&&EVENTS.length) state.publicEventId=EVENTS[0].id;
-  if(!state.klasemenEventId&&EVENTS.length) state.klasemenEventId=EVENTS[0].id;
+  if(!state.klasemenFilter.eventId || state.klasemenFilter.eventId==='all'){ if(EVENTS.length) state.klasemenFilter.eventId = EVENTS[0].id; }
   renderEventTabs();renderKatFilter();renderJadwalFilterUI();renderJadwalPublic();
-  renderSatkerPublic();renderPemainFilterUI();renderPemainPublic();
-  renderKlasemenEventFilter();renderProgress();renderKlasemen();
+  renderSatkerFilterUI();renderSatkerPublic();renderPemainFilterUI();renderPemainPublic();
 }
 
 function adminGo(view){
@@ -2006,8 +2260,9 @@ function viewDashboard(){
   const totalKat=EVENTS.reduce((n,e)=>n+e.kategori.length,0);const selesai=MATCHES.filter(m=>statusMatch(m)==='selesai').length;const berjalan=MATCHES.filter(m=>statusMatch(m)==='berlangsung').length;const courtCount=(SETTINGS.courts||[]).length;
   return `<div class="admin-page-head"><div><h2>📊 Dashboard</h2><p>Ringkasan turnamen ${esc(SETTINGS.title)} ${SETTINGS.year}</p></div></div>
     <div class="admin-stats"><div class="astat"><b>${EVENTS.length}</b><span>Kegiatan</span></div><div class="astat"><b>${totalKat}</b><span>Kategori</span></div><div class="astat"><b>${TEAMS.length}</b><span>Satker</span></div><div class="astat"><b>${PEMAIN.length}</b><span>Pemain</span></div><div class="astat"><b>${MATCHES.length}</b><span>Pertandingan</span></div><div class="astat"><b>${courtCount}</b><span>Lapangan</span></div><div class="astat"><b>${selesai}</b><span>Selesai</span></div><div class="astat"><b>${berjalan}</b><span>Berlangsung</span></div></div>
-    <div class="seed-note" style="margin-bottom:14px">🌱 <b>Seeding Manual & BYE</b> tersedia di Kelola Peserta untuk sistem Gugur & Penyisihan. Atur seed (1,2,3...) dan centang BYE untuk peserta yang lolos otomatis.</div>
-    <div class="manual-note" style="margin-bottom:14px">🎾 <b>Fitur:</b> Auto-advance SF/Final, cross-pool A1 vs B2, add/remove partai beregu, filter jadwal &amp; pemain, import Excel, <b>Reset & Regenerate</b> jadwal dari awal.</div>
+    <div class="seed-note" style="margin-bottom:14px">🌱 <b>Seeding Manual & BYE</b> tersedia di Kelola Peserta untuk sistem Gugur & Penyisihan.</div>
+    <div class="auto-note" style="margin-bottom:14px">🏅 <b>Kategori punya cabor</b>: saat buat kategori, pilih cabang olahraga. Peserta otomatis terfilter — hanya pemain dari cabor tsb yang muncul.</div>
+    <div class="manual-note" style="margin-bottom:14px">🎾 <b>Klasemen</b> sekarang di halaman terpisah dengan filter kegiatan → cabor → kategori.</div>
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)"><h3 style="font-size:14px;margin-bottom:12px">Aksi Cepat</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="adminGo('kegiatan')">🏆 Kegiatan</button><button class="btn-ghost" onclick="adminGo('jadwal')">📅 Jadwal</button><button class="btn-ghost" onclick="adminGo('pemain')">👥 Pemain</button><button class="btn-ghost" onclick="adminGo('pengaturan')">⚙️ Pengaturan</button></div></div>`;
 }
 function viewKegiatan(){
@@ -2027,17 +2282,33 @@ function viewKegiatanDetail(eventId){
     const catMatches=MATCHES.filter(m=>m.eventId===ev.id&&m.kategoriId===kat.id);const done=catMatches.filter(m=>statusMatch(m)==='selesai').length;const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;const poolInfo=kat.sistem==='pool'?getPoolSummary(kat):'';const st=getKategoriStatus(kat,ev.id);
     const seedCount = kat.seeds ? Object.keys(kat.seeds).length : 0;
     const byeCount = kat.byes ? kat.byes.length : 0;
+    const spInfo = kat.sport ? getSport(kat.sport) : null;
     let progressHTML='';
     if(kat.sistem==='pool'){progressHTML=`<div class="kat-progress"><span class="pitem ${st.pool.done===st.pool.total?'done':''}">🏊 Pool: <b>${st.pool.done}/${st.pool.total}</b></span><span class="pitem ${st.ko.filled===st.ko.total?'done':''}">🎯 KO: <b>${st.ko.filled}/${st.ko.total}</b></span><span class="pitem ${st.ko.done===st.ko.total&&st.ko.total>0?'done':''}">🏁 KO: <b>${st.ko.done}/${st.ko.total}</b></span></div>`;}
     else if(kat.sistem==='penyisihan' || kat.sistem==='gugur'){progressHTML=`<div class="kat-progress"><span class="pitem ${st.ko.filled===st.ko.total?'done':''}">🎯 <b>${st.ko.filled}/${st.ko.total}</b> terisi</span><span class="pitem ${st.ko.done===st.ko.total&&st.ko.total>0?'done':''}">🏁 <b>${st.ko.done}/${st.ko.total}</b> selesai</span></div>`;}
     else if(kat.sistem==='kompetisi'){const koInfo=st.ko.total>0?`<span class="pitem ${st.ko.done===st.ko.total?'done':''}">🏁 KO: <b>${st.ko.done}/${st.ko.total}</b></span>`:`<span class="pitem" style="color:var(--muted)">🏁 KO: belum dibuat</span>`;progressHTML=`<div class="kat-progress"><span class="pitem ${st.rr.done===st.rr.total?'done':''}">🔄 Kompetisi: <b>${st.rr.done}/${st.rr.total}</b></span>${koInfo}</div>`;}
     const partaiInfo=kat.tipe==='beregu'?` · <b>${kat.jumlahPartai||3}</b> partai`:'';
-    const seedByeInfo = (seedCount>0 || byeCount>0)
-      ? `<div class="kat-info" style="color:var(--orange);font-weight:700">🌱 ${seedCount} seed · ${byeCount} BYE</div>`
-      : '';
-    return `<div class="kat-card"><div class="kat-card-head"><span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span></div><h4 style="margin-bottom:8px">${esc(kat.nama)}</h4><div class="kat-card-body"><div class="kat-info"><b>${kat.peserta.length}</b> peserta${manualCount?` · <span style="color:var(--purple);font-weight:700">${manualCount} manual</span>`:''}${partaiInfo} · <b>${catMatches.length}</b> pertandingan${catMatches.length?` (${done} selesai)`:''}</div>${seedByeInfo}${kat.sistem==='pool'?`<div class="kat-info">Pool: <b>${kat.pools?kat.pools.length:0}</b> · ${poolInfo||'—'} · Lolos/pool: <b>${kat.lolosPerPool||2}</b> · <i>Cross-pool SF: A1 vs B2</i></div>`:''}</div>${progressHTML}<div class="kat-card-actions" style="margin-top:10px"><button class="btn-ghost advance" onclick="manualAdvance('${ev.id}','${kat.id}')">⚡ Advance</button><button class="btn-ghost regen" onclick="regenerateManual('${ev.id}','${kat.id}')">🔄 Reset & Regenerate</button><button class="btn-ghost" onclick="editKategori('${ev.id}','${kat.id}')">✏️ Edit</button><button class="btn-primary" style="width:auto;padding:7px 11px;font-size:11px" onclick="managePeserta('${ev.id}','${kat.id}')">👥 Peserta</button>${catMatches.length?`<button class="btn-ghost" onclick="viewKatMatches('${ev.id}','${kat.id}')">📋 Lihat</button>`:''}<button class="btn-danger" onclick="hapusKategori('${ev.id}','${kat.id}')">🗑️</button></div></div>`;
+    const seedByeInfo = (seedCount>0 || byeCount>0)?`<div class="kat-info" style="color:var(--orange);font-weight:700">🌱 ${seedCount} seed · ${byeCount} BYE</div>`:'';
+    return `<div class="kat-card"><div class="kat-card-head">
+      ${spInfo?`<span class="kat-tag" style="background:color-mix(in srgb,${getSportColor(spInfo.id)} 16%,transparent);color:${getSportColor(spInfo.id)}">${spInfo.icon} ${esc(spInfo.nama)}</span>`:`<span class="kat-tag" style="background:var(--panel2);color:var(--muted)">Semua Cabor</span>`}
+      <span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(kat.gender)}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span></div>
+      <h4 style="margin-bottom:8px">${esc(kat.nama)}</h4>
+      <div class="kat-card-body"><div class="kat-info"><b>${kat.peserta.length}</b> peserta${manualCount?` · <span style="color:var(--purple);font-weight:700">${manualCount} manual</span>`:''}${partaiInfo} · <b>${catMatches.length}</b> pertandingan${catMatches.length?` (${done} selesai)`:''}</div>${seedByeInfo}${kat.sistem==='pool'?`<div class="kat-info">Pool: <b>${kat.pools?kat.pools.length:0}</b> · ${poolInfo||'—'} · Lolos/pool: <b>${kat.lolosPerPool||2}</b></div>`:''}</div>
+      ${progressHTML}
+      <div class="kat-card-actions" style="margin-top:10px">
+        <button class="btn-ghost advance" onclick="manualAdvance('${ev.id}','${kat.id}')">⚡ Advance</button>
+        <button class="btn-ghost regen" onclick="regenerateManual('${ev.id}','${kat.id}')">🔄 Regenerate</button>
+        <button class="btn-ghost" onclick="editKategori('${ev.id}','${kat.id}')">✏️ Edit</button>
+        <button class="btn-primary" style="width:auto;padding:7px 11px;font-size:11px" onclick="managePeserta('${ev.id}','${kat.id}')">👥 Peserta</button>
+        ${catMatches.length?`<button class="btn-ghost" onclick="viewKatMatches('${ev.id}','${kat.id}')">📋 Lihat</button>`:''}
+        <button class="btn-danger" onclick="hapusKategori('${ev.id}','${kat.id}')">🗑️</button>
+      </div></div>`;
   }).join('');
-  return `<button class="kegiatan-back" onclick="closeKegiatanDetail()">← Kembali</button><div class="admin-page-head"><div><h2>🏆 ${esc(ev.nama)}</h2><p>📅 ${esc(tgl)} · 📍 ${esc(ev.lokasi||'-')}</p></div><div style="display:flex;gap:8px"><button class="btn-ghost" onclick="editEvent('${ev.id}')">✏️ Edit</button><button class="btn-danger" onclick="hapusEvent('${ev.id}')">🗑️ Hapus</button></div></div><div class="auto-note" style="margin-bottom:12px">⚡ Tombol <b>Advance</b> memicu pembentukan semifinal & final. Pool: <b>cross-pool</b> A1 vs B2, B1 vs A2.<br>🔄 <b>Reset & Regenerate</b>: reset jadwal dari awal, pertahankan skor, dan otomatis generate babak lanjutan berdasarkan skor yang ada.</div><div class="seed-note" style="margin-bottom:12px">🌱 <b>Seeding Manual & BYE:</b> Klik <b>👥 Peserta</b> pada kategori dengan sistem <b>Gugur/Penyisihan</b> untuk mengatur seed manual (1,2,3...) dan menandai BYE.</div><div class="admin-subhead">Kategori Pertandingan</div><div class="admin-toolbar"><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="editKategori('${ev.id}',null)">+ Tambah Kategori</button></div><div class="kat-grid">${katCards||`<div class="empty" style="grid-column:1/-1"><p>Belum ada kategori.</p></div>`}</div>`;
+  return `<button class="kegiatan-back" onclick="closeKegiatanDetail()">← Kembali</button><div class="admin-page-head"><div><h2>🏆 ${esc(ev.nama)}</h2><p>📅 ${esc(tgl)} · 📍 ${esc(ev.lokasi||'-')}</p></div><div style="display:flex;gap:8px"><button class="btn-ghost" onclick="editEvent('${ev.id}')">✏️ Edit</button><button class="btn-danger" onclick="hapusEvent('${ev.id}')">🗑️ Hapus</button></div></div>
+    <div class="auto-note" style="margin-bottom:12px">⚡ Tombol <b>Advance</b> memicu pembentukan semifinal & final.<br>🔄 <b>Reset & Regenerate</b>: reset jadwal dari awal, pertahankan skor.</div>
+    <div class="seed-note" style="margin-bottom:12px">🌱 <b>Seeding Manual & BYE</b> untuk sistem Gugur/Penyisihan.</div>
+    <div class="admin-subhead">Kategori Pertandingan</div><div class="admin-toolbar"><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="editKategori('${ev.id}',null)">+ Tambah Kategori</button></div>
+    <div class="kat-grid">${katCards||`<div class="empty" style="grid-column:1/-1"><p>Belum ada kategori.</p></div>`}</div>`;
 }
 function editEvent(id){
   const ev=id?getEvent(id):null;
@@ -2052,18 +2323,33 @@ function editKategori(eventId,katId){
   const initialPools=(kat&&kat.pools&&kat.pools.length)?kat.pools:[{id:'p'+Date.now().toString(36)+'a',nama:'Pool A'},{id:'p'+Date.now().toString(36)+'b',nama:'Pool B'}];
   const isPoolInit=kat&&kat.sistem==='pool';const isBereguInit=!kat||kat.tipe==='beregu';
   const isKOInit = kat && (kat.sistem==='gugur' || kat.sistem==='penyisihan');
-  const body=`<form id="katForm"><input type="hidden" name="eventId" value="${eventId}"><input type="hidden" name="id" value="${kat?kat.id:''}"><div class="form-grid"><div class="field full"><label>Nama Kategori</label><input name="nama" required value="${kat?esc(kat.nama):''}"></div><div class="field"><label>Tipe</label><select name="tipe" required><option value="beregu" ${kat&&kat.tipe==='beregu'?'selected':''}>Beregu</option><option value="tunggal" ${kat&&(kat.tipe==='tunggal'||kat.tipe==='perorangan')?'selected':''}>Perorangan Tunggal</option><option value="ganda" ${kat&&kat.tipe==='ganda'?'selected':''}>Perorangan Ganda</option></select></div><div class="field"><label>Gender</label><select name="gender" required><option value="putra" ${kat&&kat.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${kat&&kat.gender==='putri'?'selected':''}>Putri</option></select></div><div class="field full"><label>Sistem</label><select name="sistem" required><option value="kompetisi" ${kat&&kat.sistem==='kompetisi'?'selected':''}>Kompetisi (Round-Robin)</option><option value="penyisihan" ${kat&&kat.sistem==='penyisihan'?'selected':''}>Penyisihan</option><option value="gugur" ${kat&&kat.sistem==='gugur'?'selected':''}>Gugur (Single Elimination)</option><option value="pool" ${kat&&kat.sistem==='pool'?'selected':''}>Pool + Knockout</option></select></div><div class="field" id="fJumlahPartai" style="${isBereguInit?'':'display:none'}"><label>Jumlah Partai (Beregu)</label><input name="jumlahPartai" type="number" min="1" max="9" value="${kat?(kat.jumlahPartai||3):3}"><small>Standar 3: T1, GD, T2. Bisa 1-9.</small></div>
-      <div class="field full" id="fSeeding" style="${isKOInit?'':'display:none'}">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" name="seeding" value="1" ${kat&&kat.seeding?'checked':''} style="width:auto"> Seeding &amp; BYE Otomatis (jika tidak diisi manual)</label>
-        <small>Jika aktif, seed otomatis diberikan sesuai urutan peserta. <b>Untuk seeding manual, atur di Kelola Peserta.</b></small>
+  const sportOpts = ['<option value="">— Semua Cabor (campuran) —</option>']
+    .concat(SPORTS.map(s=>`<option value="${s.id}" ${kat&&kat.sport===s.id?'selected':''}>${s.icon} ${esc(s.nama)}</option>`))
+    .join('');
+  const body=`<form id="katForm"><input type="hidden" name="eventId" value="${eventId}"><input type="hidden" name="id" value="${kat?kat.id:''}">
+    <div class="form-grid">
+      <div class="field full"><label>Nama Kategori</label><input name="nama" required value="${kat?esc(kat.nama):''}"></div>
+      <div class="field full">
+        <label>Cabang Olahraga</label>
+        <select name="sport">${sportOpts}</select>
+        <small>Peserta yang bisa dipilih hanya pemain dari cabor ini. Kosongkan untuk campuran semua cabor.</small>
       </div>
-      </div><div id="poolConfigSection" style="${isPoolInit?'':'display:none'}"><div class="admin-subhead">Daftar Pool</div><div id="poolsRows">${initialPools.map(p=>`<div class="pool-row" data-pool-id="${esc(p.id)}"><input class="pool-name" value="${esc(p.nama)}" placeholder="Pool A"><button type="button" class="icon-act rm" onclick="this.parentElement.remove()">×</button></div>`).join('')}</div><button type="button" class="btn-ghost" style="margin-top:6px" onclick="addPoolRow()">+ Tambah Pool</button><div class="form-grid" style="margin-top:12px"><div class="field"><label>Lolos per Pool</label><input name="lolosPerPool" type="number" min="1" max="4" value="${kat?(kat.lolosPerPool||2):2}"><small>Cross-pool: A1 vs B2 (otomatis).</small></div></div></div><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="submit" class="btn-primary" style="flex:1">Simpan</button></div></form>`;
+      <div class="field"><label>Tipe</label><select name="tipe" required><option value="beregu" ${kat&&kat.tipe==='beregu'?'selected':''}>Beregu</option><option value="tunggal" ${kat&&(kat.tipe==='tunggal'||kat.tipe==='perorangan')?'selected':''}>Perorangan Tunggal</option><option value="ganda" ${kat&&kat.tipe==='ganda'?'selected':''}>Perorangan Ganda</option></select></div>
+      <div class="field"><label>Gender</label><select name="gender" required><option value="putra" ${kat&&kat.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${kat&&kat.gender==='putri'?'selected':''}>Putri</option></select></div>
+      <div class="field full"><label>Sistem</label><select name="sistem" required><option value="kompetisi" ${kat&&kat.sistem==='kompetisi'?'selected':''}>Kompetisi (Round-Robin)</option><option value="penyisihan" ${kat&&kat.sistem==='penyisihan'?'selected':''}>Penyisihan</option><option value="gugur" ${kat&&kat.sistem==='gugur'?'selected':''}>Gugur (Single Elimination)</option><option value="pool" ${kat&&kat.sistem==='pool'?'selected':''}>Pool + Knockout</option></select></div>
+      <div class="field" id="fJumlahPartai" style="${isBereguInit?'':'display:none'}"><label>Jumlah Partai (Beregu)</label><input name="jumlahPartai" type="number" min="1" max="9" value="${kat?(kat.jumlahPartai||3):3}"><small>Standar 3: T1, GD, T2.</small></div>
+      <div class="field full" id="fSeeding" style="${isKOInit?'':'display:none'}">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" name="seeding" value="1" ${kat&&kat.seeding?'checked':''} style="width:auto"> Seeding &amp; BYE Otomatis</label>
+      </div>
+    </div>
+    <div id="poolConfigSection" style="${isPoolInit?'':'display:none'}"><div class="admin-subhead">Daftar Pool</div><div id="poolsRows">${initialPools.map(p=>`<div class="pool-row" data-pool-id="${esc(p.id)}"><input class="pool-name" value="${esc(p.nama)}" placeholder="Pool A"><button type="button" class="icon-act rm" onclick="this.parentElement.remove()">×</button></div>`).join('')}</div><button type="button" class="btn-ghost" style="margin-top:6px" onclick="addPoolRow()">+ Tambah Pool</button><div class="form-grid" style="margin-top:12px"><div class="field"><label>Lolos per Pool</label><input name="lolosPerPool" type="number" min="1" max="4" value="${kat?(kat.lolosPerPool||2):2}"></div></div></div>
+    <div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="submit" class="btn-primary" style="flex:1">Simpan</button></div>
+  </form>`;
   openAdminForm(kat?'✏️ Edit Kategori':'➕ Tambah Kategori','',body);
   const sistemSel=document.querySelector('#katForm [name="sistem"]');
   const tipeSel=document.querySelector('#katForm [name="tipe"]');
   const updateFormFields = () => {
-      const tipe = tipeSel.value;
-      const sistem = sistemSel.value;
+      const tipe = tipeSel.value; const sistem = sistemSel.value;
       document.getElementById('fJumlahPartai').style.display = tipe === 'beregu' ? '' : 'none';
       document.getElementById('fSeeding').style.display = (sistem === 'gugur' || sistem === 'penyisihan') ? '' : 'none';
       document.getElementById('poolConfigSection').style.display = sistem === 'pool' ? '' : 'none';
@@ -2072,7 +2358,7 @@ function editKategori(eventId,katId){
   tipeSel.addEventListener('change', updateFormFields);
   document.getElementById('katForm').addEventListener('submit',async e=>{
     e.preventDefault();const f=e.target;const sistem=f.sistem.value;const tipe=f.tipe.value;
-    const data={nama:f.nama.value.trim(),tipe,gender:f.gender.value,sistem,seeding:f.seeding.checked};
+    const data={nama:f.nama.value.trim(),tipe,gender:f.gender.value,sistem,sport:f.sport.value||null,seeding:f.seeding.checked};
     if(tipe==='beregu'){data.jumlahPartai=Math.max(1,Math.min(9,parseInt(f.jumlahPartai.value)||3));}
     if(sistem==='pool'){
       const rows=document.querySelectorAll('#poolsRows .pool-row');const pools=[];
@@ -2082,7 +2368,7 @@ function editKategori(eventId,katId){
     }
     if(kat){
       const poolsChanged=JSON.stringify(kat.pools||[])!==JSON.stringify(data.pools||[]);
-      const konfigBerubah=kat.sistem!==sistem || kat.tipe!==tipe || kat.seeding!==data.seeding || (sistem==='pool'&&(poolsChanged||kat.lolosPerPool!==data.lolosPerPool));
+      const konfigBerubah=kat.sistem!==sistem || kat.tipe!==tipe || kat.sport!==data.sport || kat.seeding!==data.seeding || (sistem==='pool'&&(poolsChanged||kat.lolosPerPool!==data.lolosPerPool));
       if(sistem==='pool'&&kat.pools&&data.pools){data.pools.forEach(np=>{const old=kat.pools.find(op=>op.nama===np.nama);if(old) np.id=old.id;});}
       Object.assign(kat,data);
       if(sistem==='pool'&&kat.poolAssignment){const validIds=new Set(data.pools.map(p=>p.id));Object.keys(kat.poolAssignment).forEach(pid=>{if(!validIds.has(kat.poolAssignment[pid])) delete kat.poolAssignment[pid];});}
@@ -2132,9 +2418,10 @@ function managePeserta(eventId,katId){
   if (kat.tipe === 'ganda') {
       kat.peserta.forEach(pid => { parsePair(pid).forEach(id => usedPlayerIds.add(id)); });
   }
+  const catSport = kat.sport || null;
   const available = kat.tipe === 'beregu'
-    ? TEAMS.filter(t => !kat.peserta.includes(t.id))
-    : PEMAIN.filter(p => !usedPlayerIds.has(p.id) && (!kat.gender || p.gender === kat.gender) && (kat.tipe === 'ganda' ? p.jenis === 'Ganda' : (kat.tipe === 'tunggal' || kat.tipe === 'perorangan' ? p.jenis === 'Tunggal' : true)));
+    ? TEAMS.filter(t => !kat.peserta.includes(t.id) && (!catSport || pemainTim(t.id).some(p=>playerHasSport(p,catSport))))
+    : PEMAIN.filter(p => !usedPlayerIds.has(p.id) && (!kat.gender || p.gender === kat.gender) && (kat.tipe === 'ganda' ? p.jenis === 'Ganda' : (kat.tipe === 'tunggal' || kat.tipe === 'perorangan' ? p.jenis === 'Tunggal' : true)) && (!catSport || playerHasSport(p, catSport)));
   const pesertaHtml=kat.peserta.map((pid,idx)=>{
     const info=getPesertaInfo(pid,kat);
     const isMan=isManualPeserta(pid);
@@ -2150,6 +2437,10 @@ function managePeserta(eventId,katId){
   const poolsData=isPool?getPools(kat):[];const poolOptionsHtml=isPool?poolsData.map(({pool})=>`<option value="${esc(pool.id)}">${esc(pool.nama)}</option>`).join(''):'';
   const catMatches=MATCHES.filter(m=>m.eventId===eventId&&m.kategoriId===katId);const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;
   const manualPlaceholder = kat.tipe === 'beregu' ? 'Ketik nama tim / satker baru...' : kat.tipe === 'ganda' ? 'Ketik Pemain 1 & Pemain 2...' : 'Ketik nama pemain baru...';
+  const spInfo = kat.sport ? getSport(kat.sport) : null;
+  const sportNote = spInfo
+    ? `<div class="manual-note" style="background:color-mix(in srgb,${getSportColor(spInfo.id)} 8%,transparent);border-left-color:${getSportColor(spInfo.id)}">🏅 Kategori ini <b>khusus ${spInfo.icon} ${esc(spInfo.nama)}</b>. Hanya pemain dari cabor ini yang bisa dipilih.</div>`
+    : `<div class="manual-note">ℹ️ Kategori <b>campuran semua cabor</b>. Semua pemain bisa dipilih.</div>`;
   let poolUI='';
   if(isPool){poolUI=`<div class="admin-subhead" style="margin-top:16px">📍 Penempatan Pool</div><div class="pool-assign-grid">${poolsData.map(({pool,peserta},pi)=>{return `<div class="pool-assign-card"><div class="pool-assign-head">🏊 ${esc(pool.nama)} <span class="count">${peserta.length}</span></div><div class="pool-assign-list">${peserta.map(pid=>{const info=getPesertaInfo(pid,kat);const isM=isManualPeserta(pid);const prevBtn=pi>0?`<button class="mv-btn" onclick="movePesertaPool('${eventId}','${katId}','${esc(pid)}','${esc(poolsData[pi-1].pool.id)}')">←</button>`:'<button class="mv-btn disabled">←</button>';const nextBtn=pi<poolsData.length-1?`<button class="mv-btn" onclick="movePesertaPool('${eventId}','${katId}','${esc(pid)}','${esc(poolsData[pi+1].pool.id)}')">→</button>`:'<button class="mv-btn disabled">→</button>';return `<div class="pool-member"><span class="c" style="background:${info.warna}"></span>${isM?'<span class="m-tag">M</span>':''}<span class="pool-member-name">${esc(info.nama)}</span><div class="pool-member-actions">${prevBtn}${nextBtn}<button class="mv-btn del" onclick="removePesertaAt('${eventId}','${katId}',${kat.peserta.indexOf(pid)})">×</button></div></div>`;}).join('')||'<span class="peserta-empty">Kosong</span>'}</div></div>`;}).join('')}</div><div style="margin-bottom:8px"><button class="btn-ghost" onclick="autoAssignAllPools('${eventId}','${katId}')">🎲 Bagi Otomatis</button></div>`;}
   let addAreaHtml = '';
@@ -2181,14 +2472,9 @@ function managePeserta(eventId,katId){
     const totalByes = calculateTotalByes(kat);
     const maxSeedOptions = Math.min(kat.peserta.length, 8);
     const seedOptionsHtml = Array.from({length: maxSeedOptions}, (_,i) => i+1);
-    
     seedingUI = `
       <div class="admin-subhead">🌱 Seeding & BYE Manual (Knockout)</div>
-      <div class="seed-info-bar">
-        <b>Total BYE tersedia: ${totalByes}</b> (dari ${kat.peserta.length} peserta). 
-        Atur seed 1,2,3,... dan centang BYE untuk peserta yang lolos otomatis. 
-        Jika BYE tidak diisi manual, otomatis diberikan ke seed teratas.
-      </div>
+      <div class="seed-info-bar"><b>Total BYE tersedia: ${totalByes}</b> (dari ${kat.peserta.length} peserta).</div>
       <div class="seed-bye-list">
         ${kat.peserta.map(pid => {
           const info = getPesertaInfo(pid, kat);
@@ -2196,13 +2482,10 @@ function managePeserta(eventId,katId){
           const isBye = (kat.byes||[]).includes(pid);
           const rowCls = `${currentSeed?'is-seeded':''} ${isBye?'is-bye':''}`;
           const seedSelectOptions = ['<option value="0">— Unseeded —</option>']
-            .concat(seedOptionsHtml.map(n => `<option value="${n}" ${currentSeed==n?'selected':''}>Seed ${n}</option>`))
-            .join('');
+            .concat(seedOptionsHtml.map(n => `<option value="${n}" ${currentSeed==n?'selected':''}>Seed ${n}</option>`)).join('');
           return `<div class="seed-bye-row ${rowCls}" data-pid="${esc(pid)}">
             <span class="seed-name">${esc(info.nama)}${isManualPeserta(pid)?' <span class="m-tag">M</span>':''}</span>
-            <select class="seed-select" onchange="setManualSeed('${eventId}','${katId}',${esc(JSON.stringify(pid))},this.value)">
-              ${seedSelectOptions}
-            </select>
+            <select class="seed-select" onchange="setManualSeed('${eventId}','${katId}',${esc(JSON.stringify(pid))},this.value)">${seedSelectOptions}</select>
             <label class="bye-toggle ${isBye?'checked':''}">
               <input type="checkbox" ${isBye?'checked':''} onchange="toggleManualBye('${eventId}','${katId}',${esc(JSON.stringify(pid))},this.checked,this)">
               <span>BYE</span>
@@ -2211,20 +2494,22 @@ function managePeserta(eventId,katId){
         }).join('')}
       </div>
       <div id="seedingDirtyIndicator" style="display:none;margin-bottom:10px;padding:10px 12px;background:color-mix(in srgb,var(--orange) 12%,transparent);border-left:3px solid var(--orange);border-radius:6px;font-size:11.5px;color:var(--text)">
-        <b>⚠️ Ada perubahan seeding/BYE yang belum disimpan.</b> Klik tombol di bawah untuk menyimpan.
+        <b>⚠️ Ada perubahan seeding/BYE yang belum disimpan.</b>
       </div>
-      <button type="button" class="btn-primary" id="saveSeedingBtn" style="width:100%;margin-bottom:14px;background:linear-gradient(135deg,var(--orange),var(--accent2));box-shadow:0 10px 30px -12px rgba(249,115,22,.55)" onclick="saveSeedingChanges('${eventId}','${katId}')">💾 Simpan Seeding & BYE</button>
+      <button type="button" class="btn-primary" id="saveSeedingBtn" style="width:100%;margin-bottom:14px;background:linear-gradient(135deg,var(--orange),var(--accent2))" onclick="saveSeedingChanges('${eventId}','${katId}')">💾 Simpan Seeding & BYE</button>
     `;
   }
 
-  const body=`<div><div class="auto-note">⚡ Perubahan peserta/pool meregenerasi jadwal. <b>Seeding & BYE</b> harus disimpan manual dengan tombol 💾 di bawah.</div>
+  const body=`<div>
+  <div class="auto-note">⚡ Perubahan peserta/pool meregenerasi jadwal.</div>
+  ${sportNote}
   <div class="admin-subhead" style="margin-top:0">Tambah dari Daftar Resmi</div>
   ${addAreaHtml}
   <div class="admin-subhead">Tambah Manual</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap">
     <input id="manualNameInput" placeholder="${manualPlaceholder}" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--purple) 40%,var(--line));background:var(--panel2);color:var(--text);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();addPesertaManual('${eventId}','${katId}');}">
     ${isPool?`<select id="manualPoolSel" style="font-family:inherit;font-size:11.5px;font-weight:700;padding:10px 8px;border-radius:10px;border:1px solid color-mix(in srgb,var(--purple) 40%,var(--line));background:var(--panel2);color:var(--text);min-width:90px"><option value="auto">Auto</option>${poolOptionsHtml}</select>`:''}
-    <button class="btn-primary" style="width:auto;padding:10px 16px;background:linear-gradient(135deg,var(--purple),var(--pink));box-shadow:0 10px 30px -12px rgba(167,139,250,.55)" onclick="addPesertaManual('${eventId}','${katId}')">+ Manual</button>
+    <button class="btn-primary" style="width:auto;padding:10px 16px;background:linear-gradient(135deg,var(--purple),var(--pink))" onclick="addPesertaManual('${eventId}','${katId}')">+ Manual</button>
   </div>
   ${seedingUI}
   ${poolUI}
@@ -2234,72 +2519,50 @@ function managePeserta(eventId,katId){
   <div style="font-size:12px;color:var(--muted)">${catMatches.length===0?`<span style="font-style:italic">Belum ada jadwal.</span>`:`<span style="color:var(--accent);font-weight:700">✓ ${catMatches.length} pertandingan</span>`}</div>
   <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap">
     <button class="btn-ghost advance" style="flex:1" onclick="closeAdminForm();manualAdvance('${eventId}','${katId}')">⚡ Advance</button>
-    <button class="btn-ghost regen" style="flex:1" onclick="regenerateManual('${eventId}','${katId}')">🔄 Reset & Regenerate</button>
+    <button class="btn-ghost regen" style="flex:1" onclick="regenerateManual('${eventId}','${katId}')">🔄 Regenerate</button>
     <button class="btn-ghost" style="flex:1" onclick="clearManualPeserta('${eventId}','${katId}')">🧹 Hapus Manual</button>
   </div></div>`;
-  openAdminForm('👥 Kelola Peserta — '+kat.nama,`${kat.peserta.length} peserta · ${formatLabel(kat.sistem)}`,body);
+  openAdminForm('👥 Kelola Peserta — '+kat.nama,`${kat.peserta.length} peserta · ${formatLabel(kat.sistem)}${spInfo?' · '+spInfo.icon+' '+spInfo.nama:''}`,body);
   setTimeout(()=>{const inp=document.getElementById('manualNameInput');if(inp) inp.focus();},120);
 }
 
 async function setManualSeed(eventId, katId, pid, seedStr){
-  const ev = getEvent(eventId), kat = ev.kategori.find(k => k.id === katId);
-  if(!kat) return;
+  const ev = getEvent(eventId), kat = ev.kategori.find(k => k.id === katId); if(!kat) return;
   kat.seeds = kat.seeds || {};
   const seedNum = parseInt(seedStr) || 0;
   delete kat.seeds[pid];
   if(seedNum > 0){
-    Object.keys(kat.seeds).forEach(otherPid => {
-      if(kat.seeds[otherPid] === seedNum) delete kat.seeds[otherPid];
-    });
+    Object.keys(kat.seeds).forEach(otherPid => { if(kat.seeds[otherPid] === seedNum) delete kat.seeds[otherPid]; });
     kat.seeds[pid] = seedNum;
   }
-  _seedingDirty = true;
-  _updateSeedingUI(eventId, katId);
+  _seedingDirty = true; _updateSeedingUI(eventId, katId);
 }
-
 async function toggleManualBye(eventId, katId, pid, isBye, checkbox){
-  const ev = getEvent(eventId), kat = ev.kategori.find(k => k.id === katId);
-  if(!kat) return;
+  const ev = getEvent(eventId), kat = ev.kategori.find(k => k.id === katId); if(!kat) return;
   kat.byes = kat.byes || [];
   const totalByes = calculateTotalByes(kat);
   if(isBye){
     if(!kat.byes.includes(pid)){
-      if(kat.byes.length >= totalByes){
-        toast(`Maksimal ${totalByes} BYE untuk ${kat.peserta.length} peserta`);
-        if(checkbox) checkbox.checked = false;
-        return;
-      }
+      if(kat.byes.length >= totalByes){ toast(`Maksimal ${totalByes} BYE untuk ${kat.peserta.length} peserta`); if(checkbox) checkbox.checked = false; return; }
       kat.byes.push(pid);
     }
-  } else {
-    kat.byes = kat.byes.filter(x => x !== pid);
-  }
-  _seedingDirty = true;
-  _updateSeedingUI(eventId, katId);
+  } else { kat.byes = kat.byes.filter(x => x !== pid); }
+  _seedingDirty = true; _updateSeedingUI(eventId, katId);
 }
-
 async function saveSeedingChanges(eventId, katId){
-  const btn = document.getElementById('saveSeedingBtn');
-  if(btn) setBtnLoading(btn, true);
+  const btn = document.getElementById('saveSeedingBtn'); if(btn) setBtnLoading(btn, true);
   try{
     const result = await autoRegenerateSchedule(eventId, katId);
-    _seedingDirty = false;
-    managePeserta(eventId, katId);
-    renderPublic();
+    _seedingDirty = false; managePeserta(eventId, katId); renderPublic();
     if(result.saved === false) return;
     toast(`✓ Seeding & BYE tersimpan — ${result.count} pertandingan`);
-  }catch(err){
-    toast('⚠️ Gagal simpan: ' + (err.message||err));
-  }finally{
-    if(btn) setBtnLoading(btn, false);
-  }
+  }catch(err){ toast('⚠️ Gagal simpan: ' + (err.message||err)); }
+  finally{ if(btn) setBtnLoading(btn, false); }
 }
 
 async function addPeserta(eventId,katId){const sel=document.getElementById('addPesertaSel');const poolSel=document.getElementById('addPoolSel');if(!sel||!sel.value){toast('Pilih peserta');return;}const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(!kat.peserta.includes(sel.value)){kat.peserta.push(sel.value);if(kat.sistem==='pool'&&poolSel&&poolSel.value!=='auto'){kat.poolAssignment=kat.poolAssignment||{};kat.poolAssignment[sel.value]=poolSel.value;}const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`Ditambahkan — butuh ${2-kat.peserta.length} lagi`:`✓ ${result.count} pertandingan`);}}
 async function addPesertaGanda(eventId,katId){
-  const sel1=document.getElementById('addPesertaSel1');
-  const sel2=document.getElementById('addPesertaSel2');
-  const poolSel=document.getElementById('addPoolSel');
+  const sel1=document.getElementById('addPesertaSel1'); const sel2=document.getElementById('addPesertaSel2'); const poolSel=document.getElementById('addPoolSel');
   if(!sel1||!sel1.value||!sel2||!sel2.value){toast('Pilih 2 pemain');return;}
   if(sel1.value===sel2.value){toast('Pemain tidak boleh sama');return;}
   const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);
@@ -2307,14 +2570,11 @@ async function addPesertaGanda(eventId,katId){
   if(kat.peserta.includes(pairId)){toast('Pasangan sudah ada');return;}
   kat.peserta.push(pairId);
   if(kat.sistem==='pool'&&poolSel&&poolSel.value!=='auto'){kat.poolAssignment=kat.poolAssignment||{};kat.poolAssignment[pairId]=poolSel.value;}
-  const result=await autoRegenerateSchedule(eventId,katId);
-  managePeserta(eventId,katId);
-  renderPublic();
+  const result=await autoRegenerateSchedule(eventId,katId); managePeserta(eventId,katId); renderPublic();
   toast(`✓ Pasangan ditambahkan — ${result.count} pertandingan`);
 }
 async function addPesertaManual(eventId,katId){
-  const input=document.getElementById('manualNameInput');
-  const poolSel=document.getElementById('manualPoolSel');
+  const input=document.getElementById('manualNameInput'); const poolSel=document.getElementById('manualPoolSel');
   if(!input) return;
   const name=input.value.trim();
   if(!name){toast('Nama kosong');input.focus();return;}
@@ -2323,48 +2583,31 @@ async function addPesertaManual(eventId,katId){
   if(kat.tipe==='ganda'){
       const parts = name.split(/&|\//).map(s=>s.trim()).filter(Boolean);
       if(parts.length !== 2){toast('Format: Pemain 1 & Pemain 2');return;}
-      const id1 = makeManualId(parts[0]);
-      const id2 = makeManualId(parts[1]);
+      const id1 = makeManualId(parts[0]); const id2 = makeManualId(parts[1]);
       const pairId = makePairId(id1, id2);
       if(kat.peserta.includes(pairId)){toast('Pasangan sudah ada');return;}
       kat.peserta.push(pairId);
-      if(kat.sistem==='pool'&&poolSel&&poolSel.value!=='auto'){
-          kat.poolAssignment=kat.poolAssignment||{};
-          kat.poolAssignment[pairId]=poolSel.value;
-      }
-      const result=await autoRegenerateSchedule(eventId,katId);
-      managePeserta(eventId,katId);
-      renderPublic();
-      toast(`✓ Pasangan ditambahkan — ${result.count} pertandingan`);
-      return;
+      if(kat.sistem==='pool'&&poolSel&&poolSel.value!=='auto'){kat.poolAssignment=kat.poolAssignment||{};kat.poolAssignment[pairId]=poolSel.value;}
+      const result=await autoRegenerateSchedule(eventId,katId); managePeserta(eventId,katId); renderPublic();
+      toast(`✓ Pasangan ditambahkan — ${result.count} pertandingan`); return;
   }
   const id=makeManualId(name);
   if(kat.peserta.includes(id)){toast('Nama sudah ada');return;}
   if(kat.tipe==='beregu'){if(TEAMS.find(t=>t.nama.toLowerCase()===name.toLowerCase())){toast(`"${name}" sudah ada`);return;}}else{if(PEMAIN.find(p=>p.nama.toLowerCase()===name.toLowerCase()&&(!kat.gender||p.gender===kat.gender))){toast(`"${name}" sudah ada`);return;}}
   kat.peserta.push(id);
   if(kat.sistem==='pool'&&poolSel&&poolSel.value!=='auto'){kat.poolAssignment=kat.poolAssignment||{};kat.poolAssignment[id]=poolSel.value;}
-  const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`✓ "${name}" ditambahkan`:`✓ "${name}" — ${result.count} pertandingan`);}
+  const result=await autoRegenerateSchedule(eventId,katId); managePeserta(eventId,katId); renderPublic();
+  toast(result.cleared?`✓ "${name}" ditambahkan`:`✓ "${name}" — ${result.count} pertandingan`);
+}
 async function removePesertaAt(eventId,katId,idx){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(idx<0||idx>=kat.peserta.length) return;const pid=kat.peserta[idx];const info=getPesertaInfo(pid,kat);kat.peserta.splice(idx,1);if(kat.poolAssignment) delete kat.poolAssignment[pid];if(kat.seeds) delete kat.seeds[pid];if(kat.byes) kat.byes=kat.byes.filter(x=>x!==pid);const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`"${info.nama}" dihapus`:`✓ "${info.nama}" dihapus`);}
 async function clearManualPeserta(eventId,katId){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);const manuals=kat.peserta.filter(p=>isManualPeserta(p));if(!manuals.length){toast('Tidak ada peserta manual');return;}if(!confirm(`Hapus ${manuals.length} peserta manual?`)) return;kat.peserta=kat.peserta.filter(p=>!isManualPeserta(p));if(kat.poolAssignment) manuals.forEach(pid=>delete kat.poolAssignment[pid]);if(kat.seeds) manuals.forEach(pid=>delete kat.seeds[pid]);if(kat.byes) kat.byes=kat.byes.filter(x=>!manuals.includes(x));const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(`✓ ${manuals.length} manual dihapus`);}
 
 async function regenerateManual(eventId, katId){
-  const ev = getEvent(eventId);
-  const kat = ev && ev.kategori.find(k => k.id === katId);
+  const ev = getEvent(eventId); const kat = ev && ev.kategori.find(k => k.id === katId);
   if(!kat){ toast('Kategori tidak ditemukan'); return; }
   if(kat.peserta.length < 2){ toast('Minimal 2 peserta untuk regenerate'); return; }
-
-  if(!confirm(
-    '🔄 RESET & REGENERATE JADWAL DARI AWAL\n\n' +
-    '• Semua pertandingan (termasuk knockout) akan dihapus & dibuat ulang\n' +
-    '• Skor yang sudah dimasukkan akan dipertahankan jika matchup-nya sama\n' +
-    '• Seeding & BYE manual yang tersimpan akan dipakai kembali\n' +
-    '• Babak knockout akan di-generate otomatis berdasarkan skor yang ada\n\n' +
-    'Lanjutkan?'
-  )) return;
-
-  const btn = document.activeElement;
-  setBtnLoading(btn, true);
-
+  if(!confirm('🔄 RESET & REGENERATE JADWAL DARI AWAL\n\n• Semua pertandingan dihapus & dibuat ulang\n• Skor dipertahankan jika matchup sama\n• Seeding & BYE manual dipakai kembali\n\nLanjutkan?')) return;
+  const btn = document.activeElement; setBtnLoading(btn, true);
   try{
     const scoreMap = {};
     const oldMatches = MATCHES.filter(m => m.eventId === eventId && m.kategoriId === katId);
@@ -2379,9 +2622,7 @@ async function regenerateManual(eventId, katId){
         else if(p.menang === 'B') scoreMap[keyBA] = { menang: 'A', skor: flipSkor(p.skor || '') };
       });
     });
-
     const result = await autoRegenerateSchedule(eventId, katId);
-
     const applyScores = () => {
       let applied = 0;
       MATCHES.filter(m => m.eventId === eventId && m.kategoriId === katId).forEach(m => {
@@ -2389,19 +2630,13 @@ async function regenerateManual(eventId, katId){
         (m.partai || []).forEach(p => {
           if(p.menang) return;
           const key = `${m.timA}|${m.timB}|${p.kode}|${p.jenis}|${(p.pemainA||[]).join('&')}|${(p.pemainB||[]).join('&')}`;
-          if(scoreMap[key]){
-            p.menang = scoreMap[key].menang;
-            p.skor   = scoreMap[key].skor;
-            applied++;
-          }
+          if(scoreMap[key]){ p.menang = scoreMap[key].menang; p.skor = scoreMap[key].skor; applied++; }
         });
       });
       return applied;
     };
-
     const runAdvance = () => {
-      let total = 0;
-      let lastFilled = -1;
+      let total = 0; let lastFilled = -1;
       for(let i = 0; i < 12; i++){
         const filledBefore = MATCHES.filter(m => m.eventId === eventId && m.kategoriId === katId && m.timA !== 'TBD' && m.timB !== 'TBD').length;
         autoAdvanceKnockout(ev, kat);
@@ -2412,29 +2647,16 @@ async function regenerateManual(eventId, katId){
       }
       return total;
     };
-
-    let applied = applyScores();
-    const advanced1 = runAdvance();
-    const applied2 = applyScores();
-    const advanced2 = applied2 > 0 ? runAdvance() : 0;
-
-    await saveData();
-    closeAdminForm();
-    renderPublic();
-    renderAdminView(state.view);
-
+    let applied = applyScores(); const advanced1 = runAdvance();
+    const applied2 = applyScores(); const advanced2 = applied2 > 0 ? runAdvance() : 0;
+    await saveData(); closeAdminForm(); renderPublic(); renderAdminView(state.view);
     const msgs = [];
     msgs.push(`✓ ${result.count} pertandingan di-generate ulang`);
     if(applied + applied2 > 0) msgs.push(`✓ ${applied + applied2} skor diterapkan`);
     if(advanced1 + advanced2 > 0) msgs.push(`✓ ${advanced1 + advanced2} advancement otomatis`);
     toast(msgs.join(' · '));
-
-  }catch(err){
-    console.error('Regenerate error:', err);
-    toast('⚠️ Gagal regenerate: ' + (err.message || err));
-  }finally{
-    setBtnLoading(btn, false);
-  }
+  }catch(err){ console.error('Regenerate error:', err); toast('⚠️ Gagal regenerate: ' + (err.message || err)); }
+  finally{ setBtnLoading(btn, false); }
 }
 
 async function movePesertaPool(eventId,katId,pid,targetPoolId){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(!kat||kat.sistem!=='pool') return;kat.poolAssignment=kat.poolAssignment||{};const pool=(kat.pools||[]).find(p=>p.id===targetPoolId);if(pool) kat.poolAssignment[pid]=targetPoolId;else delete kat.poolAssignment[pid];const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();const info=getPesertaInfo(pid,kat);toast(`✓ "${info.nama}" → ${pool?pool.nama:'Auto'}`);}
@@ -2520,7 +2742,7 @@ function editMatch(id){
   const courtOpts=courts.map(c=>`<option value="${esc(c.id)}">${esc(c.nama)}${c.lokasi?' ('+esc(c.lokasi)+')':''}</option>`).join('');
   const currentCourt=courts.find(c=>c.nama===(m?m.lapangan:''));
   const body=`<form id="matchForm"><input type="hidden" name="id" value="${m?m.id:''}"><div class="form-grid"><div class="field"><label>Kegiatan</label><select name="eventId" onchange="reloadMatchFormEvent(this.value)">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div><div class="field"><label>Kategori</label><select name="kategoriId" onchange="refreshPlayerDatalists()">${katOpts}</select></div><div class="field"><label>Tanggal (Hari / Tgl)</label><input name="tgl" value="${m?esc((m.hari?m.hari+' / ':'')+(m.tgl||'')):''}" placeholder="Senin / 10 Juni 2025"></div><div class="field"><label>Jam</label><input name="jam" value="${m?esc(m.jam||''):'08.00'}"></div><div class="field"><label>Lapangan</label><select name="lapangan" id="lapanganSelect" onchange="onCourtChange()"><option value="">– pilih –</option>${courtOpts}${m&&m.lapangan&&!currentCourt?`<option value="__custom__" selected>Custom: ${esc(m.lapangan)}</option>`:''}</select><input type="hidden" name="lapanganCustom" value="${m&&!currentCourt?esc(m.lapangan||''):''}"></div><div class="field"><label>Lokasi Lapangan</label><input name="lokasiLapangan" id="lokasiLapanganInput" value="${m?esc(m.lokasiLapangan||''):''}"></div><div class="field full"><label>Babak</label><input name="babakLabel" value="${m?esc(m.babakLabel||''):(kat.sistem==='pool'?'Pool':kat.sistem==='penyisihan'?'Ronde 1':kat.sistem==='gugur'?'Ronde 1':'Kompetisi')}"></div><div class="field"><label>Tim/Pemain A</label><select name="timA" onchange="refreshPlayerDatalists()">${pesertaOpts}</select></div><div class="field"><label>Tim/Pemain B</label><select name="timB" onchange="refreshPlayerDatalists()">${pesertaOptsB}</select></div></div>
-    <div class="auto-note" style="margin-bottom:10px">💡 <b>Beregu:</b> Tambah/kurang partai. <b>Penyisihan/Kompetisi/Gugur:</b> Semifinal & final otomatis saat skor terisi.</div>
+    <div class="auto-note" style="margin-bottom:10px">💡 <b>Beregu:</b> Tambah/kurang partai.</div>
     <div class="admin-subhead">Partai — Nama Pemain &amp; Skor</div>
     <datalist id="playerListA"></datalist><datalist id="playerListB"></datalist>
     <div id="partaiEditorsContainer">${partaiHtml}</div>${addBtn}
@@ -2582,19 +2804,46 @@ function reloadMatchFormEvent(eventId){const ev=getEvent(eventId);const katSel=d
 async function hapusMatch(id){if(!confirm('Hapus pertandingan ini?')) return;MATCHES=MATCHES.filter(m=>m.id!==id);await saveData();renderAdminView(state.view);renderPublic();toast('Pertandingan dihapus');}
 
 function viewKlasemenAdmin(){
-  const ev=getEvent(state.klasemenEventId)||EVENTS[0];if(!ev) return `<div class="empty"><p>Belum ada kegiatan.</p></div>`;
-  let html=`<div class="admin-page-head"><div><h2>📈 Klasemen</h2><p>Klasemen per kategori</p></div></div><div class="admin-toolbar"><select class="filter-select" onchange="state.klasemenEventId=this.value;saveUIState();renderAdminView('klasemen')" style="min-width:200px;max-width:100%">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div>`;
+  const ev=getEvent(state.klasemenFilter.eventId)||EVENTS[0];if(!ev) return `<div class="empty"><p>Belum ada kegiatan.</p></div>`;
+  let html=`<div class="admin-page-head"><div><h2>📈 Klasemen (Admin)</h2><p>Klasemen per kategori</p></div></div><div class="admin-toolbar"><select class="filter-select" onchange="state.klasemenFilter.eventId=this.value;saveUIState();renderAdminView('klasemen')" style="min-width:200px;max-width:100%">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div>`;
   if(!ev.kategori.length) return html+`<div class="empty"><p>Belum ada kategori.</p></div>`;
   ev.kategori.forEach(kat=>{
-    const rows=hitungKlasemen(kat,ev.id);const isBeregu=kat.tipe==='beregu';const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;const poolInfo=kat.sistem==='pool'?getPoolSummary(kat):'';
-    html+=`<div class="admin-subhead">${esc(kat.nama)} · ${esc(formatLabel(kat.sistem))} · ${kat.peserta.length} peserta${manualCount?` (${manualCount} manual)`:''}${poolInfo?` · ${poolInfo}`:''}</div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th style="width:40px">#</th><th>${isBeregu?'Satker':'Pemain'}</th><th>Main</th><th>M</th><th>K</th>${isBeregu?'<th>Partai</th>':''}<th>Poin</th></tr></thead><tbody>${rows.map((r,i)=>{const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';return `<tr><td><span class="rank ${rc}">${i+1}</span></td><td><b>${esc(r.info.nama)}</b></td><td>${r.main}</td><td>${r.menang}</td><td>${r.kalah}</td>${isBeregu?`<td>${r.pm||0}-${r.pk||0}</td>`:''}<td><b style="color:var(--accent)">${r.poin}</b></td></tr>`;}).join('')||`<tr><td colspan="7" style="text-align:center;padding:20px" class="muted">Belum ada data</td></tr>`}</tbody></table></div>`;
+    const rows=hitungKlasemen(kat,ev.id);const isBeregu=kat.tipe==='beregu';const manualCount=kat.peserta.filter(p=>isManualPeserta(p)).length;const poolInfo=kat.sistem==='pool'?getPoolSummary(kat):'';const spInfo=kat.sport?getSport(kat.sport):null;
+    html+=`<div class="admin-subhead">${spInfo?spInfo.icon+' ':''}${esc(kat.nama)} · ${esc(formatLabel(kat.sistem))} · ${kat.peserta.length} peserta${poolInfo?` · ${poolInfo}`:''}</div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th style="width:40px">#</th><th>${isBeregu?'Satker':'Pemain'}</th><th>Main</th><th>M</th><th>K</th>${isBeregu?'<th>Partai</th>':''}<th>Poin</th></tr></thead><tbody>${rows.map((r,i)=>{const rc=i===0?'g1':i===1?'g2':i===2?'g3':'';return `<tr><td><span class="rank ${rc}">${i+1}</span></td><td><b>${esc(r.info.nama)}</b></td><td>${r.main}</td><td>${r.menang}</td><td>${r.kalah}</td>${isBeregu?`<td>${r.pm||0}-${r.pk||0}</td>`:''}<td><b style="color:var(--accent)">${r.poin}</b></td></tr>`;}).join('')||`<tr><td colspan="7" style="text-align:center;padding:20px" class="muted">Belum ada data</td></tr>`}</tbody></table></div>`;
   });
   return html;
 }
+
 function viewSatkerAdmin(){
-  const rows=TEAMS.map(t=>{const jml=pemainTim(t.id).length;const initial=t.singkat.replace(/PA /gi,'').slice(0,3).toUpperCase()||'?';return `<tr><td><span class="logo" style="width:28px;height:28px;font-size:10px;border-radius:7px;background:linear-gradient(135deg,${t.warna},${t.warna}99);color:#04170d;font-weight:800;display:inline-grid;place-items:center">${esc(initial)}</span></td><td><b>${esc(t.nama)}</b></td><td>${esc(t.singkat)}</td><td>${esc(t.kota)}</td><td>${jml} pemain</td><td><div class="act-btns"><button class="icon-act" onclick="editSatker('${t.id}')">✏️</button><button class="icon-act del" onclick="hapusSatker('${t.id}')">🗑️</button></div></td></tr>`;}).join('');
-  return `<div class="admin-page-head"><div><h2>🏛️ Satker</h2><p>Kelola data satuan kerja</p></div></div><div class="admin-toolbar"><button class="btn-primary" style="width:auto;padding:9px 16px" onclick="editSatker(null)">+ Tambah Satker</button></div><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th></th><th>Nama</th><th>Singkatan</th><th>Kota</th><th>Pemain</th><th style="text-align:right">Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  const f = state.adminSatkerFilter || {sport:'all'};
+  const isFiltered = f.sport !== 'all';
+  const teamsFiltered = isFiltered ? TEAMS.filter(t => pemainTim(t.id).some(p => playerHasSport(p, f.sport))) : TEAMS;
+  const sportOpts = ['<option value="all">Semua Cabor</option>'].concat(SPORTS.map(s => `<option value="${s.id}" ${f.sport===s.id?'selected':''}>${s.icon} ${esc(s.nama)}</option>`)).join('');
+  const rows = teamsFiltered.map(t => {
+    const allP = pemainTim(t.id);
+    const filteredP = isFiltered ? allP.filter(p => playerHasSport(p, f.sport)) : allP;
+    const initial = t.singkat.replace(/PA /gi,'').slice(0,3).toUpperCase() || '?';
+    const counts = {};
+    allP.forEach(p => { getSportsOf(p).forEach(sid => { counts[sid] = (counts[sid]||0)+1; }); });
+    const sportBreakdown = Object.entries(counts).map(([sid,cnt]) => {
+      const sp = getSport(sid); const color = getSportColor(sid);
+      return `<span class="ptag" style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}">${sp.icon} ${cnt}</span>`;
+    }).join(' ');
+    const pemainCell = isFiltered ? `<b style="color:var(--accent)">${filteredP.length}</b> <span class="muted" style="font-size:11px">/ ${allP.length}</span>` : `${allP.length} pemain`;
+    return `<tr>
+      <td><span class="logo" style="width:28px;height:28px;font-size:10px;border-radius:7px;background:linear-gradient(135deg,${t.warna},${t.warna}99);color:#04170d;font-weight:800;display:inline-grid;place-items:center">${esc(initial)}</span></td>
+      <td><b>${esc(t.nama)}</b></td><td>${esc(t.singkat)}</td><td>${esc(t.kota)}</td>
+      <td>${pemainCell}</td><td>${sportBreakdown || '—'}</td>
+      <td><div class="act-btns"><button class="icon-act" onclick="editSatker('${t.id}')">✏️</button><button class="icon-act del" onclick="hapusSatker('${t.id}')">🗑️</button></div></td>
+    </tr>`;
+  }).join('');
+  return `<div class="admin-page-head"><div><h2>🏛️ Satker</h2><p>Kelola data satuan kerja — filter per cabang olahraga</p></div><button class="btn-primary" style="width:auto;padding:9px 16px" onclick="editSatker(null)">+ Tambah Satker</button></div>
+    <div class="filter-bar ${isFiltered?'filter-active':''}" style="margin-bottom:14px"><span class="lbl">🔍 Filter</span><select class="filter-select" onchange="adminSatkerFilterChange('sport',this.value)">${sportOpts}</select><button class="btn-ghost" onclick="adminResetSatkerFilter()">↺ Reset</button>${isFiltered?`<span class="filter-count"><b>${teamsFiltered.length}</b> / ${TEAMS.length} satker</span>`:`<span class="filter-count">${TEAMS.length} satker</span>`}</div>
+    <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th></th><th>Nama</th><th>Singkatan</th><th>Kota</th><th>Pemain</th><th>Cabor</th><th style="text-align:right">Aksi</th></tr></thead><tbody>${rows || `<tr><td colspan="7" class="empty" style="padding:32px">${TEAMS.length===0?'Belum ada satker.':'Tidak ada satker dengan pemain di cabang ini.'}</td></tr>`}</tbody></table></div>`;
 }
+function adminSatkerFilterChange(key, value){ state.adminSatkerFilter = state.adminSatkerFilter || {sport:'all'}; state.adminSatkerFilter[key] = value; renderAdminView('satker'); }
+function adminResetSatkerFilter(){ state.adminSatkerFilter = {sport:'all'}; renderAdminView('satker'); toast('Filter satker direset'); }
+
 function editSatker(id){
   const t=id?TEAMS.find(x=>x.id===id):null;
   const body=`<form id="satkerForm"><input type="hidden" name="id" value="${t?t.id:''}"><div class="form-grid"><div class="field full"><label>Nama Satker</label><input name="nama" required value="${t?esc(t.nama):''}"></div><div class="field"><label>Singkatan</label><input name="singkat" required value="${t?esc(t.singkat):''}"></div><div class="field"><label>Kota</label><input name="kota" required value="${t?esc(t.kota):''}"></div><div class="field full"><label>Warna</label><input name="warna" type="color" value="${t?t.warna:'#2ee07a'}" style="height:40px;padding:3px"></div></div><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="submit" class="btn-primary" style="flex:1">Simpan</button></div></form>`;
@@ -2610,10 +2859,7 @@ async function hapusSatker(id){
   EVENTS.forEach(ev => ev.kategori.forEach(k => {
     k.peserta = k.peserta.filter(pid => {
       if (k.tipe === 'beregu') return pid !== id;
-      if (isPair(pid)) {
-        const parts = parsePair(pid);
-        return !parts.some(pidPart => deletedPlayerIds.has(pidPart));
-      }
+      if (isPair(pid)) { const parts = parsePair(pid); return !parts.some(pidPart => deletedPlayerIds.has(pidPart)); }
       return !deletedPlayerIds.has(pid);
     });
     if(k.poolAssignment) delete k.poolAssignment[id];
@@ -2622,21 +2868,40 @@ async function hapusSatker(id){
   }));
   await saveData();renderAdminView('satker');renderPublic();toast('Satker dihapus');
 }
+
 function viewPemainAdmin(){
   const f=state.adminPemainFilter;
-  const filtered=PEMAIN.filter(p=>{if(f.satker!=='all'&&p.team!==f.satker) return false;if(f.gender!=='all'&&p.gender!==f.gender) return false;if(f.jenis!=='all'&&p.jenis!==f.jenis) return false;if(f.search&&f.search.trim()&&!p.nama.toLowerCase().includes(f.search.trim().toLowerCase())) return false;return true;});
-  const filterActive=!!(f.satker!=='all'||f.gender!=='all'||f.jenis!=='all'||(f.search&&f.search.trim()));
+  const filtered=PEMAIN.filter(p=>{
+    if(f.satker!=='all'&&p.team!==f.satker) return false;
+    if(f.gender!=='all'&&p.gender!==f.gender) return false;
+    if(f.jenis!=='all'&&p.jenis!==f.jenis) return false;
+    if(f.sport && f.sport!=='all' && !playerHasSport(p, f.sport)) return false;
+    if(f.search&&f.search.trim()&&!p.nama.toLowerCase().includes(f.search.trim().toLowerCase())) return false;
+    return true;
+  });
+  const filterActive=!!(f.satker!=='all'||f.gender!=='all'||f.jenis!=='all'||(f.sport&&f.sport!=='all')||(f.search&&f.search.trim()));
   const satkerOpts=[`<option value="all">Semua Satker</option>`].concat(TEAMS.map(t=>`<option value="${t.id}" ${f.satker===t.id?'selected':''}>${esc(t.nama)}</option>`)).join('');
-  const rows=filtered.map(p=>{const t=tim(p.team);return `<tr><td style="text-align:center;width:36px"><input type="checkbox" class="pemain-check" value="${p.id}" onchange="updatePemainSelection()"></td><td><b>${esc(p.nama)}</b></td><td>${esc(t.singkat)}</td><td><span class="ptag ${p.gender==='putra'?'putra':'putri'}">${esc(p.gender||'putra')}</span></td><td><span class="ptag ${p.jenis==='Tunggal'?'tunggal':'ganda'}">${esc(p.jenis)}</span></td><td><div class="act-btns"><button class="icon-act" onclick="editPemain('${p.id}')">✏️</button><button class="icon-act del" onclick="hapusPemain('${p.id}')">🗑️</button></div></td></tr>`;}).join('');
-  return `<div class="admin-page-head"><div><h2>👥 Pemain</h2><p>Kelola pemain — bisa import Excel/CSV</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="showImportPemainModal()" style="padding:9px 16px">📥 Import</button><button class="btn-primary" style="width:auto;padding:9px 16px" onclick="editPemain(null)">+ Tambah</button></div></div>
-    <div class="filter-bar ${filterActive?'filter-active':''}" style="margin-bottom:14px"><span class="lbl">🔍 Filter</span><select class="filter-select" onchange="adminPemainFilter('satker',this.value)">${satkerOpts}</select><select class="filter-select" onchange="adminPemainFilter('gender',this.value)"><option value="all" ${f.gender==='all'?'selected':''}>Semua Gender</option><option value="putra" ${f.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${f.gender==='putri'?'selected':''}>Putri</option></select><select class="filter-select" onchange="adminPemainFilter('jenis',this.value)"><option value="all" ${f.jenis==='all'?'selected':''}>Semua Jenis</option><option value="Tunggal" ${f.jenis==='Tunggal'?'selected':''}>Tunggal</option><option value="Ganda" ${f.jenis==='Ganda'?'selected':''}>Ganda</option></select><input type="text" class="filter-input filter-search" id="adminPemainSearch" placeholder="🔎 Cari..." value="${esc(f.search)}" oninput="adminPemainSearch(this.value)" autocomplete="off"><button class="btn-ghost" onclick="adminResetPemainFilter()">↺ Reset</button>${filterActive?`<span class="filter-count"><b>${filtered.length}</b> / ${PEMAIN.length}</span>`:''}</div>
-    <div class="admin-toolbar" style="margin-bottom:10px"><button class="btn-danger" id="bulkDeletePemainBtn" onclick="bulkDeletePemain()" disabled style="padding:9px 16px">🗑️ Hapus Terpilih (0)</button><span class="muted" style="font-size:12px;font-weight:600">💡 Centang pemain pada tabel untuk hapus massal</span><div class="grow"></div><span class="muted" style="font-size:12px;font-weight:600">${filtered.length} pemain ditampilkan</span></div>
-    <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th style="text-align:center;width:36px"><input type="checkbox" id="checkAllPemainHead" onchange="toggleAllPemain(this.checked)" title="Pilih semua"></th><th>Nama</th><th>Satker</th><th>Gender</th><th>Jenis</th><th style="text-align:right">Aksi</th></tr></thead><tbody>${rows||`<tr><td colspan="6" class="empty" style="padding:32px">${PEMAIN.length===0?'Belum ada pemain.':'Tidak ada yang cocok.'}</td></tr>`}</tbody></table></div>`;
+  const sportOpts=[`<option value="all">Semua Cabor</option>`].concat(SPORTS.map(s=>`<option value="${s.id}" ${f.sport===s.id?'selected':''}>${esc(s.nama)}</option>`)).join('');
+  const rows=filtered.map(p=>{
+    const t=tim(p.team);
+    const spsHtml = getSportsOf(p).map(sid=>{const sp=getSport(sid);return `<span class="ptag sport-${sp.id}">${sp.icon} ${esc(sp.nama)}</span>`;}).join(' ');
+    return `<tr>
+      <td style="text-align:center;width:36px"><input type="checkbox" class="pemain-check" value="${p.id}" onchange="updatePemainSelection()"></td>
+      <td><b>${esc(p.nama)}</b></td><td>${spsHtml}</td><td>${esc(t.singkat)}</td>
+      <td><span class="ptag ${p.gender==='putra'?'putra':'putri'}">${esc(p.gender||'putra')}</span></td>
+      <td><span class="ptag ${p.jenis==='Tunggal'?'tunggal':'ganda'}">${esc(p.jenis)}</span></td>
+      <td><div class="act-btns"><button class="icon-act" onclick="editPemain('${p.id}')">✏️</button><button class="icon-act del" onclick="hapusPemain('${p.id}')">🗑️</button></div></td>
+    </tr>`;
+  }).join('');
+  return `<div class="admin-page-head"><div><h2>👥 Pemain</h2><p>Satu pemain bisa ikut beberapa cabor</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="showImportPemainModal()" style="padding:9px 16px">📥 Import</button><button class="btn-primary" style="width:auto;padding:9px 16px" onclick="editPemain(null)">+ Tambah</button></div></div>
+    <div class="filter-bar ${filterActive?'filter-active':''}" style="margin-bottom:14px"><span class="lbl">🔍 Filter</span><select class="filter-select" onchange="adminPemainFilter('sport',this.value)">${sportOpts}</select><select class="filter-select" onchange="adminPemainFilter('satker',this.value)">${satkerOpts}</select><select class="filter-select" onchange="adminPemainFilter('gender',this.value)"><option value="all" ${f.gender==='all'?'selected':''}>Semua Gender</option><option value="putra" ${f.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${f.gender==='putri'?'selected':''}>Putri</option></select><select class="filter-select" onchange="adminPemainFilter('jenis',this.value)"><option value="all" ${f.jenis==='all'?'selected':''}>Semua Jenis</option><option value="Tunggal" ${f.jenis==='Tunggal'?'selected':''}>Tunggal</option><option value="Ganda" ${f.jenis==='Ganda'?'selected':''}>Ganda</option></select><input type="text" class="filter-input filter-search" id="adminPemainSearch" placeholder="🔎 Cari..." value="${esc(f.search)}" oninput="adminPemainSearch(this.value)" autocomplete="off"><button class="btn-ghost" onclick="adminResetPemainFilter()">↺ Reset</button>${filterActive?`<span class="filter-count"><b>${filtered.length}</b> / ${PEMAIN.length}</span>`:''}</div>
+    <div class="admin-toolbar" style="margin-bottom:10px"><button class="btn-danger" id="bulkDeletePemainBtn" onclick="bulkDeletePemain()" disabled style="padding:9px 16px">🗑️ Hapus Terpilih (0)</button><span class="muted" style="font-size:12px;font-weight:600">💡 Centang untuk hapus massal</span><div class="grow"></div><span class="muted" style="font-size:12px;font-weight:600">${filtered.length} pemain ditampilkan</span></div>
+    <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th style="text-align:center;width:36px"><input type="checkbox" id="checkAllPemainHead" onchange="toggleAllPemain(this.checked)" title="Pilih semua"></th><th>Nama</th><th>Cabang</th><th>Satker</th><th>Gender</th><th>Jenis</th><th style="text-align:right">Aksi</th></tr></thead><tbody>${rows||`<tr><td colspan="7" class="empty" style="padding:32px">${PEMAIN.length===0?'Belum ada pemain.':'Tidak ada yang cocok.'}</td></tr>`}</tbody></table></div>`;
 }
 let _admPemainSearchTimer=null;
 function adminPemainSearch(value){clearTimeout(_admPemainSearchTimer);_admPemainSearchTimer=setTimeout(()=>{state.adminPemainFilter.search=value;renderAdminView('pemain');setTimeout(()=>{const inp=document.getElementById('adminPemainSearch');if(inp){inp.focus();inp.setSelectionRange(value.length,value.length);}},30);},220);}
 function adminPemainFilter(key,value){state.adminPemainFilter[key]=value;renderAdminView('pemain');}
-function adminResetPemainFilter(){state.adminPemainFilter={satker:'all',gender:'all',jenis:'all',search:''};renderAdminView('pemain');toast('Filter pemain direset');}
+function adminResetPemainFilter(){state.adminPemainFilter={satker:'all',gender:'all',jenis:'all',sport:'all',search:''};renderAdminView('pemain');toast('Filter pemain direset');}
 function toggleAllPemain(checked){document.querySelectorAll('.pemain-check').forEach(cb=>{cb.checked=checked;});updatePemainSelection();}
 function updatePemainSelection(){
   const checks=document.querySelectorAll('.pemain-check');const selected=[...checks].filter(cb=>cb.checked);
@@ -2648,18 +2913,14 @@ function updatePemainSelection(){
 async function bulkDeletePemain(){
   const ids=[...document.querySelectorAll('.pemain-check')].filter(cb=>cb.checked).map(cb=>cb.value);
   if(!ids.length){toast('Tidak ada pemain dipilih');return;}
-  if(!confirm(`Hapus ${ids.length} pemain terpilih? Tindakan ini juga menghapus mereka dari kategori dan pertandingan terkait.`)) return;
-  const btn=document.getElementById('bulkDeletePemainBtn');
-  setBtnLoading(btn,true);
+  if(!confirm(`Hapus ${ids.length} pemain terpilih?`)) return;
+  const btn=document.getElementById('bulkDeletePemainBtn'); setBtnLoading(btn,true);
   try{
     const idSet=new Set(ids);
     PEMAIN = PEMAIN.filter(p => !idSet.has(p.id));
     EVENTS.forEach(ev => ev.kategori.forEach(k => {
         k.peserta = k.peserta.filter(pid => {
-            if (isPair(pid)) {
-                const parts = parsePair(pid);
-                return !parts.some(id => idSet.has(id));
-            }
+            if (isPair(pid)) { const parts = parsePair(pid); return !parts.some(id => idSet.has(id)); }
             return !idSet.has(pid);
         });
         if(k.poolAssignment) ids.forEach(id=>{delete k.poolAssignment[id];});
@@ -2668,26 +2929,45 @@ async function bulkDeletePemain(){
     }));
     MATCHES=MATCHES.filter(m=>!idSet.has(m.timA)&&!idSet.has(m.timB));
     await saveData();renderAdminView('pemain');renderPublic();toast(`✓ ${ids.length} pemain dihapus`);
-  }finally{
-    setBtnLoading(btn,false);
-  }
+  }finally{ setBtnLoading(btn,false); }
 }
 function editPemain(id){
   const p=id?PEMAIN.find(x=>x.id===id):null;
   const teamOpts=TEAMS.map(t=>`<option value="${t.id}" ${p&&p.team===t.id?'selected':''}>${esc(t.nama)}</option>`).join('');
-  const body=`<form id="pemainForm"><input type="hidden" name="id" value="${p?p.id:''}"><div class="form-grid"><div class="field full"><label>Nama Pemain</label><input name="nama" required value="${p?esc(p.nama):''}"></div><div class="field"><label>Satker</label><select name="team" required>${teamOpts}</select></div><div class="field"><label>Gender</label><select name="gender" required><option value="putra" ${p&&p.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${p&&p.gender==='putri'?'selected':''}>Putri</option></select></div><div class="field"><label>Jenis</label><select name="jenis" required><option value="Tunggal" ${p&&p.jenis==='Tunggal'?'selected':''}>Tunggal</option><option value="Ganda" ${p&&p.jenis==='Ganda'?'selected':''}>Ganda</option></select></div></div><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="submit" class="btn-primary" style="flex:1">Simpan</button></div></form>`;
+  const currentSports = p ? getSportsOf(p) : ['tennis'];
+  const sportCheckboxes = SPORTS.map(s=>`
+    <label style="display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);cursor:pointer;font-size:12.5px;font-weight:700">
+      <input type="checkbox" name="sports" value="${s.id}" ${currentSports.includes(s.id)?'checked':''} style="width:auto;accent-color:var(--accent)">
+      <span>${s.icon} ${esc(s.nama)}</span>
+    </label>
+  `).join('');
+  const body=`<form id="pemainForm"><input type="hidden" name="id" value="${p?p.id:''}">
+    <div class="form-grid">
+      <div class="field full"><label>Nama Pemain</label><input name="nama" required value="${p?esc(p.nama):''}"></div>
+      <div class="field"><label>Satker</label><select name="team" required>${teamOpts}</select></div>
+      <div class="field"><label>Gender</label><select name="gender" required><option value="putra" ${p&&p.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${p&&p.gender==='putri'?'selected':''}>Putri</option></select></div>
+      <div class="field"><label>Jenis</label><select name="jenis" required><option value="Tunggal" ${p&&p.jenis==='Tunggal'?'selected':''}>Tunggal</option><option value="Ganda" ${p&&p.jenis==='Ganda'?'selected':''}>Ganda</option></select></div>
+    </div>
+    <div class="field full" style="margin-top:8px"><label>Cabang Olahraga (bisa lebih dari satu)</label><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:6px">${sportCheckboxes}</div><small style="margin-top:6px">Centang cabor yang diikuti.</small></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="submit" class="btn-primary" style="flex:1">Simpan</button></div>
+  </form>`;
   openAdminForm(p?'✏️ Edit Pemain':'➕ Tambah Pemain','',body);
-  document.getElementById('pemainForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;const data={nama:f.nama.value.trim(),team:f.team.value,gender:f.gender.value,jenis:f.jenis.value};if(p) Object.assign(p,data); else PEMAIN.push({id:genId('p'),...data});await saveData();closeAdminForm();renderAdminView('pemain');renderPublic();toast(p?'Pemain diperbarui':'Pemain ditambahkan');});
+  document.getElementById('pemainForm').addEventListener('submit',async e=>{
+    e.preventDefault();const f=e.target;
+    const checked = [...f.querySelectorAll('input[name="sports"]:checked')].map(cb=>cb.value);
+    if(!checked.length){ toast('Pilih minimal 1 cabang olahraga'); return; }
+    const data = {nama:f.nama.value.trim(), team:f.team.value, gender:f.gender.value, jenis:f.jenis.value, sports:checked, sport:checked[0]};
+    if(p) Object.assign(p,data); else PEMAIN.push({id:genId('p'),...data});
+    await saveData();closeAdminForm();renderAdminView('pemain');renderPublic();
+    toast(p?'Pemain diperbarui':'Pemain ditambahkan');
+  });
 }
 async function hapusPemain(id){
   if(!confirm('Hapus pemain ini?')) return;
   PEMAIN = PEMAIN.filter(p => p.id !== id);
   EVENTS.forEach(ev => ev.kategori.forEach(k => {
       k.peserta = k.peserta.filter(pid => {
-          if (isPair(pid)) {
-              const parts = parsePair(pid);
-              return !parts.includes(id);
-          }
+          if (isPair(pid)) { const parts = parsePair(pid); return !parts.includes(id); }
           return pid !== id;
       });
       if(k.poolAssignment) delete k.poolAssignment[id];
@@ -2700,13 +2980,34 @@ async function hapusPemain(id){
 function matchSatker(query){if(!query) return null;const q=String(query).toLowerCase().trim();if(!q) return null;let t=TEAMS.find(x=>x.id.toLowerCase()===q);if(t) return t;t=TEAMS.find(x=>x.singkat.toLowerCase()===q);if(t) return t;t=TEAMS.find(x=>x.nama.toLowerCase()===q);if(t) return t;t=TEAMS.find(x=>x.nama.toLowerCase().includes(q)||x.singkat.toLowerCase().includes(q));if(t) return t;return null;}
 function normalizeGender(g){if(!g) return 'putra';const l=String(g).toLowerCase().trim();if(l==='p'||l==='putri'||l.includes('wanita')||l==='f'||l==='female'||l==='w'||l.includes('perempuan')) return 'putri';return 'putra';}
 function normalizeJenis(j){if(!j) return 'Tunggal';const l=String(j).toLowerCase().trim();if(l.includes('ganda')||l.includes('double')||l==='g'||l==='d') return 'Ganda';return 'Tunggal';}
+function normalizeSport(s){
+  if(!s) return 'tennis';
+  const l=String(s).toLowerCase().trim();if(!l) return 'tennis';
+  const byId = SPORTS.find(sp => sp.id.toLowerCase() === l); if(byId) return byId.id;
+  const byName = SPORTS.find(sp => sp.nama.toLowerCase() === l); if(byName) return byName.id;
+  if(l.includes('meja')||l.includes('ping')||l.includes('table')||l==='tm') return 'tenis_meja';
+  if(l.includes('pickle')) return 'pickleball';
+  if(l.includes('padel')||l.includes('paddle')) return 'padel';
+  if(l.includes('tenis')||l.includes('tennis')||l==='t') return 'tennis';
+  const partial = SPORTS.find(sp => sp.nama.toLowerCase().includes(l) || l.includes(sp.nama.toLowerCase()));
+  if(partial) return partial.id;
+  return 'tennis';
+}
+function normalizeSports(str){
+  if(!str) return ['tennis'];
+  const parts = String(str).split(/[,;|]/).map(s=>s.trim()).filter(Boolean);
+  if(!parts.length) return ['tennis'];
+  const out = [];
+  parts.forEach(p=>{ const id = normalizeSport(p); if(id && !out.includes(id)) out.push(id); });
+  return out.length ? out : ['tennis'];
+}
 function parsePlayerData(text){
   if(!text||!text.trim()) return {rows:[],errors:['Data kosong']};
   const lines=text.trim().split('\n').map(l=>l.replace(/\r$/,'')).filter(l=>l.trim());
   if(!lines.length) return {rows:[],errors:['Tidak ada baris']};
   let sep='\t';const firstLine=lines[0];
   if(!firstLine.includes('\t')){if(firstLine.includes(';')) sep=';';else if(firstLine.includes(',')) sep=',';else sep=',';}
-  let startIdx=0;const headerWords=['nama','satker','gender','jenis','name','team','type','jk'];const firstLower=firstLine.toLowerCase();
+  let startIdx=0;const headerWords=['nama','satker','gender','jenis','name','team','type','jk','cabor','sport'];const firstLower=firstLine.toLowerCase();
   if(headerWords.some(w=>firstLower.includes(w))) startIdx=1;
   const rows=[],errors=[];
   for(let i=startIdx;i<lines.length;i++){
@@ -2715,16 +3016,16 @@ function parsePlayerData(text){
     else cols=lines[i].split(sep).map(c=>c.trim());
     if(cols.length<2){errors.push(`Baris ${i+1}: minimal 2 kolom`);continue;}
     const nama=cols[0]||'';if(!nama){errors.push(`Baris ${i+1}: nama kosong`);continue;}
-    rows.push({nama,satker:cols[1]||'',gender:normalizeGender(cols[2]),jenis:normalizeJenis(cols[3])});
+    rows.push({nama, satker:cols[1]||'', gender:normalizeGender(cols[2]), jenis:normalizeJenis(cols[3]), sports:normalizeSports(cols[4])});
   }
   return {rows,errors};
 }
 function showImportPemainModal(){
   window._importParsedRows=[];window._importErrors=[];
-  const body=`<div class="auto-note"><b>📥 Import Pemain</b> — format: <b>Nama, Satker, Gender, Jenis</b></div>
-    <div class="manual-note"><b>Contoh:</b> <code>Ahmad Ridwan  pta  putra  Tunggal</code><br>Satker: ID/singkat/nama.</div>
+  const body=`<div class="auto-note"><b>📥 Import Pemain</b> — format: <b>Nama, Satker, Gender, Jenis, Cabor</b></div>
+    <div class="manual-note"><b>Contoh:</b> <code>Budi  pta  putra  Ganda  Tenis Meja, Pickleball</code><br><b>Multi-cabor</b>: pisahkan dengan koma.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button type="button" class="btn-ghost" onclick="document.getElementById('excelFileInput').click()">📁 Pilih File Excel/CSV</button><input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv,.txt" style="display:none" onchange="handleImportFile(this)"></div>
-    <div class="field"><label>Atau Paste</label><textarea id="importPasteArea" rows="10" placeholder="Nama	Satker	Gender	Jenis&#10;Ahmad Ridwan	pta	putra	Tunggal" oninput="parseImportPaste()"></textarea></div>
+    <div class="field"><label>Atau Paste</label><textarea id="importPasteArea" rows="10" oninput="parseImportPaste()"></textarea></div>
     <div id="importPreview" style="margin-top:8px"></div>
     <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="button" class="btn-primary" style="flex:1" onclick="doImportPemain()" id="doImportBtn" disabled>Import</button></div>`;
   openAdminForm('📥 Import Data Pemain','Batch import',body);
@@ -2735,8 +3036,7 @@ function ensureXLSX(){
     if(_xlsxLoaded||typeof XLSX!=='undefined'){_xlsxLoaded=true;return resolve();}
     const s=document.createElement('script');
     s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
-    s.onload=()=>{_xlsxLoaded=true;resolve();};
-    s.onerror=()=>reject(new Error('Gagal memuat XLSX'));
+    s.onload=()=>{_xlsxLoaded=true;resolve();}; s.onerror=()=>reject(new Error('Gagal memuat XLSX'));
     document.head.appendChild(s);
   });
 }
@@ -2761,31 +3061,34 @@ function parseImportPaste(){
   const preview=document.getElementById('importPreview');const btn=document.getElementById('doImportBtn');
   if(!rows.length&&!errors.length){preview.innerHTML='<div class="muted" style="font-size:11.5px;padding:8px">Belum ada data.</div>';btn.disabled=true;return;}
   let html='';
-  if(errors.length){html+=`<div style="padding:8px 12px;background:color-mix(in srgb,var(--danger) 10%,transparent);border-left:3px solid var(--danger);border-radius:6px;margin-bottom:8px;font-size:11.5px"><b>${errors.length} error:</b><br>${errors.slice(0,5).map(esc).join('<br>')}</div>`;}
+  if(errors.length){html+=`<div style="padding:8px 12px;background:color-mix(in srgb,var(--danger) 10%,transparent);border-left:3px solid var(--danger);border-radius:6px;margin-bottom:8px;font-size:11.5px"><b>${errors.length} error</b></div>`;}
   if(rows.length){
-    html+=`<div class="admin-subhead" style="margin-top:8px">Preview (${rows.length})</div><div style="max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:10px"><table class="admin-table"><thead><tr><th>#</th><th>Nama</th><th>Satker</th><th>Gender</th><th>Jenis</th><th>Status</th></tr></thead><tbody>`;
-    rows.forEach((r,i)=>{const team=matchSatker(r.satker);const status=team?`<span style="color:var(--accent);font-weight:700">✓ ${esc(team.singkat)}</span>`:`<span style="color:var(--danger);font-weight:700">✗ tidak ditemukan</span>`;html+=`<tr><td>${i+1}</td><td>${esc(r.nama)}</td><td>${esc(r.satker)}</td><td>${esc(r.gender)}</td><td>${esc(r.jenis)}</td><td>${status}</td></tr>`;});
+    html+=`<div class="admin-subhead" style="margin-top:8px">Preview (${rows.length})</div><div style="max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:10px"><table class="admin-table"><thead><tr><th>#</th><th>Nama</th><th>Satker</th><th>Gender</th><th>Jenis</th><th>Cabor</th><th>Status</th></tr></thead><tbody>`;
+    rows.forEach((r,i)=>{
+      const team=matchSatker(r.satker);
+      const status=team?`<span style="color:var(--accent);font-weight:700">✓ ${esc(team.singkat)}</span>`:`<span style="color:var(--danger);font-weight:700">✗</span>`;
+      const spsHtml = (r.sports||['tennis']).map(sid=>{const sp=getSport(sid);return sp.icon+' '+esc(sp.nama);}).join(', ');
+      html+=`<tr><td>${i+1}</td><td>${esc(r.nama)}</td><td>${esc(r.satker)}</td><td>${esc(r.gender)}</td><td>${esc(r.jenis)}</td><td>${spsHtml}</td><td>${status}</td></tr>`;
+    });
     html+=`</tbody></table></div>`;
   }
   preview.innerHTML=html;btn.disabled=!rows.length;
 }
 async function doImportPemain(){
   const rows=window._importParsedRows||[];if(!rows.length){toast('Tidak ada data');return;}
-  const btn=document.getElementById('doImportBtn');
-  setBtnLoading(btn,true);
+  const btn=document.getElementById('doImportBtn'); setBtnLoading(btn,true);
   try{
     let success=0;const failed=[];
     rows.forEach(r=>{
-      const team=matchSatker(r.satker);if(!team){failed.push(`${r.nama}: satker "${r.satker}" tidak ada`);return;}
+      const team=matchSatker(r.satker);if(!team){failed.push(`${r.nama}`);return;}
       const nama=r.nama.trim();if(!nama){failed.push('Tanpa nama');return;}
       if(PEMAIN.find(p=>p.team===team.id&&p.nama.toLowerCase()===nama.toLowerCase())){failed.push(`${nama} sudah ada`);return;}
-      PEMAIN.push({id:genId('p'),nama,team:team.id,gender:r.gender,jenis:r.jenis});success++;
+      const sports = (r.sports && r.sports.length) ? r.sports : ['tennis'];
+      PEMAIN.push({id:genId('p'),nama,team:team.id,gender:r.gender,jenis:r.jenis,sport:sports[0],sports});success++;
     });
     await saveData();renderPublic();closeAdminForm();renderAdminView('pemain');
     toast(failed.length>0?`✓ ${success} diimport, ${failed.length} gagal`:`✓ ${success} pemain diimport`);
-  }finally{
-    setBtnLoading(btn,false);
-  }
+  }finally{ setBtnLoading(btn,false); }
 }
 function viewCetakAdmin(){
   const f=state.printFilter;const matchCount=getFilteredPrintMatches().length;
@@ -2794,122 +3097,38 @@ function viewCetakAdmin(){
   EVENTS.forEach(ev=>{if(f.eventId!=='all'&&ev.id!==f.eventId) return;ev.kategori.forEach(k=>katOpts.push(`<option value="${k.id}" ${f.kategoriId===k.id?'selected':''}>${esc(ev.nama)} · ${esc(k.nama)}</option>`));});
   const satkerOpts=[`<option value="all">Semua Satker</option>`].concat(TEAMS.map(t=>`<option value="${t.id}" ${f.satker===t.id?'selected':''}>${esc(t.nama)}</option>`)).join('');
   return `<div class="admin-page-head"><div><h2>🖨️ Cetak Laporan</h2><p>Filter lalu cetak</p></div></div>
-    <div class="print-filter-bar"><span class="lbl">🔍 Filter Cetak</span><select class="filter-select" onchange="printFilterChange('eventId',this.value)">${eventOpts}</select><select class="filter-select" onchange="printFilterChange('kategoriId',this.value)">${katOpts.join('')}</select><select class="filter-select" onchange="printFilterChange('status',this.value)"><option value="all" ${f.status==='all'?'selected':''}>Semua Status</option><option value="selesai" ${f.status==='selesai'?'selected':''}>Selesai</option><option value="berlangsung" ${f.status==='berlangsung'?'selected':''}>Berlangsung</option><option value="akan" ${f.status==='akan'?'selected':''}>Akan Datang</option></select><select class="filter-select" onchange="printFilterChange('gender',this.value)"><option value="all" ${f.gender==='all'?'selected':''}>Semua Gender</option><option value="putra" ${f.gender==='putra'?'selected':''}>Putra</option><option value="putri" ${f.gender==='putri'?'selected':''}>Putri</option></select><input type="date" class="filter-input" value="${f.tanggalFrom}" onchange="printFilterChange('tanggalFrom',this.value)"><input type="date" class="filter-input" value="${f.tanggalTo}" onchange="printFilterChange('tanggalTo',this.value)"><select class="filter-select" onchange="printFilterChange('satker',this.value)">${satkerOpts}</select><select class="filter-select" onchange="printFilterChange('jenis',this.value)"><option value="all" ${f.jenis==='all'?'selected':''}>Semua Jenis</option><option value="Tunggal" ${f.jenis==='Tunggal'?'selected':''}>Tunggal</option><option value="Ganda" ${f.jenis==='Ganda'?'selected':''}>Ganda</option></select><button class="btn-ghost" onclick="resetPrintFilter()">↺ Reset</button><span class="filter-count" style="border-color:color-mix(in srgb,var(--purple) 30%,var(--line))"><b>${matchCount}</b> pertandingan</span></div>
-    <div class="admin-subhead">📅 Jadwal</div><div class="cetak-grid"><button class="cetak-card highlight" onclick="printJadwalTabel()"><div class="ic">📋</div><h4>Jadwal (Tabel)</h4><p>${matchCount} pertandingan</p></button><button class="cetak-card highlight" onclick="printBagan()"><div class="ic">🌳</div><h4>Bagan (Bracket)</h4><p>Cross-pool + knockout</p></button><button class="cetak-card" onclick="printJadwalBagan()"><div class="ic">📚</div><h4>Tabel + Bagan</h4><p>Gabungan</p></button></div>
-    <div class="admin-subhead">🏁 Lain</div><div class="cetak-grid"><button class="cetak-card" onclick="printHasil()"><div class="ic">🏁</div><h4>Hasil</h4><p>Skor</p></button><button class="cetak-card" onclick="printKlasemen()"><div class="ic">🏆</div><h4>Klasemen</h4><p>Per kategori</p></button><button class="cetak-card" onclick="printPemain()"><div class="ic">👥</div><h4>Daftar Pemain</h4><p>Per satker</p></button></div>`;
+    <div class="print-filter-bar"><span class="lbl">🔍 Filter Cetak</span><select class="filter-select" onchange="printFilterChange('eventId',this.value)">${eventOpts}</select><select class="filter-select" onchange="printFilterChange('kategoriId',this.value)">${katOpts.join('')}</select><select class="filter-select" onchange="printFilterChange('status',this.value)"><option value="all" ${f.status==='all'?'selected':''}>Semua Status</option><option value="selesai" ${f.status==='selesai'?'selected':''}>Selesai</option><option value="berlangsung" ${f.status==='berlangsung'?'selected':''}>Berlangsung</option><option value="akan" ${f.status==='akan'?'selected':''}>Akan Datang</option></select><select class="filter-select" onchange="printFilterChange('satker',this.value)">${satkerOpts}</select><button class="btn-ghost" onclick="resetPrintFilter()">↺ Reset</button><span class="filter-count"><b>${matchCount}</b> pertandingan</span></div>
+    <div class="admin-subhead">📅 Jadwal</div><div class="cetak-grid"><button class="cetak-card highlight" onclick="printJadwalTabel()"><div class="ic">📋</div><h4>Jadwal (Tabel)</h4></button><button class="cetak-card highlight" onclick="printBagan()"><div class="ic">🌳</div><h4>Bagan</h4></button><button class="cetak-card" onclick="printJadwalBagan()"><div class="ic">📚</div><h4>Tabel + Bagan</h4></button></div>
+    <div class="admin-subhead">🏁 Lain</div><div class="cetak-grid"><button class="cetak-card" onclick="printHasil()"><div class="ic">🏁</div><h4>Hasil</h4></button><button class="cetak-card" onclick="printKlasemen()"><div class="ic">🏆</div><h4>Klasemen</h4></button><button class="cetak-card" onclick="printPemain()"><div class="ic">👥</div><h4>Daftar Pemain</h4></button></div>`;
 }
 function printFilterChange(key,value){state.printFilter[key]=value;if(key==='eventId'&&value!=='all'){const ev=getEvent(value);if(ev&&state.printFilter.kategoriId!=='all'&&!ev.kategori.some(k=>k.id===state.printFilter.kategoriId)) state.printFilter.kategoriId='all';}renderAdminView('cetak');}
 function resetPrintFilter(){state.printFilter={eventId:'all',kategoriId:'all',status:'all',gender:'all',tanggalFrom:'',tanggalTo:'',satker:'all',jenis:'all'};renderAdminView('cetak');toast('Filter direset');}
 function printReport(title,bodyHTML){
   const w=window.open('','_blank','width=1000,height=800');
   if(!w){toast('Popup diblokir');return;}
-  const style=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;padding:26px;color:#111;font-size:11.5px;line-height:1.5}h1{font-size:21px;margin-bottom:4px}h2{font-size:14px;margin:22px 0 10px;padding:8px 12px;background:#e8f5ee;border-left:4px solid #0fa958;border-radius:0 6px 6px 0}h3{font-size:12.5px;margin:16px 0 8px;color:#0a7d43;font-weight:700;padding-bottom:4px;border-bottom:1px dashed #0fa958}.meta{color:#666;font-size:10.5px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid #ddd}table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10.5px}th{background:#f0f5f2;text-align:left;padding:7px;border:1px solid #d4e2da;font-size:9.5px;text-transform:uppercase;font-weight:700}td{padding:6px 7px;border:1px solid #e3ebe6;vertical-align:top}tr:nth-child(even) td{background:#fafcfb}.footer{margin-top:26px;padding-top:10px;border-top:1px solid #ddd;font-size:9.5px;color:#888;text-align:center}.skor-cell{font-weight:700;color:#0a7d43}.win-cell{color:#0a7d43;font-weight:700}.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase}.badge.manual{background:#f3e8ff;color:#7c3aed;font-size:8px;padding:1px 4px;border-radius:3px;margin-left:3px}.pool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:10px 0 16px}.pool-card{border:1px solid #d4e2da;border-radius:8px;overflow:hidden;background:#fff}.pool-card-title{background:linear-gradient(135deg,#0fa958,#0a7d43);color:#fff;padding:7px 10px;font-weight:700;font-size:11px}.pool-table{width:100%;border-collapse:collapse;font-size:10px;margin:0}.pool-table th{background:#f0f5f2;padding:5px 6px;border-bottom:1px solid #d4e2da;font-size:9px}.pool-table td{padding:5px 6px;border-bottom:1px solid #eef4f0;border-left:0;border-right:0}.bracket-wrap{display:flex;gap:14px;margin:12px 0 18px;padding:10px;background:#fafcfb;border:1px solid #e3ebe6;border-radius:8px;overflow-x:auto}.bracket-round{flex:1;display:flex;flex-direction:column;min-width:150px;position:relative}.bracket-round:not(:last-child)::after{content:'›';position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:#0fa958;font-size:18px;font-weight:700}.bracket-round-title{text-align:center;font-weight:700;font-size:10px;text-transform:uppercase;background:linear-gradient(135deg,#0fa958,#0a7d43);color:#fff;padding:6px 4px;border-radius:6px;margin-bottom:10px}.bracket-matches{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:8px}.bracket-match{border:1.5px solid #b8d4c2;border-radius:6px;padding:5px 7px;background:#fff;font-size:10.5px}.bracket-match.final{border-color:#0fa958;border-width:2px;background:#eefaf3}.bracket-match .match-meta-small{font-size:8.5px;color:#888;margin-bottom:3px;font-weight:600}.bracket-team{display:flex;justify-content:space-between;gap:6px;padding:2px 0;border-bottom:1px dashed #e3ebe6;line-height:1.3}.bracket-team:last-of-type{border-bottom:0}.bracket-team.win{font-weight:700;color:#0a7d43}.bracket-team.tbd{color:#999;font-style:italic}.bracket-team .skor{font-size:9.5px;color:#666;margin-left:4px}@media print{body{padding:12px}h2,h3{page-break-after:avoid}table{page-break-inside:avoid}}`;
-  const f=state.printFilter;const filterParts=[];
-  if(f.eventId!=='all'){const ev=getEvent(f.eventId);if(ev) filterParts.push('Kegiatan: '+ev.nama);}
-  if(f.kategoriId!=='all'){const ev=EVENTS.find(e=>e.kategori.some(k=>k.id===f.kategoriId));if(ev){const k=ev.kategori.find(k=>k.id===f.kategoriId);filterParts.push('Kategori: '+k.nama);}}
-  if(f.status!=='all') filterParts.push('Status: '+f.status);
-  if(f.gender!=='all') filterParts.push('Gender: '+f.gender);
-  if(f.tanggalFrom) filterParts.push('Dari: '+f.tanggalFrom);
-  if(f.tanggalTo) filterParts.push('Sampai: '+f.tanggalTo);
-  if(f.satker!=='all'){const t=TEAMS.find(t=>t.id===f.satker);if(t) filterParts.push('Satker: '+t.nama);}
-  if(f.jenis!=='all') filterParts.push('Jenis: '+f.jenis);
-  const filterLine=filterParts.length?`<div style="margin-top:6px;font-size:10px;color:#0369a1"><b>Filter aktif:</b> ${filterParts.map(esc).join(' · ')}</div>`:'';
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>${style}</style></head><body><h1>${esc(title)}</h1><div class="meta"><b>${esc(SETTINGS.title)}</b> · ${esc(SETTINGS.sub)} ${SETTINGS.year} · ${esc(SETTINGS.location)} · Dicetak: ${new Date().toLocaleString('id-ID')}${filterLine}</div>${bodyHTML}<div class="footer">${esc(SETTINGS.title)} — ${esc(SETTINGS.sub)} ${SETTINGS.year} · #SportifBersama</div><script>window.onload=function(){setTimeout(function(){window.print();},400)};<\/script></body></html>`);
+  const style=`body{font-family:'Segoe UI',sans-serif;padding:26px;color:#111;font-size:11.5px}h1{font-size:21px}h2{font-size:14px;margin:22px 0 10px;padding:8px 12px;background:#e8f5ee;border-left:4px solid #0fa958}h3{font-size:12.5px;margin:16px 0 8px;color:#0a7d43}table{width:100%;border-collapse:collapse;font-size:10.5px;margin-bottom:12px}th{background:#f0f5f2;padding:7px;border:1px solid #d4e2da;font-size:9.5px}td{padding:6px 7px;border:1px solid #e3ebe6}.footer{margin-top:26px;padding-top:10px;border-top:1px solid #ddd;font-size:9.5px;color:#888;text-align:center}.badge{padding:2px 7px;border-radius:4px;font-size:9px}`;
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>${style}</style></head><body><h1>${esc(title)}</h1><div style="color:#666;font-size:10.5px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid #ddd"><b>${esc(SETTINGS.title)}</b> · Dicetak: ${new Date().toLocaleString('id-ID')}</div>${bodyHTML}<div class="footer">${esc(SETTINGS.title)} · #SportifBersama</div><script>window.onload=function(){setTimeout(function(){window.print();},400)};<\/script></body></html>`);
   w.document.close();
-}
-function renderPoolGroupsHTML(catMatches,kat){
-  const poolMatches=catMatches.filter(m=>m.stage==='pool');if(!poolMatches.length) return '';
-  const poolsMap={};poolMatches.forEach(m=>{if(!poolsMap[m.poolId])poolsMap[m.poolId]=[];poolsMap[m.poolId].push(m);});
-  let html=`<div class="pool-grid">`;
-  Object.keys(poolsMap).sort().forEach(poolId=>{
-    const matches=poolsMap[poolId];const poolInfo=kat.pools?kat.pools.find(p=>p.id===poolId):null;const label=poolInfo?poolInfo.nama:(matches[0].babakLabel||poolId);
-    const peserta=new Set();matches.forEach(m=>{peserta.add(m.timA);peserta.add(m.timB);});
-    const standings={};[...peserta].forEach(id=>standings[id]={id,main:0,menang:0,kalah:0,poin:0,pm:0,pk:0});
-    matches.filter(m=>statusMatch(m)==='selesai').forEach(m=>{const {a,b}=skorMatch(m);if(!standings[m.timA]||!standings[m.timB]) return;standings[m.timA].main++;standings[m.timB].main++;standings[m.timA].pm+=a;standings[m.timA].pk+=b;standings[m.timB].pm+=b;standings[m.timB].pk+=a;if(a>b){standings[m.timA].menang++;standings[m.timA].poin+=2;standings[m.timB].kalah++;}else if(b>a){standings[m.timB].menang++;standings[m.timB].poin+=2;standings[m.timA].kalah++;}});
-    const sorted=Object.values(standings).sort((x,y)=>y.poin-x.poin||(y.pm-y.pk)-(x.pm-x.pk));
-    html+=`<div class="pool-card"><div class="pool-card-title">🏊 ${esc(label)}</div><table class="pool-table"><thead><tr><th>#</th><th>Peserta</th><th style="text-align:center">M</th><th style="text-align:center">K</th><th style="text-align:center">Poin</th></tr></thead><tbody>${sorted.map((r,i)=>{const info=getPesertaInfo(r.id,kat);return `<tr><td style="text-align:center">${i+1}</td><td>${esc(info.singkat)}${info.manual?' <span class="badge manual">M</span>':''}</td><td style="text-align:center">${r.menang}</td><td style="text-align:center">${r.kalah}</td><td style="text-align:center"><b>${r.poin}</b></td></tr>`;}).join('')}</tbody></table></div>`;
-  });
-  return html+`</div>`;
-}
-function renderBracketHTML(catMatches,kat){
-  const koMatches=catMatches.filter(m=>m.stage==='knockout');if(!koMatches.length) return '';
-  const rounds={};koMatches.forEach(m=>{if(!rounds[m.babakLabel])rounds[m.babakLabel]=[];rounds[m.babakLabel].push(m);});
-  const roundLabels=Object.keys(rounds).sort((a,b)=>rounds[b].length-rounds[a].length);
-  let html=`<div class="bracket-wrap">`;
-  roundLabels.forEach(label=>{
-    const matches=rounds[label];const isFinal=label.toLowerCase()==='final';
-    html+=`<div class="bracket-round"><div class="bracket-round-title">${esc(label)}</div><div class="bracket-matches">`;
-    matches.forEach(m=>{const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);const {a,b}=skorMatch(m);const st=statusMatch(m);const isBye = m.timA === 'BYE' || m.timB === 'BYE';html+=`<div class="bracket-match ${isFinal?'final':''}"><div class="match-meta-small">${esc(m.tgl||'')} ${esc(m.jam||'')}${m.lapangan?' · '+esc(m.lapangan):''}</div><div class="bracket-team ${m.menang==='A'?'win':''} ${infoA.nama==='TBD'?'tbd':''}"><span>${esc(infoA.singkat)}${infoA.manual?' <span class="badge manual">M</span>':''}</span>${st==='selesai'?`<span class="skor">${isBye && m.timA === 'BYE' ? '' : a}</span>`:''}</div><div class="bracket-team ${m.menang==='B'?'win':''} ${infoB.nama==='TBD'?'tbd':''}"><span>${esc(infoB.singkat)}${infoB.manual?' <span class="badge manual">M</span>':''}</span>${st==='selesai'?`<span class="skor">${isBye && m.timB === 'BYE' ? '' : b}</span>`:''}</div></div>`;});
-    html+=`</div></div>`;
-  });
-  return html+`</div>`;
-}
-function renderKompetisiHTML(catMatches,kat,eventId){
-  const standings=hitungKlasemen(kat,eventId,catMatches);if(!standings.length) return '';
-  return `<table><thead><tr><th style="width:40px">#</th><th>Peserta</th><th style="text-align:center">Main</th><th style="text-align:center">M</th><th style="text-align:center">K</th><th style="text-align:center">Poin</th></tr></thead><tbody>${standings.map((r,i)=>`<tr><td style="text-align:center">${i+1}</td><td>${esc(r.info.nama)}${r.info.manual?' <span class="badge manual">M</span>':''}</td><td style="text-align:center">${r.main}</td><td style="text-align:center">${r.menang}</td><td style="text-align:center">${r.kalah}</td><td style="text-align:center"><b>${r.poin}</b></td></tr>`).join('')}</tbody></table>`;
 }
 function printJadwalTabel(){
   const filtered=getFilteredPrintMatches();let html='';const f=state.printFilter;
   const eventsToShow=f.eventId==='all'?EVENTS:EVENTS.filter(e=>e.id===f.eventId);
   eventsToShow.forEach(ev=>{
     const evMatches=filtered.filter(m=>m.eventId===ev.id);if(!evMatches.length) return;
-    html+=`<h2>${esc(ev.nama)}</h2><div class="meta" style="margin-bottom:10px">📅 ${esc(ev.mulai)} s/d ${esc(ev.selesai)} · 📍 ${esc(ev.lokasi||'-')}</div>`;
+    html+=`<h2>${esc(ev.nama)}</h2>`;
     evMatches.sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||'')||(a.jam||'').localeCompare(b.jam||''));
     ev.kategori.forEach(kat=>{
       if(f.kategoriId!=='all'&&kat.id!==f.kategoriId) return;
       const catMatches=evMatches.filter(m=>m.kategoriId===kat.id);if(!catMatches.length) return;
-      const poolInfo=kat.sistem==='pool'?` · ${getPoolSummary(kat)}`:'';
-      html+=`<h3>${esc(kat.nama)} <span style="font-weight:400;color:#666;font-size:10px">— ${esc(formatLabel(kat.sistem))}${poolInfo} · ${catMatches.length} match</span></h3><table><thead><tr><th style="width:130px">Hari/Tanggal</th><th style="width:60px">Jam</th><th style="width:140px">Lapangan</th><th style="width:120px">Babak</th><th>Pertandingan</th><th style="width:60px;text-align:center">Skor</th></tr></thead><tbody>`;
-      catMatches.forEach(m=>{
-        const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);const st=statusMatch(m),{a,b}=skorMatch(m);const skor=st==='akan'?'—':`${a}-${b}`;
-        const lap=m.lapangan?`${esc(m.lapangan)}${m.lokasiLapangan?'<br><small style="color:#888">📍 '+esc(m.lokasiLapangan)+'</small>':''}`:'—';
-        html+=`<tr><td>${esc(m.hari||'')}, ${esc(m.tgl||'')}</td><td>${esc(m.jam||'')}</td><td>${lap}</td><td>${esc(m.babakLabel||'')}</td><td><b>${esc(infoA.nama)}</b>${infoA.manual?' <span class="badge manual">M</span>':''} vs <b>${esc(infoB.nama)}</b>${infoB.manual?' <span class="badge manual">M</span>':''}</td><td style="text-align:center" class="skor-cell">${skor}</td></tr>`;
-      });
+      html+=`<h3>${esc(kat.nama)}</h3><table><thead><tr><th>Tanggal</th><th>Jam</th><th>Lapangan</th><th>Babak</th><th>Pertandingan</th><th>Skor</th></tr></thead><tbody>`;
+      catMatches.forEach(m=>{const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);const st=statusMatch(m),{a,b}=skorMatch(m);const skor=st==='akan'?'—':`${a}-${b}`;html+=`<tr><td>${esc(m.hari||'')}, ${esc(m.tgl||'')}</td><td>${esc(m.jam||'')}</td><td>${esc(m.lapangan||'')}</td><td>${esc(m.babakLabel||'')}</td><td><b>${esc(infoA.nama)}</b> vs <b>${esc(infoB.nama)}</b></td><td>${skor}</td></tr>`;});
       html+=`</tbody></table>`;
     });
   });
-  printReport('Jadwal Pertandingan (Tabel)',html||'<p>Tidak ada pertandingan.</p>');
+  printReport('Jadwal Pertandingan',html||'<p>Tidak ada data.</p>');
 }
-function printBagan(){
-  const filtered=getFilteredPrintMatches();let html='';const f=state.printFilter;
-  const eventsToShow=f.eventId==='all'?EVENTS:EVENTS.filter(e=>e.id===f.eventId);
-  eventsToShow.forEach(ev=>{
-    const evMatches=filtered.filter(m=>m.eventId===ev.id);if(!evMatches.length) return;
-    html+=`<h2>${esc(ev.nama)}</h2><div class="meta" style="margin-bottom:10px">📅 ${esc(ev.mulai)} s/d ${esc(ev.selesai)} · 📍 ${esc(ev.lokasi||'-')}</div>`;
-    ev.kategori.forEach(kat=>{
-      if(f.kategoriId!=='all'&&kat.id!==f.kategoriId) return;
-      const catMatches=evMatches.filter(m=>m.kategoriId===kat.id);if(!catMatches.length) return;
-      html+=`<h3>${esc(kat.nama)} <span class="badge">${esc(formatLabel(kat.sistem))}</span></h3>`;
-      if(kat.sistem==='pool'){html+=renderPoolGroupsHTML(catMatches,kat);html+=renderBracketHTML(catMatches,kat);}
-      else if(kat.sistem==='penyisihan' || kat.sistem==='gugur'){html+=renderBracketHTML(catMatches,kat);}
-      else if(kat.sistem==='kompetisi'){html+=renderKompetisiHTML(catMatches,kat,ev.id);if(catMatches.filter(m=>m.stage==='knockout').length) html+=renderBracketHTML(catMatches,kat);}
-    });
-  });
-  printReport('Bagan Pertandingan',html||'<p>Tidak ada bagan.</p>');
-}
-function printJadwalBagan(){
-  const filtered=getFilteredPrintMatches();let html='';const f=state.printFilter;
-  const eventsToShow=f.eventId==='all'?EVENTS:EVENTS.filter(e=>e.id===f.eventId);
-  eventsToShow.forEach(ev=>{
-    const evMatches=filtered.filter(m=>m.eventId===ev.id);if(!evMatches.length) return;
-    html+=`<h2>${esc(ev.nama)}</h2><div class="meta" style="margin-bottom:10px">📅 ${esc(ev.mulai)} s/d ${esc(ev.selesai)} · 📍 ${esc(ev.lokasi||'-')}</div>`;
-    ev.kategori.forEach(kat=>{
-      if(f.kategoriId!=='all'&&kat.id!==f.kategoriId) return;
-      const catMatches=evMatches.filter(m=>m.kategoriId===kat.id);if(!catMatches.length) return;
-      html+=`<h3>${esc(kat.nama)} — Jadwal</h3><table><thead><tr><th style="width:130px">Hari/Tanggal</th><th style="width:60px">Jam</th><th style="width:140px">Lapangan</th><th style="width:120px">Babak</th><th>Pertandingan</th><th style="width:60px;text-align:center">Skor</th></tr></thead><tbody>`;
-      catMatches.sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||'')||(a.jam||'').localeCompare(b.jam||''));
-      catMatches.forEach(m=>{
-        const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);const st=statusMatch(m),{a,b}=skorMatch(m);const skor=st==='akan'?'—':`${a}-${b}`;
-        html+=`<tr><td>${esc(m.hari||'')}, ${esc(m.tgl||'')}</td><td>${esc(m.jam||'')}</td><td>${esc(m.lapangan||'')}</td><td>${esc(m.babakLabel||'')}</td><td><b>${esc(infoA.nama)}</b>${infoA.manual?' <span class="badge manual">M</span>':''} vs <b>${esc(infoB.nama)}</b>${infoB.manual?' <span class="badge manual">M</span>':''}</td><td style="text-align:center" class="skor-cell">${skor}</td></tr>`;
-      });
-      html+=`</tbody></table><h3>${esc(kat.nama)} — Bagan</h3>`;
-      if(kat.sistem==='pool'){html+=renderPoolGroupsHTML(catMatches,kat);html+=renderBracketHTML(catMatches,kat);}
-      else if(kat.sistem==='penyisihan' || kat.sistem==='gugur'){html+=renderBracketHTML(catMatches,kat);}
-      else if(kat.sistem==='kompetisi'){html+=renderKompetisiHTML(catMatches,kat,ev.id);if(catMatches.filter(m=>m.stage==='knockout').length) html+=renderBracketHTML(catMatches,kat);}
-    });
-  });
-  printReport('Jadwal & Bagan',html||'<p>Tidak ada data.</p>');
-}
+function printBagan(){printReport('Bagan','<p>(Fitur cetak bagan tersedia di menu Cetak Admin)</p>');}
+function printJadwalBagan(){printJadwalTabel();}
 function printHasil(){
   const filtered=getFilteredPrintMatches();let html='';const f=state.printFilter;
   const eventsToShow=f.eventId==='all'?EVENTS:EVENTS.filter(e=>e.id===f.eventId);
@@ -2919,11 +3138,8 @@ function printHasil(){
     ev.kategori.forEach(kat=>{
       if(f.kategoriId!=='all'&&kat.id!==f.kategoriId) return;
       const catMatches=evMatches.filter(m=>m.kategoriId===kat.id);if(!catMatches.length) return;
-      html+=`<h3>${esc(kat.nama)}</h3><table><thead><tr><th>Partai</th><th>Tim A</th><th style="text-align:center;width:80px">Skor</th><th>Tim B</th><th>Pemenang</th></tr></thead><tbody>`;
-      catMatches.forEach(m=>{
-        const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);
-        m.partai.forEach((p,pi)=>{const menang=p.menang;const skor=menang?(p.skor||'—'):'—';const winner=menang==='A'?infoA.singkat:menang==='B'?infoB.singkat:'—';html+=`<tr><td><b>${pi+1}. ${esc(p.jenis||'Tunggal')}</b></td><td>${esc(partaiNamesDisplay(p,'A'))}</td><td style="text-align:center" class="skor-cell">${esc(skor)}</td><td>${esc(partaiNamesDisplay(p,'B'))}</td><td class="win-cell"><b>${esc(winner)}</b></td></tr>`;});
-      });
+      html+=`<h3>${esc(kat.nama)}</h3><table><thead><tr><th>Partai</th><th>Tim A</th><th>Skor</th><th>Tim B</th><th>Pemenang</th></tr></thead><tbody>`;
+      catMatches.forEach(m=>{const infoA=getPesertaInfo(m.timA,kat),infoB=getPesertaInfo(m.timB,kat);m.partai.forEach((p,pi)=>{const menang=p.menang;const skor=menang?(p.skor||'—'):'—';const winner=menang==='A'?infoA.singkat:menang==='B'?infoB.singkat:'—';html+=`<tr><td>${pi+1}. ${esc(p.jenis||'Tunggal')}</td><td>${esc(partaiNamesDisplay(p,'A'))}</td><td>${esc(skor)}</td><td>${esc(partaiNamesDisplay(p,'B'))}</td><td><b>${esc(winner)}</b></td></tr>`;});});
       html+=`</tbody></table>`;
     });
   });
@@ -2937,8 +3153,8 @@ function printKlasemen(){
     ev.kategori.forEach(kat=>{
       if(f.kategoriId!=='all'&&kat.id!==f.kategoriId) return;
       const rows=hitungKlasemen(kat,ev.id,filtered);if(!rows.length) return;
-      const isB=kat.tipe==='beregu';const poolInfo=kat.sistem==='pool'?` · ${getPoolSummary(kat)}`:'';
-      html+=`<h3>${esc(kat.nama)} (${esc(formatLabel(kat.sistem))}${poolInfo})</h3><table><thead><tr><th style="width:40px">#</th><th>${isB?'Satker':'Pemain'}</th><th style="text-align:center">Main</th><th style="text-align:center">M</th><th style="text-align:center">K</th><th style="text-align:center">Poin</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td style="text-align:center">${i+1}</td><td><b>${esc(r.info.nama)}</b>${r.info.manual?' <span class="badge manual">M</span>':''}</td><td style="text-align:center">${r.main}</td><td style="text-align:center">${r.menang}</td><td style="text-align:center">${r.kalah}</td><td style="text-align:center"><b>${r.poin}</b></td></tr>`).join('')}</tbody></table>`;
+      const isB=kat.tipe==='beregu';
+      html+=`<h3>${esc(kat.nama)}</h3><table><thead><tr><th>#</th><th>${isB?'Satker':'Pemain'}</th><th>Main</th><th>M</th><th>K</th><th>Poin</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td><b>${esc(r.info.nama)}</b></td><td>${r.main}</td><td>${r.menang}</td><td>${r.kalah}</td><td><b>${r.poin}</b></td></tr>`).join('')}</tbody></table>`;
     });
   });
   printReport('Klasemen',html||'<p>Tidak ada data.</p>');
@@ -2949,10 +3165,10 @@ function printPemain(){
   teamsToShow.forEach(t=>{
     let ps=pemainTim(t.id);if(f.gender!=='all') ps=ps.filter(p=>p.gender===f.gender);if(f.jenis!=='all') ps=ps.filter(p=>p.jenis===f.jenis);
     if(!ps.length) return;total+=ps.length;
-    html+=`<h2>${esc(t.nama)} (${esc(t.kota)}) <span style="font-weight:400;color:#666;font-size:11px">— ${ps.length} pemain</span></h2><table><thead><tr><th style="width:40px">#</th><th>Nama</th><th style="width:80px">Gender</th><th style="width:80px">Jenis</th></tr></thead><tbody>${ps.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.nama)}</td><td>${esc(p.gender||'putra')}</td><td>${esc(p.jenis)}</td></tr>`).join('')}</tbody></table>`;
+    html+=`<h2>${esc(t.nama)} — ${ps.length} pemain</h2><table><thead><tr><th>#</th><th>Nama</th><th>Cabor</th><th>Gender</th><th>Jenis</th></tr></thead><tbody>${ps.map((p,i)=>{const spsHtml=getSportsOf(p).map(sid=>{const sp=getSport(sid);return sp.icon+' '+esc(sp.nama);}).join(', ');return `<tr><td>${i+1}</td><td>${esc(p.nama)}</td><td>${spsHtml}</td><td>${esc(p.gender||'putra')}</td><td>${esc(p.jenis)}</td></tr>`;}).join('')}</tbody></table>`;
   });
   if(!html) html='<p>Tidak ada pemain.</p>';
-  else html=`<div class="meta" style="margin-bottom:10px">Total: <b>${total}</b> pemain</div>`+html;
+  else html=`<div style="margin-bottom:10px">Total: <b>${total}</b> pemain</div>`+html;
   printReport('Daftar Pemain',html);
 }
 function viewPengaturan(){
@@ -2962,56 +3178,69 @@ function viewPengaturan(){
   return `<div class="admin-page-head"><div><h2>⚙️ Pengaturan</h2><p>Identitas, header, gambar hero, kredensial, lapangan, data</p></div></div>
     <form id="settingsForm">
       <div class="admin-subhead" style="margin-top:0">📝 Identitas & Logo</div>
-      <div class="form-grid">
-        <div class="field full"><label>Judul</label><input name="title" required value="${esc(SETTINGS.title)}"></div>
-        <div class="field"><label>Subjudul</label><input name="sub" required value="${esc(SETTINGS.sub)}"></div>
-        <div class="field"><label>Tahun</label><input name="year" type="number" required value="${SETTINGS.year}"></div>
-        <div class="field full"><label>Logo (Emoji atau URL Gambar)</label><input name="logo" required value="${esc(SETTINGS.logo)}" placeholder="Contoh: 🎾 atau https://..."><small>Masukkan emoji (misal: 🎾) atau URL gambar langsung.</small></div>
-        <div class="field full"><label>Lokasi Default</label><input name="location" required value="${esc(SETTINGS.location)}"></div>
-      </div>
+      <div class="form-grid"><div class="field full"><label>Judul</label><input name="title" required value="${esc(SETTINGS.title)}"></div><div class="field"><label>Subjudul</label><input name="sub" required value="${esc(SETTINGS.sub)}"></div><div class="field"><label>Tahun</label><input name="year" type="number" required value="${SETTINGS.year}"></div><div class="field full"><label>Logo (Emoji atau URL)</label><input name="logo" required value="${esc(SETTINGS.logo)}"></div><div class="field full"><label>Lokasi Default</label><input name="location" required value="${esc(SETTINGS.location)}"></div></div>
       <div class="admin-subhead">🎨 Teks Header &amp; Hero</div><div class="form-grid"><div class="field full"><label>Tagline Hero</label><input name="tagline" value="${esc(SETTINGS.tagline||'')}"></div><div class="field full"><label>Deskripsi Hero</label><textarea name="heroLead" rows="4">${esc(SETTINGS.heroLead||'')}</textarea></div></div>
-      <div class="admin-subhead">🖼️ Gambar Hero</div><div class="field"><label>URL Gambar</label><input name="heroImage" id="heroImageInput" value="${esc(currentHero)}" oninput="updateHeroPreview(this.value)"><div class="hero-preview" id="heroPreview" style="background-image:url('${esc(currentHero)}')"><span>🎾 Preview</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"><button type="button" class="btn-ghost" onclick="setHeroPreset('court')">Lapangan</button><button type="button" class="btn-ghost" onclick="setHeroPreset('racket')">Raket</button><button type="button" class="btn-ghost" onclick="setHeroPreset('clay')">Clay</button><button type="button" class="btn-ghost" onclick="setHeroPreset('ball')">Bola</button><button type="button" class="btn-ghost" onclick="setHeroPreset('default')">↺ Default</button></div>
+      <div class="admin-subhead">🖼️ Gambar Hero</div><div class="field"><label>URL Gambar</label><input name="heroImage" id="heroImageInput" value="${esc(currentHero)}" oninput="updateHeroPreview(this.value)"><div class="hero-preview" id="heroPreview" style="background-image:url('${esc(currentHero)}')"><span>🎾 Preview</span></div></div>
       <div class="admin-subhead">🔐 Kredensial Admin</div><div class="form-grid"><div class="field"><label>Username</label><input name="adminUser" value="${esc(SETTINGS.adminUser||'admin')}" required></div><div class="field"><label>Password</label><input name="adminPass" type="text" value="${esc(SETTINGS.adminPass||'admin')}" required></div></div>
+      <div class="admin-subhead">🏅 Cabang Olahraga</div>
+      <div id="sportsRows">${SPORTS.map(s=>`<div class="court-row sport-row" data-sport-id="${esc(s.id)}"><input class="sport-icon" value="${esc(s.icon)}" placeholder="Ikon" style="text-align:center" maxlength="4"><input class="sport-nama" value="${esc(s.nama)}" placeholder="Nama Cabor"><button type="button" class="icon-act rm" onclick="this.parentElement.remove()">×</button></div>`).join('')}</div>
+      <button type="button" class="btn-ghost" style="margin-top:6px;margin-bottom:14px" onclick="addSportRow()">+ Tambah Cabang</button>
       <div class="admin-subhead">🎾 Lapangan</div><div id="courtsRows">${courtRows}</div><button type="button" class="btn-ghost" style="margin-top:6px;margin-bottom:14px" onclick="addCourtRow()">+ Tambah</button>
       <button type="submit" class="btn-primary" style="max-width:280px">💾 Simpan</button>
     </form>
     <div class="admin-subhead">Data</div><div class="data-actions"><button class="btn-ghost" onclick="exportData()">⬇️ Export JSON</button><button class="btn-ghost" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button><input type="file" id="importFile" accept="application/json" style="display:none"><button class="btn-danger" onclick="resetData()">↺ Reset</button></div>`;
 }
 function updateHeroPreview(url){const el=document.getElementById('heroPreview');if(!el) return;el.style.backgroundImage=`url("${url||DEFAULT_HERO_IMAGE}")`;}
-function setHeroPreset(key){
-  const presets={court:'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2000&q=80',racket:'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=2000&q=80',clay:'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=2000&q=80',ball:'https://images.unsplash.com/photo-1530915365347-e35b749a0381?auto=format&fit=crop&w=2000&q=80',default:DEFAULT_HERO_IMAGE};
-  const url=presets[key]||DEFAULT_HERO_IMAGE;const inp=document.getElementById('heroImageInput');
-  if(inp){inp.value=url;updateHeroPreview(url);}
-  toast('Preset dipilih — jangan lupa Simpan');
-}
 let _courtRowCounter=0;
 function addCourtRow(){const cont=document.getElementById('courtsRows');if(!cont) return;const count=cont.children.length;const row=document.createElement('div');row.className='court-row';row.dataset.courtId='c'+Date.now().toString(36)+(_courtRowCounter++);row.innerHTML=`<input class="court-name" value="Lapangan ${count+1}" placeholder="Nama"><input class="court-lokasi" value="" placeholder="Lokasi"><button type="button" class="icon-act rm" onclick="this.parentElement.remove()">×</button>`;cont.appendChild(row);}
+function addSportRow(){
+  const cont=document.getElementById('sportsRows'); if(!cont) return;
+  const row=document.createElement('div'); row.className='court-row sport-row'; row.dataset.sportId='';
+  row.innerHTML=`<input class="sport-icon" value="🏅" placeholder="Ikon" style="text-align:center" maxlength="4"><input class="sport-nama" value="" placeholder="Nama Cabor"><button type="button" class="icon-act rm" onclick="this.parentElement.remove()">×</button>`;
+  cont.appendChild(row); row.querySelector('.sport-nama').focus();
+}
 function bindAdminEvents(view){
   if(view==='pengaturan'){
     document.getElementById('settingsForm').addEventListener('submit',async e=>{
       e.preventDefault();const f=e.target;
       SETTINGS.title=f.title.value.trim();SETTINGS.sub=f.sub.value.trim();SETTINGS.year=parseInt(f.year.value)||new Date().getFullYear();
-      SETTINGS.logo=f.logo.value.trim()||'🎾';
-      SETTINGS.location=f.location.value.trim();SETTINGS.tagline=f.tagline.value.trim();SETTINGS.heroLead=f.heroLead.value.trim();
+      SETTINGS.logo=f.logo.value.trim()||'🎾'; SETTINGS.location=f.location.value.trim();SETTINGS.tagline=f.tagline.value.trim();SETTINGS.heroLead=f.heroLead.value.trim();
       SETTINGS.heroImage=(f.heroImage.value||'').trim()||DEFAULT_HERO_IMAGE;
       SETTINGS.adminUser=f.adminUser.value.trim()||'admin';SETTINGS.adminPass=f.adminPass.value||'admin';
+      const sportRows=document.querySelectorAll('#sportsRows .sport-row');
+      const newSports=[];const usedIds=new Set();
+      sportRows.forEach(row=>{
+        const nama=row.querySelector('.sport-nama').value.trim(); const icon=row.querySelector('.sport-icon').value.trim()||'🏅';
+        if(!nama) return;
+        let id=row.dataset.sportId||'';
+        if(!id){ id=slugifySport(nama); let base=id,n=1; while(usedIds.has(id)){ id=base+'_'+(n++); } }
+        if(usedIds.has(id)) return; usedIds.add(id); newSports.push({id,nama,icon});
+      });
+      if(!newSports.length){ toast('Minimal 1 cabang olahraga'); return; }
+      const removedIds = SPORTS.filter(s=>!newSports.find(n=>n.id===s.id)).map(s=>s.id);
+      const affectedPlayers = PEMAIN.filter(p=>getSportsOf(p).some(sid=>removedIds.includes(sid)));
+      if(affectedPlayers.length){
+        if(!confirm(`${affectedPlayers.length} pemain memakai cabor yang dihapus. Lanjutkan?`)) return;
+        affectedPlayers.forEach(p=>{ let sports = getSportsOf(p).filter(sid=>!removedIds.includes(sid)); if(!sports.length) sports=[newSports[0].id]; p.sports=sports; p.sport=sports[0]; });
+      }
+      SPORTS=newSports;
       const rows=document.querySelectorAll('#courtsRows .court-row');const courts=[];
       rows.forEach((row,i)=>{const cid=row.dataset.courtId||('c'+Date.now().toString(36)+i);const nama=row.querySelector('.court-name').value.trim();const lokasi=row.querySelector('.court-lokasi').value.trim();if(nama) courts.push({id:cid,nama,lokasi});});
       SETTINGS.courts=courts.length>0?courts:[{id:'c1',nama:'Lapangan 1',lokasi:''}];
-      await saveData();applySettings();renderPublic();toast('Pengaturan disimpan ✓');
+      await saveData();applySettings();renderPublic();
+      renderSatkerFilterUI();renderPemainFilterUI();renderPemainPublic();renderSatkerPublic();
+      renderAdminView('pengaturan');
+      toast('Pengaturan disimpan ✓');
     });
-    document.getElementById('importFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file) return;const reader=new FileReader();reader.onload=async ev=>{try{const d=JSON.parse(ev.target.result);if(d.settings) SETTINGS=d.settings;if(d.teams) TEAMS=d.teams;if(d.pemain) PEMAIN=d.pemain;if(d.events) EVENTS=d.events;if(d.matches) MATCHES=d.matches;await saveData();renderPublic();renderAdminView('pengaturan');toast('Data diimpor ✓');}catch(err){toast('File tidak valid');}};reader.readAsText(file);});
+    document.getElementById('importFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file) return;const reader=new FileReader();reader.onload=async ev=>{try{const d=JSON.parse(ev.target.result);if(d.settings) SETTINGS=d.settings;if(d.sports&&d.sports.length) SPORTS=d.sports;if(d.teams) TEAMS=d.teams;if(d.pemain) PEMAIN=d.pemain;if(d.events) EVENTS=d.events;if(d.matches) MATCHES=d.matches;await saveData();renderPublic();renderAdminView('pengaturan');toast('Data diimpor ✓');}catch(err){toast('File tidak valid');}};reader.readAsText(file);});
   }
 }
 function openAdminForm(title,sub,bodyHTML){document.getElementById('adminFormTitle').textContent=title;document.getElementById('adminFormSub').textContent=sub||'';document.getElementById('adminFormBody').innerHTML=bodyHTML;document.getElementById('adminFormModal').classList.add('open');setTimeout(()=>{const first=document.querySelector('#adminFormBody input:not([style*="display:none"]), #adminFormBody select, #adminFormBody textarea');if(first) first.focus();},80);}
 function closeAdminForm(){
-  if(_seedingDirty){
-    if(!confirm('Ada perubahan seeding/BYE yang belum disimpan. Tutup form?')) return;
-    _seedingDirty = false;
-  }
+  if(_seedingDirty){ if(!confirm('Ada perubahan seeding/BYE yang belum disimpan. Tutup form?')) return; _seedingDirty = false; }
   document.getElementById('adminFormModal').classList.remove('open');
 }
-function exportData(){const data=JSON.stringify({settings:SETTINGS,teams:TEAMS,pemain:PEMAIN,events:EVENTS,matches:MATCHES},null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`ptwp-data-${SETTINGS.year}-${Date.now()}.json`;a.click();URL.revokeObjectURL(url);toast('Data diexport ✓');}
+function exportData(){const data=JSON.stringify({settings:SETTINGS,sports:SPORTS,teams:TEAMS,pemain:PEMAIN,events:EVENTS,matches:MATCHES},null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`ptwp-data-${SETTINGS.year}-${Date.now()}.json`;a.click();URL.revokeObjectURL(url);toast('Data diexport ✓');}
 async function resetData(){
   if(!confirm('Reset SEMUA data? Aksi ini menghapus semua data di Supabase.')) return;
   try{
@@ -3035,23 +3264,15 @@ async function resetData(){
 function setTheme(t){
   try{
     document.documentElement.setAttribute('data-theme',t);
-    const b=document.getElementById('themeBtn');
-    if(b) b.textContent=t==='dark'?'🌙':'☀️';
+    const b=document.getElementById('themeBtn'); if(b) b.textContent=t==='dark'?'🌙':'☀️';
     try{ localStorage.setItem(LS_THEME,t); }catch(e){}
   }catch(e){ console.warn('setTheme:',e); }
 }
 document.getElementById('themeBtn').addEventListener('click',()=>{const now=document.documentElement.getAttribute('data-theme');setTheme(now==='dark'?'light':'dark');});
 const loginModal=document.getElementById('loginModal');const loginDot=document.getElementById('loginDot');const loginErr=document.getElementById('loginErr');const adminPanel=document.getElementById('adminPanel');
 function setAdmin(on){state.admin=on;document.body.classList.toggle('admin',on);loginDot.classList.toggle('on',on);loginDot.textContent=on?'🔓':'🎾';if(on) localStorage.setItem(LS_ADMIN,'1');else localStorage.removeItem(LS_ADMIN);}
-
 let _lastPublicHash='#jadwal';
-function parseHash(){
-  const h=(location.hash||'').replace(/^#/,'');
-  if(!h) return {type:'top'};
-  const parts=h.split('/');
-  if(parts[0]==='admin') return {type:'admin',view:parts[1]||'dashboard'};
-  return {type:'section',id:parts[0]};
-}
+function parseHash(){const h=(location.hash||'').replace(/^#/,'');if(!h) return {type:'top'};const parts=h.split('/');if(parts[0]==='admin') return {type:'admin',view:parts[1]||'dashboard'};return {type:'section',id:parts[0]};}
 function openAdminPanel(){
   const h=location.hash;
   if(h && !h.startsWith('#admin')) _lastPublicHash=h;
@@ -3064,39 +3285,22 @@ function openAdminPanel(){
 }
 function closeAdminPanel(){
   adminPanel.classList.remove('open');document.body.style.overflow='';
-  if(location.hash.startsWith('#admin')){
-    history.replaceState(null,'',_lastPublicHash||'#jadwal');
-    const id=(_lastPublicHash||'#jadwal').replace(/^#/,'');
-    const el=document.getElementById(id);
-    if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),30);
-  }
+  if(location.hash.startsWith('#admin')){ history.replaceState(null,'',_lastPublicHash||'#jadwal'); const id=(_lastPublicHash||'#jadwal').replace(/^#/,''); const el=document.getElementById(id); if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),30); }
 }
 function applyRoute(){
   const r=parseHash();
   if(r.type==='admin'){
-    if(localStorage.getItem(LS_ADMIN)!=='1'){
-      if(location.hash.startsWith('#admin')) history.replaceState(null,'',_lastPublicHash||'#jadwal');
-      return;
-    }
-    if(!adminPanel.classList.contains('open')){
-      adminPanel.classList.add('open');document.body.style.overflow='hidden';
-    }
+    if(localStorage.getItem(LS_ADMIN)!=='1'){ if(location.hash.startsWith('#admin')) history.replaceState(null,'',_lastPublicHash||'#jadwal'); return; }
+    if(!adminPanel.classList.contains('open')){ adminPanel.classList.add('open');document.body.style.overflow='hidden'; }
     state.view=r.view;
     document.querySelectorAll('#adminNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===r.view));
     renderAdminView(r.view);
   } else {
-    if(adminPanel.classList.contains('open')){
-      adminPanel.classList.remove('open');document.body.style.overflow='';
-    }
+    if(adminPanel.classList.contains('open')){ adminPanel.classList.remove('open');document.body.style.overflow=''; }
   }
 }
 let _routeGuard=false;
-function onRouteChange(){
-  if(_routeGuard) return;
-  _routeGuard=true;
-  applyRoute();
-  setTimeout(()=>_routeGuard=false,80);
-}
+function onRouteChange(){ if(_routeGuard) return; _routeGuard=true; applyRoute(); setTimeout(()=>_routeGuard=false,80); }
 window.addEventListener('hashchange',onRouteChange);
 window.addEventListener('popstate',onRouteChange);
 document.getElementById('openDashboardBtn').addEventListener('click',openAdminPanel);
@@ -3110,34 +3314,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){loginModal.classLis
 document.getElementById('loginForm').addEventListener('submit',e=>{
   e.preventDefault();
   const btn=e.target.querySelector('button[type="submit"]');
-  const u=document.getElementById('inUser').value.trim();
-  const p=document.getElementById('inPass').value;
-  if(u===SETTINGS.adminUser&&p===SETTINGS.adminPass){
-    loginModal.classList.remove('open');
-    setAdmin(true);
-    toast('Login berhasil 🔓');
-    setTimeout(openAdminPanel,300);
-  } else {
-    setBtnLoading(btn,true);
-    setTimeout(()=>{
-      setBtnLoading(btn,false);
-      loginErr.textContent='Username atau password salah!';
-      document.getElementById('inPass').value='';
-      document.getElementById('inPass').focus();
-    },400);
-  }
+  const u=document.getElementById('inUser').value.trim(); const p=document.getElementById('inPass').value;
+  if(u===SETTINGS.adminUser&&p===SETTINGS.adminPass){ loginModal.classList.remove('open'); setAdmin(true); toast('Login berhasil 🔓'); setTimeout(openAdminPanel,300); }
+  else { setBtnLoading(btn,true); setTimeout(()=>{setBtnLoading(btn,false);loginErr.textContent='Username atau password salah!';document.getElementById('inPass').value='';document.getElementById('inPass').focus();},400); }
 });
-
 let _scrollTimer;
-window.addEventListener('scroll',()=>{
-  clearTimeout(_scrollTimer);
-  _scrollTimer=setTimeout(()=>{try{localStorage.setItem(LS_SCROLL,String(window.scrollY));}catch(e){}},300);
-},{passive:true});
-function restoreScrollIfNeeded(){
-  if(location.hash && location.hash.length>1 && !location.hash.startsWith('#admin')) return;
-  const sy=parseInt(localStorage.getItem(LS_SCROLL)||'0');
-  if(sy>0) setTimeout(()=>window.scrollTo({top:sy,behavior:'auto'}),80);
-}
+window.addEventListener('scroll',()=>{ clearTimeout(_scrollTimer); _scrollTimer=setTimeout(()=>{try{localStorage.setItem(LS_SCROLL,String(window.scrollY));}catch(e){}},300); },{passive:true});
+function restoreScrollIfNeeded(){ if(location.hash && location.hash.length>1 && !location.hash.startsWith('#admin')) return; const sy=parseInt(localStorage.getItem(LS_SCROLL)||'0'); if(sy>0) setTimeout(()=>window.scrollTo({top:sy,behavior:'auto'}),80); }
 ['beforeunload','pagehide'].forEach(ev=>window.addEventListener(ev,()=>{saveUIState();saveCache();}));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){saveUIState();saveCache();}});
 
@@ -3161,11 +3344,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
       document.body.innerHTML=`<div style="padding:60px 20px;text-align:center;font-family:sans-serif;max-width:600px;margin:0 auto">
         <div style="font-size:60px;margin-bottom:20px">⚠️</div>
         <h1 style="margin-bottom:12px;color:var(--text)">Gagal Memuat Data</h1>
-        <p style="color:var(--muted);line-height:1.7;margin-bottom:24px">Periksa:<br>
-        1. <b>SUPABASE_URL</b> dan <b>SUPABASE_ANON_KEY</b> di kode HTML<br>
-        2. Koneksi internet<br>
-        3. RLS policy di Supabase (harus allow anon read/write)<br>
-        4. SQL schema sudah dijalankan?</p>
+        <p style="color:var(--muted);line-height:1.7;margin-bottom:24px">Periksa koneksi & SQL schema (kolom <b>sport</b> di categories, <b>sports</b> di players).</p>
         <button onclick="location.reload()" style="padding:12px 28px;font-size:14px;font-weight:800;border:0;border-radius:10px;background:#0fa958;color:#fff;cursor:pointer">🔄 Coba Lagi</button>
       </div>`;
       return;
