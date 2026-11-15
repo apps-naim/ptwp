@@ -2466,6 +2466,7 @@ function manageBereguPeserta(eventId, katId){
     </div>
   </div>`;
 
+  // ──── POOL UI: dengan tombol Edit (✏️) & Hapus (🗑️) ────
   let poolUI = '';
   if(isPool){
     poolUI = `<div class="admin-subhead" style="margin-top:16px">📍 Penempatan Pool</div>
@@ -2482,7 +2483,13 @@ function manageBereguPeserta(eventId, katId){
                 const nextBtn = pi < poolsData.length-1 
                   ? `<button class="mv-btn" onclick="movePesertaPool('${eventId}','${katId}','${esc(pid)}','${esc(poolsData[pi+1].pool.id)}')" title="→ ${esc(poolsData[pi+1].pool.nama)}">→</button>` 
                   : '<button class="mv-btn disabled">→</button>';
-                return `<div class="pool-member"><span class="c" style="background:${info.warna}"></span><span class="pool-member-name">${esc(info.nama)}</span><div class="pool-member-actions">${prevBtn}${nextBtn}</div></div>`;
+                const editBtn = `<button class="mv-btn" onclick="openEditTeam('${eventId}','${katId}','${esc(pid)}')" title="✏️ Edit tim">✏️</button>`;
+                const delBtn = `<button class="mv-btn del" onclick="removeTeam('${eventId}','${katId}','${esc(pid)}')" title="🗑️ Hapus tim">🗑️</button>`;
+                return `<div class="pool-member">
+                  <span class="c" style="background:${info.warna}"></span>
+                  <span class="pool-member-name">${esc(info.nama)}</span>
+                  <div class="pool-member-actions">${prevBtn}${nextBtn}${editBtn}${delBtn}</div>
+                </div>`;
               }).join('') || '<span class="peserta-empty">Kosong</span>'}
             </div>
           </div>
@@ -2490,7 +2497,7 @@ function manageBereguPeserta(eventId, katId){
       </div>
       <div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="btn-ghost" onclick="autoAssignAllPools('${eventId}','${katId}')">🎲 Bagi Otomatis ke Pool</button>
-        <span class="muted" style="font-size:11.5px">← → pindah antar pool · Total: ${poolsData.reduce((n,p)=>n+p.peserta.length,0)} tim di pool</span>
+        <span class="muted" style="font-size:11.5px">← → pindah · ✏️ edit · 🗑️ hapus · Total: ${poolsData.reduce((n,p)=>n+p.peserta.length,0)} tim di pool</span>
       </div>`;
   }
 
