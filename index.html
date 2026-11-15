@@ -819,7 +819,6 @@ function getSportColor(id){
   let hash=0; for(let i=0;i<id.length;i++) hash=((hash<<5)-hash+id.charCodeAt(i))|0;
   return colors[Math.abs(hash)%colors.length];
 }
-/* Helper campuran */
 const isMixedGender = g => g === 'campuran';
 const fmtGender = g => g === 'campuran' ? 'Campuran / Mix' : g;
 
@@ -1185,7 +1184,6 @@ function makePartaiDefault(kat,timA,timB){
     }
     return [{kode:'P1', jenis:isGanda?'Ganda':'Tunggal', pemainA:namesA, pemainB:namesB, menang:null, skor:''}];
   }
-  // Beregu — campuran tidak memfilter gender
   const filterG=arr=>(kat.gender && kat.gender!=='campuran')?arr.filter(p=>p.gender===kat.gender):arr;
   const getPlayers=(teamId)=>{
     if(!teamId||teamId==='TBD'||teamId==='BYE') return {tunggal:[],ganda:[]};
@@ -1231,7 +1229,6 @@ function rebuildPartaiNames(m,kat){
     m.partai = [{kode:oldKode, jenis:isGanda?'Ganda':'Tunggal', pemainA:namesA, pemainB:namesB, menang:null, skor:''}];
     return;
   }
-  // Beregu campuran
   const filterG=arr=>(kat.gender && kat.gender!=='campuran')?arr.filter(p=>p.gender===kat.gender):arr;
   const getPlayers=(teamId)=>{
     if(!teamId||teamId==='TBD'||teamId==='BYE') return {tunggal:[],ganda:[]};
@@ -1646,7 +1643,6 @@ function getFilteredPrintMatches(opts){
     if(f.gender!=='all'){
       const ev=getEvent(m.eventId);const kat=ev&&ev.kategori.find(k=>k.id===m.kategoriId);
       if(!kat) return false;
-      // Campuran: ikut ditampilkan di filter putra maupun putri
       if(kat.gender !== 'campuran' && kat.gender !== f.gender) return false;
     }
     if(f.sport && f.sport!=='all'){
@@ -2123,7 +2119,8 @@ function viewDashboard(){
   const totalKat=EVENTS.reduce((n,e)=>n+e.kategori.length,0);const selesai=MATCHES.filter(m=>statusMatch(m)==='selesai').length;const berjalan=MATCHES.filter(m=>statusMatch(m)==='berlangsung').length;const courtCount=(SETTINGS.courts||[]).length;
   return `<div class="admin-page-head"><div><h2>📊 Dashboard</h2><p>Ringkasan turnamen ${esc(SETTINGS.title)} ${SETTINGS.year}</p></div></div>
     <div class="admin-stats"><div class="astat"><b>${EVENTS.length}</b><span>Kegiatan</span></div><div class="astat"><b>${totalKat}</b><span>Kategori</span></div><div class="astat"><b>${TEAMS.length}</b><span>Satker</span></div><div class="astat"><b>${PEMAIN.length}</b><span>Pemain</span></div><div class="astat"><b>${MATCHES.length}</b><span>Pertandingan</span></div><div class="astat"><b>${courtCount}</b><span>Lapangan</span></div><div class="astat"><b>${selesai}</b><span>Selesai</span></div><div class="astat"><b>${berjalan}</b><span>Berlangsung</span></div></div>
-    <div class="auto-note" style="margin-bottom:14px">⚤ <b>Ganda Campuran / Beregu Campuran</b>: kategori dengan gender "Campuran / Mix" bisa berisi pemain putra & putri. Ganda campuran otomatis memvalidasi 1 putra + 1 putri.</div>
+    <div class="auto-note" style="margin-bottom:14px">🎲 <b>Tombol Acak</b>: Tersedia di form Edit Match (Acak Tim A vs B) dan di Kelola Peserta (Acak Pasangan / Acak Peserta). Cek juga tombol <b>🎲 Acak</b> di setiap kartu kategori untuk shuffle urutan peserta + regenerate bracket.</div>
+    <div class="auto-note" style="margin-bottom:14px">⚤ <b>Ganda Campuran / Beregu Campuran</b>: kategori dengan gender "Campuran / Mix" bisa berisi pemain putra & putri.</div>
     <div class="manual-note" style="margin-bottom:14px">🏅 <b>Kategori punya cabor</b>: peserta otomatis terfilter.</div>
     <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)"><h3 style="font-size:14px;margin-bottom:12px">Aksi Cepat</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="adminGo('kegiatan')">🏆 Kegiatan</button><button class="btn-ghost" onclick="adminGo('jadwal')">📅 Jadwal</button><button class="btn-ghost" onclick="adminGo('cetak')">🖨️ Cetak</button><button class="btn-ghost" onclick="adminGo('pengaturan')">⚙️ Pengaturan</button></div></div>`;
 }
@@ -2150,7 +2147,7 @@ function viewKegiatanDetail(eventId){
     else if(kat.sistem==='penyisihan' || kat.sistem==='gugur'){progressHTML=`<div class="kat-progress"><span class="pitem">🎯 <b>${st.ko.filled}/${st.ko.total}</b> terisi</span></div>`;}
     else if(kat.sistem==='kompetisi'){progressHTML=`<div class="kat-progress"><span class="pitem">🔄 <b>${st.rr.done}/${st.rr.total}</b></span></div>`;}
     const seedByeInfo = (seedCount>0 || byeCount>0)?`<div class="kat-info" style="color:var(--orange);font-weight:700">🌱 ${seedCount} seed · ${byeCount} BYE</div>`:'';
-    return `<div class="kat-card"><div class="kat-card-head">${spInfo?`<span class="kat-tag" style="background:color-mix(in srgb,${getSportColor(spInfo.id)} 16%,transparent);color:${getSportColor(spInfo.id)}">${spInfo.icon} ${esc(spInfo.nama)}</span>`:`<span class="kat-tag" style="background:var(--panel2);color:var(--muted)">Semua Cabor</span>`}<span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(fmtGender(kat.gender))}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span></div><h4 style="margin-bottom:8px">${esc(kat.nama)}</h4><div class="kat-card-body"><div class="kat-info"><b>${kat.peserta.length}</b> peserta · <b>${catMatches.length}</b> match${catMatches.length?` (${done} selesai)`:''}</div>${seedByeInfo}</div>${progressHTML}<div class="kat-card-actions" style="margin-top:10px"><button class="btn-ghost advance" onclick="manualAdvance('${ev.id}','${kat.id}')">⚡ Advance</button><button class="btn-ghost regen" onclick="regenerateManual('${ev.id}','${kat.id}')">🔄 Regenerate</button><button class="btn-ghost" onclick="editKategori('${ev.id}','${kat.id}')">✏️ Edit</button><button class="btn-primary" style="width:auto;padding:7px 11px;font-size:11px" onclick="managePeserta('${ev.id}','${kat.id}')">👥 Peserta</button><button class="btn-danger" onclick="hapusKategori('${ev.id}','${kat.id}')">🗑️</button></div></div>`;
+    return `<div class="kat-card"><div class="kat-card-head">${spInfo?`<span class="kat-tag" style="background:color-mix(in srgb,${getSportColor(spInfo.id)} 16%,transparent);color:${getSportColor(spInfo.id)}">${spInfo.icon} ${esc(spInfo.nama)}</span>`:`<span class="kat-tag" style="background:var(--panel2);color:var(--muted)">Semua Cabor</span>`}<span class="kat-tag ${kat.tipe}">${esc(kat.tipe)}</span><span class="kat-tag ${kat.gender}">${esc(fmtGender(kat.gender))}</span><span class="kat-tag ${kat.sistem}">${esc(formatLabel(kat.sistem))}</span></div><h4 style="margin-bottom:8px">${esc(kat.nama)}</h4><div class="kat-card-body"><div class="kat-info"><b>${kat.peserta.length}</b> peserta · <b>${catMatches.length}</b> match${catMatches.length?` (${done} selesai)`:''}</div>${seedByeInfo}</div>${progressHTML}<div class="kat-card-actions" style="margin-top:10px"><button class="btn-ghost" onclick="randomizeAndRegenerate('${ev.id}','${kat.id}')" title="Acak urutan peserta & regenerate jadwal" style="border-color:color-mix(in srgb,var(--orange) 50%,var(--line));color:var(--orange)">🎲 Acak</button><button class="btn-ghost advance" onclick="manualAdvance('${ev.id}','${kat.id}')">⚡ Advance</button><button class="btn-ghost regen" onclick="regenerateManual('${ev.id}','${kat.id}')">🔄 Regenerate</button><button class="btn-ghost" onclick="editKategori('${ev.id}','${kat.id}')">✏️ Edit</button><button class="btn-primary" style="width:auto;padding:7px 11px;font-size:11px" onclick="managePeserta('${ev.id}','${kat.id}')">👥 Peserta</button><button class="btn-danger" onclick="hapusKategori('${ev.id}','${kat.id}')">🗑️</button></div></div>`;
   }).join('');
   return `<button class="kegiatan-back" onclick="closeKegiatanDetail()">← Kembali</button><div class="admin-page-head"><div><h2>🏆 ${esc(ev.nama)}</h2><p>📅 ${esc(tgl)} · 📍 ${esc(ev.lokasi||'-')}</p></div><div style="display:flex;gap:8px"><button class="btn-ghost" onclick="editEvent('${ev.id}')">✏️ Edit</button><button class="btn-danger" onclick="hapusEvent('${ev.id}')">🗑️ Hapus</button></div></div><div class="admin-subhead">Kategori Pertandingan</div><div class="admin-toolbar"><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="editKategori('${ev.id}',null)">+ Tambah Kategori</button></div><div class="kat-grid">${katCards||`<div class="empty" style="grid-column:1/-1"><p>Belum ada kategori.</p></div>`}</div>`;
 }
@@ -2280,9 +2277,9 @@ function managePeserta(eventId,katId){
   if(isPool){poolUI=`<div class="admin-subhead" style="margin-top:16px">📍 Penempatan Pool</div><div class="pool-assign-grid">${poolsData.map(({pool,peserta},pi)=>{return `<div class="pool-assign-card"><div class="pool-assign-head">🏊 ${esc(pool.nama)} <span class="count">${peserta.length}</span></div><div class="pool-assign-list">${peserta.map(pid=>{const info=getPesertaInfo(pid,kat);const isM=isManualPeserta(pid);const prevBtn=pi>0?`<button class="mv-btn" onclick="movePesertaPool('${eventId}','${katId}','${esc(pid)}','${esc(poolsData[pi-1].pool.id)}')">←</button>`:'<button class="mv-btn disabled">←</button>';const nextBtn=pi<poolsData.length-1?`<button class="mv-btn" onclick="movePesertaPool('${eventId}','${katId}','${esc(pid)}','${esc(poolsData[pi+1].pool.id)}')">→</button>`:'<button class="mv-btn disabled">→</button>';return `<div class="pool-member"><span class="c" style="background:${info.warna}"></span>${isM?'<span class="m-tag">M</span>':''}<span class="pool-member-name">${esc(info.nama)}</span><div class="pool-member-actions">${prevBtn}${nextBtn}<button class="mv-btn del" onclick="removePesertaAt('${eventId}','${katId}',${kat.peserta.indexOf(pid)})">×</button></div></div>`;}).join('')||'<span class="peserta-empty">Kosong</span>'}</div></div>`;}).join('')}</div><div style="margin-bottom:8px"><button class="btn-ghost" onclick="autoAssignAllPools('${eventId}','${katId}')">🎲 Bagi Otomatis</button></div>`;}
   let addAreaHtml = '';
   if (kat.tipe === 'ganda') {
-      addAreaHtml = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><select id="addPesertaSel1" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text)">${optionsHtml || '<option value="">Tidak ada pemain</option>'}</select><span style="font-weight:bold;font-size:14px;color:var(--muted)">&</span><select id="addPesertaSel2" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text)">${optionsHtml || '<option value="">Tidak ada pemain</option>'}</select>${isPool?`<select id="addPoolSel" style="font-family:inherit;font-size:11.5px;font-weight:700;padding:10px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);min-width:90px"><option value="auto">Auto</option>${poolOptionsHtml}</select>`:''}<button class="btn-primary" style="width:auto;padding:10px 16px" onclick="addPesertaGanda('${eventId}','${katId}')">Tambah</button></div>`;
+      addAreaHtml = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><select id="addPesertaSel1" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text)">${optionsHtml || '<option value="">Tidak ada pemain</option>'}</select><span style="font-weight:bold;font-size:14px;color:var(--muted)">&</span><select id="addPesertaSel2" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text)">${optionsHtml || '<option value="">Tidak ada pemain</option>'}</select>${isPool?`<select id="addPoolSel" style="font-family:inherit;font-size:11.5px;font-weight:700;padding:10px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);min-width:90px"><option value="auto">Auto</option>${poolOptionsHtml}</select>`:''}<button class="btn-ghost" onclick="randomizePesertaGanda('${eventId}','${katId}')" title="Acak 2 pemain" style="padding:10px 12px;font-size:14px">🎲</button><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="addPesertaGanda('${eventId}','${katId}')">Tambah</button></div>`;
   } else {
-      addAreaHtml = `<div style="display:flex;gap:6px;flex-wrap:wrap"><select id="addPesertaSel" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text)">${optionsHtml || '<option value="">Tidak ada peserta</option>'}</select>${isPool?`<select id="addPoolSel" style="font-family:inherit;font-size:11.5px;font-weight:700;padding:10px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);min-width:90px"><option value="auto">Auto</option>${poolOptionsHtml}</select>`:''}<button class="btn-primary" style="width:auto;padding:10px 16px" onclick="addPeserta('${eventId}','${katId}')">Tambah</button></div>`;
+      addAreaHtml = `<div style="display:flex;gap:6px;flex-wrap:wrap"><select id="addPesertaSel" style="flex:1;min-width:140px;font-family:inherit;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text)">${optionsHtml || '<option value="">Tidak ada peserta</option>'}</select>${isPool?`<select id="addPoolSel" style="font-family:inherit;font-size:11.5px;font-weight:700;padding:10px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);min-width:90px"><option value="auto">Auto</option>${poolOptionsHtml}</select>`:''}<button class="btn-ghost" onclick="randomizeSinglePeserta('${eventId}','${katId}')" title="Pilih acak" style="padding:10px 12px;font-size:14px">🎲</button><button class="btn-primary" style="width:auto;padding:10px 16px" onclick="addPeserta('${eventId}','${katId}')">Tambah</button></div>`;
   }
   let seedingUI = '';
   const isKO = kat.sistem === 'gugur' || kat.sistem === 'penyisihan';
@@ -2325,7 +2322,6 @@ async function addPesertaGanda(eventId,katId){
   if(!sel1||!sel1.value||!sel2||!sel2.value){toast('Pilih 2 pemain');return;}
   if(sel1.value===sel2.value){toast('Pemain tidak boleh sama');return;}
   const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);
-  // Validasi campuran: 1 putra + 1 putri
   if(kat.gender === 'campuran'){
     const p1 = PEMAIN.find(x=>x.id===sel1.value);
     const p2 = PEMAIN.find(x=>x.id===sel2.value);
@@ -2350,7 +2346,6 @@ async function addPesertaManual(eventId,katId){
   if(kat.tipe==='ganda'){
       const parts = name.split(/&|\//).map(s=>s.trim()).filter(Boolean);
       if(parts.length !== 2){toast('Format: Pemain 1 & Pemain 2');return;}
-      // Validasi campuran jika nama cocok dengan pemain di DB
       if(kat.gender === 'campuran'){
         const p1Match = PEMAIN.find(p=>p.nama.toLowerCase()===parts[0].toLowerCase());
         const p2Match = PEMAIN.find(p=>p.nama.toLowerCase()===parts[1].toLowerCase());
@@ -2375,6 +2370,79 @@ async function addPesertaManual(eventId,katId){
 }
 async function removePesertaAt(eventId,katId,idx){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);if(idx<0||idx>=kat.peserta.length) return;const pid=kat.peserta[idx];const info=getPesertaInfo(pid,kat);kat.peserta.splice(idx,1);if(kat.poolAssignment) delete kat.poolAssignment[pid];if(kat.seeds) delete kat.seeds[pid];if(kat.byes) kat.byes=kat.byes.filter(x=>x!==pid);const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(result.cleared?`"${info.nama}" dihapus`:`✓ "${info.nama}" dihapus`);}
 async function clearManualPeserta(eventId,katId){const ev=getEvent(eventId),kat=ev.kategori.find(k=>k.id===katId);const manuals=kat.peserta.filter(p=>isManualPeserta(p));if(!manuals.length){toast('Tidak ada peserta manual');return;}if(!confirm(`Hapus ${manuals.length} peserta manual?`)) return;kat.peserta=kat.peserta.filter(p=>!isManualPeserta(p));if(kat.poolAssignment) manuals.forEach(pid=>delete kat.poolAssignment[pid]);if(kat.seeds) manuals.forEach(pid=>delete kat.seeds[pid]);if(kat.byes) kat.byes=kat.byes.filter(x=>!manuals.includes(x));const result=await autoRegenerateSchedule(eventId,katId);managePeserta(eventId,katId);renderPublic();toast(`✓ ${manuals.length} manual dihapus`);}
+
+/* ============================================================
+   🎲 TOMBOL ACAK — fungsi random selection
+   ============================================================ */
+function fisherYatesShuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function randomizeTimMatch(){
+  const form = document.getElementById('matchForm');
+  if(!form) return;
+  const evSel = form.querySelector('[name="eventId"]');
+  const katSel = form.querySelector('[name="kategoriId"]');
+  if(!evSel || !katSel) return;
+  const ev = getEvent(evSel.value);
+  const kat = ev ? ev.kategori.find(k => k.id === katSel.value) : null;
+  if(!kat){ toast('Kategori tidak ditemukan'); return; }
+  if((kat.peserta || []).length < 2){ toast('Minimal 2 peserta untuk diacak'); return; }
+  const selA = form.querySelector('[name="timA"]');
+  const selB = form.querySelector('[name="timB"]');
+  if(!selA || !selB){ toast('Form tim tidak ditemukan'); return; }
+  const shuffled = fisherYatesShuffle(kat.peserta);
+  selA.value = shuffled[0];
+  selB.value = shuffled[1];
+  toast('🎲 Tim A vs Tim B diacak');
+}
+function randomizePesertaGanda(eventId, katId){
+  const sel1 = document.getElementById('addPesertaSel1');
+  const sel2 = document.getElementById('addPesertaSel2');
+  if(!sel1 || !sel2) return;
+  const ev = getEvent(eventId), kat = ev && ev.kategori.find(k => k.id === katId);
+  if(!kat) return;
+  const avail = [...sel1.options].map(o => o.value).filter(Boolean);
+  if(avail.length < 2){ toast('Tidak cukup pemain tersedia'); return; }
+  const isMix = kat.gender === 'campuran';
+  if(isMix){
+    const players = avail.map(id => PEMAIN.find(p => p.id === id)).filter(Boolean);
+    const putra = players.filter(p => p.gender === 'putra');
+    const putri = players.filter(p => p.gender === 'putri');
+    if(!putra.length || !putri.length){ toast('Ganda campuran butuh min 1 putra & 1 putri'); return; }
+    sel1.value = putra[Math.floor(Math.random() * putra.length)].id;
+    sel2.value = putri[Math.floor(Math.random() * putri.length)].id;
+  } else {
+    const shuffled = fisherYatesShuffle(avail);
+    sel1.value = shuffled[0];
+    sel2.value = shuffled[1];
+  }
+  toast('🎲 Pasangan diacak');
+}
+function randomizeSinglePeserta(eventId, katId){
+  const sel = document.getElementById('addPesertaSel');
+  if(!sel) return;
+  const avail = [...sel.options].map(o => o.value).filter(Boolean);
+  if(!avail.length){ toast('Tidak ada peserta tersedia'); return; }
+  sel.value = avail[Math.floor(Math.random() * avail.length)];
+  toast('🎲 Peserta dipilih acak');
+}
+async function randomizeAndRegenerate(eventId, katId){
+  const ev = getEvent(eventId), kat = ev && ev.kategori.find(k => k.id === katId);
+  if(!kat){ toast('Kategori tidak ditemukan'); return; }
+  if((kat.peserta || []).length < 2){ toast('Minimal 2 peserta untuk diacak'); return; }
+  if(!confirm('🎲 ACAK URUTAN PESERTA & REGENERATE JADWAL?\n\n• Urutan peserta di kategori ini akan diacak\n• Jadwal di-regenerate dari awal\n• Skor yang cocok akan dipertahankan\n• Untuk sistem gugur/penyisihan: matchup jadi acak\n\nLanjutkan?')) return;
+  kat.peserta = fisherYatesShuffle(kat.peserta);
+  const result = await autoRegenerateSchedule(eventId, katId);
+  renderAdminView(state.view);
+  renderPublic();
+  toast(`🎲 Urutan diacak & regenerate — ${result.count} pertandingan`);
+}
+/* ============================================================ */
 
 async function regenerateManual(eventId, katId){
   const ev = getEvent(eventId); const kat = ev && ev.kategori.find(k => k.id === katId);
@@ -2458,7 +2526,7 @@ function editMatch(id){
   const pesertaOptsB=buildOpts(m?m.timB:null);
   let partaiList;if(m){partaiList=m.partai;}else{partaiList=makePartaiDefault(kat,kat.peserta[0]||'',kat.peserta[1]||'');}
   const partaiHtml=partaiList.map((p,pi)=>renderPartaiEditorHTML(p,pi,kat.tipe==='beregu')).join('');
-  const body=`<form id="matchForm"><input type="hidden" name="id" value="${m?m.id:''}"><div class="form-grid"><div class="field"><label>Kegiatan</label><select name="eventId">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div><div class="field"><label>Kategori</label><select name="kategoriId">${katOpts}</select></div><div class="field"><label>Tanggal (Hari / Tgl)</label><input name="tgl" value="${m?esc((m.hari?m.hari+' / ':'')+(m.tgl||'')):''}" placeholder="Senin / 10 Juni 2025"></div><div class="field"><label>Jam</label><input name="jam" value="${m?esc(m.jam||''):'08.00'}"></div><div class="field full"><label>Babak</label><input name="babakLabel" value="${m?esc(m.babakLabel||''):'Ronde 1'}"></div><div class="field"><label>Tim/Pemain A</label><select name="timA">${pesertaOpts}</select></div><div class="field"><label>Tim/Pemain B</label><select name="timB">${pesertaOptsB}</select></div></div>
+  const body=`<form id="matchForm"><input type="hidden" name="id" value="${m?m.id:''}"><div class="form-grid"><div class="field"><label>Kegiatan</label><select name="eventId">${EVENTS.map(e=>`<option value="${e.id}" ${e.id===ev.id?'selected':''}>${esc(e.nama)}</option>`).join('')}</select></div><div class="field"><label>Kategori</label><select name="kategoriId">${katOpts}</select></div><div class="field"><label>Tanggal (Hari / Tgl)</label><input name="tgl" value="${m?esc((m.hari?m.hari+' / ':'')+(m.tgl||'')):''}" placeholder="Senin / 10 Juni 2025"></div><div class="field"><label>Jam</label><input name="jam" value="${m?esc(m.jam||''):'08.00'}"></div><div class="field full"><label>Babak</label><input name="babakLabel" value="${m?esc(m.babakLabel||''):'Ronde 1'}"></div><div class="field full" style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end"><div><label>Tim/Pemain A</label><select name="timA">${pesertaOpts}</select></div><div><label>Tim/Pemain B</label><select name="timB">${pesertaOptsB}</select></div><button type="button" class="btn-ghost" onclick="randomizeTimMatch()" title="Acak Tim A vs B" style="height:38px;padding:8px 14px;font-size:14px">🎲</button></div></div>
     <div class="admin-subhead">Partai — Nama Pemain &amp; Skor</div>
     <div id="partaiEditorsContainer">${partaiHtml}</div>
     <div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn-ghost" onclick="closeAdminForm()">Batal</button><button type="submit" class="btn-primary" style="flex:1">Simpan</button></div></form>`;
