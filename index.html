@@ -2380,9 +2380,17 @@ function manageBereguPeserta(eventId, katId){
   const ev = getEvent(eventId);
   const kat = ev && ev.kategori.find(k => k.id === katId);
   if(!kat) return;
+  
+  const isPool = kat.sistem === 'pool';
   const catSport = kat.sport || null;
   const isMix = kat.gender === 'campuran';
   const onTeam = getPlayersAlreadyOnTeam(kat);
+
+  if(isPool){ 
+    ensurePools(kat); 
+    autoAssignPools(kat); 
+  }
+  if(!kat.poolAssignment) kat.poolAssignment = {};
 
   const availablePlayers = PEMAIN.filter(p => {
     if(onTeam.has(p.id)) return false;
@@ -2393,9 +2401,12 @@ function manageBereguPeserta(eventId, katId){
 
   const spInfo = kat.sport ? getSport(kat.sport) : null;
   const notes = [];
-  if(spInfo) notes.push(`<div class="manual-note" style="background:color-mix(in srgb,${getSportColor(spInfo.id)} 8%,transparent);border-left-color:${getSportColor(spInfo.id)}">🏅 Kategori khusus <b>${spInfo.icon} ${esc(spInfo.nama)}</b>. Pemain yang bisa ditambahkan hanya dari cabor ini.</div>`);
-  if(isMix) notes.push(`<div class="manual-note" style="background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 8%,transparent),color-mix(in srgb,var(--pink) 8%,transparent));border-left-color:var(--purple)">⚤ <b>Campuran / Mix</b> — pemain putra & putri bisa bergabung dalam satu tim.</div>`);
+  if(spInfo) notes.push(`<div class="manual-note" style="background:color-mix(in srgb,${getSportColor(spInfo.id)} 8%,transparent);border-left-color:${getSportColor(spInfo.id)}">🏅 Kategori khusus <b>${spInfo.icon} ${esc(spInfo.nama)}</b>.</div>`);
+  if(isMix) notes.push(`<div class="manual-note" style="background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 8%,transparent),color-mix(in srgb,var(--pink) 8%,transparent));border-left-color:var(--purple)">⚤ <b>Campuran / Mix</b> — pemain putra &amp; putri bisa bergabung dalam satu tim.</div>`);
+  if(isPool) notes.push(`<div class="auto-note">🏊 <b>Sistem Pool</b> — pilih pool saat membuat tim, atau pindahkan tim antar pool dengan tombol ← →. Klik <b>🎲 Bagi Otomatis ke Pool</b> untuk reset &amp; bagi ulang.</div>`);
   const notesHtml = notes.join('');
+
+  const poolsData = isPool ? getPools(kat) : [];
 
   const teamsHtml = kat.customTeams.length ? kat.customTeams.map(team => {
     const rosterChips = (team.players||[]).map(pid => {
@@ -2404,9 +2415,19 @@ function manageBereguPeserta(eventId, katId){
       const t = tim(p.team);
       return `<span class="peserta-chip"><span class="c" style="background:${t.warna}"></span>${esc(p.nama)}<span class="m-tag" style="background:var(--panel);color:var(--muted);margin-left:4px">${esc(t.singkat)}</span></span>`;
     }).join('') || '<span class="peserta-empty">Belum ada pemain — klik ✏️ untuk menambah.</span>';
+    
+    const poolId = isPool ? kat.poolAssignment[team.id] : null;
+    let poolBadge = '';
+    if(isPool){
+      poolBadge = poolId 
+        ? `<span class="chip pool" style="font-size:10px">🏊 ${esc(getPoolName(kat, poolId))}</span>` 
+        : `<span class="chip" style="font-size:10px;color:var(--orange)">⚠ Belum di pool</span>`;
+    }
+    
     return `<div style="border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2);margin-bottom:8px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
         <span style="font-weight:800;font-size:13px;flex:1">${esc(team.nama)}</span>
+        ${poolBadge}
         <span class="chip" style="font-size:10px">${(team.players||[]).length} pemain</span>
         <button class="icon-act" onclick="openEditTeam('${eventId}','${katId}','${team.id}')" title="Edit tim">✏️</button>
         <button class="icon-act del" onclick="removeTeam('${eventId}','${katId}','${team.id}')" title="Hapus tim">🗑️</button>
@@ -2415,8 +2436,19 @@ function manageBereguPeserta(eventId, katId){
     </div>`;
   }).join('') : `<div class="empty" style="padding:24px;margin-bottom:12px"><div class="big">👥</div><p>Belum ada tim. Klik <b>➕ Buat Tim Baru</b> untuk memulai.</p></div>`;
 
+  const poolSelectNew = isPool 
+    ? `<div class="field"><label>Pool (opsional)</label>
+        <select id="newTeamPool">
+          <option value="">🎲 Auto (bagi otomatis)</option>
+          ${poolsData.map(({pool}) => `<option value="${esc(pool.id)}">${esc(pool.nama)}</option>`).join('')}
+        </select>
+        <small>Kosongkan untuk auto · atau pilih pool langsung saat membuat tim.</small>
+      </div>` 
+    : '';
+
   const newTeamFormHtml = `<div id="newTeamForm" style="display:none;border:1px solid var(--accent);border-radius:10px;padding:14px;margin-bottom:14px;background:color-mix(in srgb,var(--accent) 4%,var(--panel2))">
     <div class="field"><label>Nama Tim</label><input id="newTeamNameInput" placeholder="Contoh: Tim PA Mamuju"></div>
+    ${poolSelectNew}
     <div class="admin-subhead" style="margin-top:6px">Pilih Pemain (<span id="newTeamCount">0</span>)</div>
     <div style="max-height:320px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">
       ${availablePlayers.map(p => {
@@ -2434,14 +2466,43 @@ function manageBereguPeserta(eventId, katId){
     </div>
   </div>`;
 
-  const catMatches=MATCHES.filter(m=>m.eventId===eventId&&m.kategoriId===katId);
+  let poolUI = '';
+  if(isPool){
+    poolUI = `<div class="admin-subhead" style="margin-top:16px">📍 Penempatan Pool</div>
+      <div class="pool-assign-grid">
+        ${poolsData.map(({pool,peserta},pi) => `
+          <div class="pool-assign-card">
+            <div class="pool-assign-head">🏊 ${esc(pool.nama)} <span class="count">${peserta.length}</span></div>
+            <div class="pool-assign-list">
+              ${peserta.map(pid => {
+                const info = getPesertaInfo(pid, kat);
+                const prevBtn = pi > 0 
+                  ? `<button class="mv-btn" onclick="movePesertaPool('${eventId}','${katId}','${esc(pid)}','${esc(poolsData[pi-1].pool.id)}')" title="← ${esc(poolsData[pi-1].pool.nama)}">←</button>` 
+                  : '<button class="mv-btn disabled">←</button>';
+                const nextBtn = pi < poolsData.length-1 
+                  ? `<button class="mv-btn" onclick="movePesertaPool('${eventId}','${katId}','${esc(pid)}','${esc(poolsData[pi+1].pool.id)}')" title="→ ${esc(poolsData[pi+1].pool.nama)}">→</button>` 
+                  : '<button class="mv-btn disabled">→</button>';
+                return `<div class="pool-member"><span class="c" style="background:${info.warna}"></span><span class="pool-member-name">${esc(info.nama)}</span><div class="pool-member-actions">${prevBtn}${nextBtn}</div></div>`;
+              }).join('') || '<span class="peserta-empty">Kosong</span>'}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn-ghost" onclick="autoAssignAllPools('${eventId}','${katId}')">🎲 Bagi Otomatis ke Pool</button>
+        <span class="muted" style="font-size:11.5px">← → pindah antar pool · Total: ${poolsData.reduce((n,p)=>n+p.peserta.length,0)} tim di pool</span>
+      </div>`;
+  }
+
+  const catMatches = MATCHES.filter(m => m.eventId === eventId && m.kategoriId === katId);
   const body = `<div>
-    <div class="auto-note">ℹ️ <b>Beregu / Tim</b> — buat tim dengan memilih pemain dari daftar global. Satu tim bisa berisi pemain dari berbagai satker. Setelah dibuat, tim otomatis jadi peserta kategori ini.</div>
+    <div class="auto-note">ℹ️ <b>Beregu / Tim</b> — buat tim dari pool pemain global. Satu tim bisa berisi pemain dari berbagai satker.</div>
     ${notesHtml}
     <div class="admin-subhead" style="margin-top:0">Daftar Tim (${kat.customTeams.length})</div>
     ${teamsHtml}
     ${newTeamFormHtml}
     <button class="btn-primary" style="width:auto;margin-bottom:14px" onclick="toggleNewTeamForm()">➕ Buat Tim Baru</button>
+    ${poolUI}
     <div class="admin-subhead">Status</div>
     <div style="font-size:12px;color:var(--muted)">${catMatches.length===0?`<span style="font-style:italic">Belum ada jadwal.</span>`:`<span style="color:var(--accent);font-weight:700">✓ ${catMatches.length} pertandingan</span>`}</div>
     <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap">
@@ -2480,9 +2541,13 @@ async function saveNewTeam(eventId, katId){
   const kat = ev.kategori.find(k => k.id === katId);
   if(!kat) return;
   if(!kat.customTeams) kat.customTeams = [];
+  if(!kat.poolAssignment) kat.poolAssignment = {};
   const newId = 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
   kat.customTeams.push({ id: newId, nama: name, players: playerIds });
   kat.peserta.push(newId);
+  // Assign ke pool jika user memilih pool saat membuat tim
+  const poolSel = document.getElementById('newTeamPool');
+  if(poolSel && poolSel.value){ kat.poolAssignment[newId] = poolSel.value; }
   const result = await autoRegenerateSchedule(eventId, katId);
   manageBereguPeserta(eventId, katId);
   renderPublic();
@@ -2509,6 +2574,8 @@ function openEditTeam(eventId, katId, teamId){
   if(!kat) return;
   const team = (kat.customTeams||[]).find(t => t.id === teamId);
   if(!team) return;
+  const isPool = kat.sistem === 'pool';
+  if(isPool) ensurePools(kat);
   const catSport = kat.sport || null;
   const onTeam = getPlayersAlreadyOnTeam(kat, teamId);
   const availablePlayers = PEMAIN.filter(p => {
@@ -2517,8 +2584,19 @@ function openEditTeam(eventId, katId, teamId){
     if(kat.gender && kat.gender !== 'campuran' && p.gender !== kat.gender) return false;
     return true;
   });
+  const currentPoolId = isPool ? ((kat.poolAssignment||{})[teamId] || '') : '';
+  const poolSelect = isPool 
+    ? `<div class="field"><label>Pool</label>
+        <select id="editTeamPool">
+          <option value="">🎲 Auto (bagi otomatis)</option>
+          ${(kat.pools||[]).map(p => `<option value="${esc(p.id)}" ${currentPoolId===p.id?'selected':''}>${esc(p.nama)}</option>`).join('')}
+        </select>
+        <small>Pilih pool untuk tim ini, atau Auto untuk dibagi otomatis.</small>
+      </div>` 
+    : '';
   const body = `
     <div class="field"><label>Nama Tim</label><input id="editTeamNameInput" value="${esc(team.nama)}"></div>
+    ${poolSelect}
     <div class="admin-subhead" style="margin-top:6px">Pilih Pemain (<span id="editTeamCount">${(team.players||[]).length}</span>)</div>
     <div style="max-height:320px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">
       ${availablePlayers.map(p => {
@@ -2552,6 +2630,15 @@ async function saveEditTeam(eventId, katId, teamId){
   if(!team) return;
   team.nama = name;
   team.players = playerIds;
+  // Update pool assignment jika kategori sistem Pool
+  if(kat.sistem === 'pool'){
+    if(!kat.poolAssignment) kat.poolAssignment = {};
+    const poolSel = document.getElementById('editTeamPool');
+    if(poolSel){
+      if(poolSel.value){ kat.poolAssignment[teamId] = poolSel.value; }
+      else { delete kat.poolAssignment[teamId]; }
+    }
+  }
   const result = await autoRegenerateSchedule(eventId, katId);
   manageBereguPeserta(eventId, katId);
   renderPublic();
